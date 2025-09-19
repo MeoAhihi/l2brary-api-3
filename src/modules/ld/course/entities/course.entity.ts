@@ -81,6 +81,10 @@ export class Course {
     // enrollmentDeadline is inclusive (can enroll until the end of the day)
     const deadline = new Date(this.enrollmentDeadline);
     deadline.setHours(23, 59, 59, 999);
+
+    // TODO: is not full
+
+    
     return now <= deadline;
   }
 

@@ -11,6 +11,9 @@ import {
 import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
 import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
 import { EnrollmentService } from "./enrollment.service";
+import { EnrollmentStatusEnum } from "./types/enrollment-status.enum";
+import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ManageEnrollmentDto } from "./dto/manage-enrollment.dto";
 
 @Controller("enrollment")
 export class EnrollmentController {
@@ -23,8 +26,34 @@ export class EnrollmentController {
   }
 
   @Get()
-  findAll() {
-    return this.enrollmentService.findAll();
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Page number",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Items per page",
+  })
+  @ApiQuery({
+    name: "courseId",
+    required: false,
+    type: String,
+    description: "Filter by course ID",
+  })
+  findAll(
+    @Query("page") page?: number,
+    @Query("limit") limit?: number,
+    @Query("courseId") courseId?: string
+  ) {
+    return this.enrollmentService.findAll({
+      page,
+      limit,
+      courseId,
+    });
   }
 
   @Get(":id")
@@ -33,11 +62,11 @@ export class EnrollmentController {
   }
 
   @Patch(":id")
-  update(
+  manageEnrollment(
     @Param("id") id: string,
-    @Body() updateEnrollmentDto: UpdateEnrollmentDto
+    @Body() manageEnrollmentDto: ManageEnrollmentDto
   ) {
-    return this.enrollmentService.update(+id, updateEnrollmentDto);
+    return this.enrollmentService.update(+id, manageEnrollmentDto.status);
   }
 
   @Delete(":id")

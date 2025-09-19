@@ -1,7 +1,11 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserService } from "src/modules/iam/user/user.service";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 import { CourseService } from "../course/course.service";
 import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
 import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
@@ -20,12 +24,52 @@ export class EnrollmentService {
     return "This action adds a new enrollment";
   }
 
-  findAll() {
-    return `This action returns all enrollment`;
+  async findAll({
+    page = 1,
+    limit = 10,
+    courseId,
+  }: {
+    page?: number;
+    limit?: number;
+    courseId?: string;
+  } = {}): Promise<{
+    items: Enrollment[];
+    total: number;
+    page: number;
+    limit: number;
+    pageCount: number;
+  }> {
+    const where: FindOptionsWhere<Enrollment> = {};
+    if (courseId) {
+      where.course = { id: courseId };
+    }
+
+    const [items, total] = await this.enrollmentRepository.findAndCount({
+      where,
+      relations: ["user", "course"],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { id: "DESC" },
+    });
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pageCount: Math.ceil(total / limit),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} enrollment`;
+  async findOne(id: number): Promise<Enrollment> {
+    const enrollment = await this.enrollmentRepository.findOne({
+      where: { id },
+      relations: ["user", "course"],
+    });
+    if (!enrollment) {
+      throw new NotFoundException(`Enrollment with id ${id} not found`);
+    }
+    return enrollment;
   }
 
   update(id: number, updateEnrollmentDto: UpdateEnrollmentDto) {
@@ -79,5 +123,18 @@ export class EnrollmentService {
       },
     });
     return !!enrollment;
+  }
+
+  async manageEnrollment(id: number, status: EnrollmentStatusEnum) {
+    // Find the enrollment by ID
+    const enrollment = await this.findOne(id);
+
+    // Update the status
+    enrollment.status = status;
+
+    // Save the updated enrollment
+    await this.enrollmentRepository.save(enrollment);
+
+    return enrollment;
   }
 }
