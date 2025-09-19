@@ -7,6 +7,7 @@ import { UserModule } from "./modules/iam/user/user.module";
 import { CourseModule } from "./modules/ld/course/course.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Logger } from "@nestjs/common";
+import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { Logger } from "@nestjs/common";
         },
       }),
     }),
+    EnrollmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
