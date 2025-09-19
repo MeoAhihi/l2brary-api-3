@@ -8,6 +8,8 @@ import { CourseModule } from "./modules/ld/course/course.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Logger } from "@nestjs/common";
 import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
+import { ActivityModule } from './modules/ae/activity/activity.module';
+import { GamificationModule } from './modules/ae/gamification/gamification.module';
 
 @Module({
   imports: [
@@ -18,27 +20,29 @@ import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
     DatabaseModule,
     UserModule,
     CourseModule,
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get<string>("MONGODB_DATABASE_URL") ?? "",
-        connectionFactory: (connection) => {
-          const logger = new Logger("MongooseConnection");
-          connection.on("connected", () => {
-            logger.log("MongoDB connected");
-          });
-          connection.on("disconnected", () => {
-            logger.warn("MongoDB disconnected");
-          });
-          connection.on("reconnected", () => {
-            logger.log("MongoDB reconnected");
-          });
-          return connection;
-        },
-      }),
-    }),
+    // MongooseModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => ({
+    //     uri: configService.get<string>("MONGODB_DATABASE_URL") ?? "",
+    //     connectionFactory: (connection) => {
+    //       const logger = new Logger("MongooseConnection");
+    //       connection.on("connected", () => {
+    //         logger.log("MongoDB connected");
+    //       });
+    //       connection.on("disconnected", () => {
+    //         logger.warn("MongoDB disconnected");
+    //       });
+    //       connection.on("reconnected", () => {
+    //         logger.log("MongoDB reconnected");
+    //       });
+    //       return connection;
+    //     },
+    //   }),
+    // }),
     EnrollmentModule,
+    ActivityModule,
+    GamificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
