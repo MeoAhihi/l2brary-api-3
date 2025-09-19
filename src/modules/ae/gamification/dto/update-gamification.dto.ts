@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateGamificationDto } from './create-gamification.dto';
+import { PartialType } from "@nestjs/swagger";
 
-export class UpdateGamificationDto extends PartialType(CreateGamificationDto) {}
+export class UpdateGamificationDto {}

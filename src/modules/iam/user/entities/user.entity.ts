@@ -1,4 +1,5 @@
 import { Exclude, Expose } from "class-transformer";
+import { ActivityLog } from "src/modules/ae/gamification/entities/activity-log.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -6,6 +7,7 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
 
 export enum Gender {
@@ -50,6 +52,12 @@ export class User {
   @Column()
   @Exclude()
   password: string;
+
+  // Activity logs for gamification
+  // A user can have many activity logs
+  // (see src/modules/ae/gamification/entities/activity-log.entity.ts)
+  @OneToMany(() => ActivityLog, (activityLog) => activityLog.user)
+  activityLogs: ActivityLog[];
 
   @CreateDateColumn()
   @Expose()

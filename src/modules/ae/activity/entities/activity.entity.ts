@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { ActivityLog } from "../../gamification/entities/activity-log.entity";
 
 @Entity()
 export class Activity {
@@ -13,4 +14,7 @@ export class Activity {
 
   @Column()
   category: string;
+
+  @OneToMany(() => ActivityLog, (activityLog) => activityLog.activity)
+  activityLogs: ActivityLog[];
 }
