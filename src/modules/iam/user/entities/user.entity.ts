@@ -1,5 +1,6 @@
 import { Exclude, Expose } from "class-transformer";
 import { ActivityLog } from "src/modules/ae/gamification/entities/activity-log.entity";
+import { Article } from "src/modules/kn/article/entities/article.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -53,12 +54,6 @@ export class User {
   @Exclude()
   password: string;
 
-  // Activity logs for gamification
-  // A user can have many activity logs
-  // (see src/modules/ae/gamification/entities/activity-log.entity.ts)
-  @OneToMany(() => ActivityLog, (activityLog) => activityLog.user)
-  activityLogs: ActivityLog[];
-
   @CreateDateColumn()
   @Expose()
   createdAt: Date;
@@ -70,4 +65,10 @@ export class User {
   @DeleteDateColumn()
   @Exclude()
   deletedAt: Date;
+
+  @OneToMany(() => ActivityLog, (activityLog) => activityLog.user)
+  activityLogs: ActivityLog[];
+
+  @OneToMany(() => Article, (article) => article.author)
+  articles: Article[];
 }
