@@ -11,6 +11,7 @@ import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
 import { ActivityModule } from './modules/ae/activity/activity.module';
 import { GamificationModule } from './modules/ae/gamification/gamification.module';
 import { ArticleModule } from './modules/ks/article/article.module';
+import { AnalyticsModule } from './modules/aa/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ArticleModule } from './modules/ks/article/article.module';
     ActivityModule,
     GamificationModule,
     ArticleModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
