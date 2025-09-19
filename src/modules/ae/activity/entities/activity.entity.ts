@@ -1,20 +1,16 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsInt, Min } from "class-validator";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
+@Entity()
 export class Activity {
-  @ApiProperty({ description: "Name of the activity", example: "Quiz" })
-  @IsString()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   name: string;
 
-  @ApiProperty({ description: "Point value for the activity", example: 10 })
-  @IsInt()
-  @Min(0)
+  @Column("int")
   point: number;
 
-  @ApiProperty({
-    description: "Category of the activity",
-    example: "Assessment",
-  })
-  @IsString()
+  @Column()
   category: string;
 }

@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { UpdateActivityDto } from './dto/update-activity.dto';
-
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Activity } from "./entities/activity.entity";
+import { CreateActivityDto } from "./dto/create-activity.dto";
+import { UpdateActivityDto } from "./dto/update-activity.dto";
+import { NotFoundException } from "@nestjs/common";
 @Injectable()
 export class ActivityService {
-  create(createActivityDto: CreateActivityDto) {
-    return 'This action adds a new activity';
+  constructor(
+    @InjectRepository(Activity)
+    private readonly activityRepository: Repository<Activity>
+  ) {}
+
+  async create(createActivityDto: CreateActivityDto): Promise<Activity> {
+    const activity = this.activityRepository.create(createActivityDto);
+    return this.activityRepository.save(activity);
   }
 
-  findAll() {
-    return `This action returns all activity`;
+  async findAll(): Promise<Activity[]> {
+    return this.activityRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} activity`;
+  async findOne(id: number): Promise<Activity> {
+    const activity = await this.activityRepository.findOneBy({ id });
+    if (!activity) {
+      throw new NotFoundException(`Activity with id ${id} not found`);
+    }
+    return activity;
   }
 
-  update(id: number, updateActivityDto: UpdateActivityDto) {
-    return `This action updates a #${id} activity`;
+  async update(
+    id: number,
+    updateActivityDto: UpdateActivityDto
+  ): Promise<Activity> {
+    const activity = await this.findOne(id);
+    Object.assign(activity, updateActivityDto);
+    return this.activityRepository.save(activity);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} activity`;
+  async remove(id: number): Promise<void> {
+    await this.activityRepository.delete(id);
+  }
+
+  async getCategories(): Promise<string[]> {
+    const categories = await this.activityRepository
+      .createQueryBuilder("activity")
+      .select("activity.category", "category")
+      // .distinct(true)
+      .getRawMany();
+    return categories.map<string>((c) => c.category);
   }
 }
