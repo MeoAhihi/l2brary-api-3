@@ -57,6 +57,9 @@ export class Course {
   @Column({ type: "json" })
   scheduleDetail: ScheduleDetail;
 
+  @Column({ type: "text", nullable: true })
+  chatGroupUrl: string;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;
 
@@ -84,7 +87,6 @@ export class Course {
 
     // TODO: is not full
 
-    
     return now <= deadline;
   }
 

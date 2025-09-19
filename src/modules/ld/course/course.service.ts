@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { Course } from "./entities/course.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, Repository } from "typeorm";
-import { ScheduleType } from "./types/schedule.types";
+import { ScheduleDetail, ScheduleType } from "./types/schedule.types";
 @Injectable()
 export class CourseService {
   constructor(
@@ -12,8 +16,86 @@ export class CourseService {
     private readonly courseRepository: Repository<Course>
   ) {}
 
-  create(createCourseDto: CreateCourseDto) {
-    return "This action adds a new course";
+  isValidateSchedule(
+    scheduleType: ScheduleType,
+    scheduleDetail: ScheduleDetail
+  ): boolean {
+    // Check if scheduleDetail matches the expected structure for the given scheduleType
+    if (!scheduleDetail || !scheduleType) {
+      return false;
+    }
+
+    switch (scheduleType) {
+      case ScheduleType.WEEKLY:
+        // Should have daysOfWeek as a non-empty array of Weekday
+        return (
+          Array.isArray((scheduleDetail as any).daysOfWeek) &&
+          (scheduleDetail as any).daysOfWeek.length > 0 &&
+          (scheduleDetail as any).daysOfWeek.every(
+            (d: any) =>
+              Object.values(ScheduleType).includes(d) || // fallback, but should be Weekday
+              [
+                "MONDAY",
+                "TUESDAY",
+                "WEDNESDAY",
+                "THURSDAY",
+                "FRIDAY",
+                "SATURDAY",
+                "SUNDAY",
+              ].includes(d)
+          )
+        );
+      case ScheduleType.MONTHLY:
+      case ScheduleType.LUNAR_MONTHLY:
+        // Should have daysOfMonth as a non-empty array of numbers between 1 and 31
+        return (
+          Array.isArray((scheduleDetail as any).daysOfMonth) &&
+          (scheduleDetail as any).daysOfMonth.length > 0 &&
+          (scheduleDetail as any).daysOfMonth.every(
+            (d: any) => typeof d === "number" && d >= 1 && d <= 31
+          )
+        );
+      case ScheduleType.ONE_TIME:
+        // Should have dates as a non-empty array of Date or date strings
+        return (
+          Array.isArray((scheduleDetail as any).dates) &&
+          (scheduleDetail as any).dates.length > 0 &&
+          (scheduleDetail as any).dates.every(
+            (d: any) =>
+              d instanceof Date ||
+              (typeof d === "string" && !isNaN(Date.parse(d)))
+          )
+        );
+      default:
+        return false;
+    }
+  }
+
+  async create(createCourseDto: CreateCourseDto): Promise<Course> {
+    // Check if scheduleDetail matches the expected structure for the given scheduleType
+    const { scheduleType, scheduleDetail } = createCourseDto;
+    if (!this.isValidateSchedule(scheduleType, scheduleDetail)) {
+      throw new ConflictException(
+        "Invalid scheduleDetail for the given scheduleType"
+      );
+    }
+
+    // Transform enrollmentDeadlineDate, startDate, endDate from string to Date
+    if (createCourseDto.enrollmentDeadlineDate) {
+      (createCourseDto as any).enrollmentDeadline = new Date(
+        createCourseDto.enrollmentDeadlineDate
+      );
+      delete (createCourseDto as any).enrollmentDeadlineDate;
+    }
+    if (createCourseDto.startDate) {
+      (createCourseDto as any).startDate = new Date(createCourseDto.startDate);
+    }
+    if (createCourseDto.endDate) {
+      (createCourseDto as any).endDate = new Date(createCourseDto.endDate);
+    }
+
+    const course = this.courseRepository.create(createCourseDto);
+    return await this.courseRepository.save(course);
   }
 
   async findAll({
