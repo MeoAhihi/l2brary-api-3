@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { User } from "src/modules/iam/user/entities/user.entity";
 import { Course } from "../../course/entities/course.entity";
-import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
+import { EnrollmentStatusEnum } from "../../types/enrollment-status.enum";
 
 @Entity()
 export class Enrollment {
