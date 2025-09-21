@@ -8,6 +8,7 @@ import { CourseModule } from "./modules/ld/course/course.module";
 import { MongooseModule } from "@nestjs/mongoose";
 import { Logger } from "@nestjs/common";
 import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
+import { SessionModule } from './modules/ld/session/session.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
       }),
     }),
     EnrollmentModule,
+    SessionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
