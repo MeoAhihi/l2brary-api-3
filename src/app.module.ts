@@ -9,6 +9,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Logger } from "@nestjs/common";
 import { EnrollmentModule } from './modules/ld/enrollment/enrollment.module';
 import { SessionModule } from './modules/ld/session/session.module';
+import { GameModule } from './modules/ld/game/game.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { SessionModule } from './modules/ld/session/session.module';
     }),
     EnrollmentModule,
     SessionModule,
+    GameModule,
   ],
   controllers: [AppController],
   providers: [AppService],
