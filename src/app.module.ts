@@ -14,6 +14,7 @@ import { ArticleModule } from "./modules/ks/article/article.module";
 import { AnalyticsModule } from "./modules/aa/analytics/analytics.module";
 import { SessionModule } from "./modules/ld/session/session.module";
 import { GameModule } from "./modules/ld/game/game.module";
+import { AuthenticationModule } from './modules/iam/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { GameModule } from "./modules/ld/game/game.module";
     AnalyticsModule,
     SessionModule,
     GameModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
