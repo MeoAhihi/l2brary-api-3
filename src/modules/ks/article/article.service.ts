@@ -25,6 +25,8 @@ export class ArticleService {
       author,
       tags: createArticleDto.tags,
       isPublished: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
     return this.articleRepository.save(article);
   }
@@ -138,6 +140,7 @@ export class ArticleService {
 
     // Update fields
     Object.assign(article, updateArticleDto);
+    article.updatedAt = new Date()
 
     await this.articleRepository.save(article);
 

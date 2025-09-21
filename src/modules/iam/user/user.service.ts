@@ -20,6 +20,8 @@ export class UserService {
     const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
     return this.userRepository.save(user);
   }
@@ -42,6 +44,7 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
+    user.updatedAt = new Date();
     Object.assign(user, updateUserDto);
     return this.userRepository.save(user);
   }

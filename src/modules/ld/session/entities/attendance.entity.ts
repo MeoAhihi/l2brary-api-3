@@ -21,10 +21,8 @@ export class Attendance {
 
   @Column({
     name: "attend_time",
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP",
   })
-  attendTime: Date;
+  attendTime: Date ;
 
   @ManyToOne(() => Session, (session) => session.attendances)
   session: Session;

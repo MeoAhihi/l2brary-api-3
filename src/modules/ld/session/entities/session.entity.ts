@@ -6,7 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { Course } from "../../course/entities/course.entity";
 import { Game } from "../../game/entities/game.entity";
@@ -32,12 +32,12 @@ export class Session {
   course: Course;
 
   @Expose()
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column()
   startTime: Date;
 
   @Expose()
   @Column()
-  endTime: Date;
+  endTime?: Date;
 
   @Expose()
   @Column()
@@ -65,14 +65,23 @@ export class Session {
   get status(): SessionStatus {
     const now = new Date();
     const start = new Date(this.startTime);
-    const end = new Date(this.endTime);
 
-    if (now < start) {
-      return SessionStatus.SCHEDULED;
-    } else if (now >= start && now <= end) {
-      return SessionStatus.ONGOING;
-    } else if (now > end) {
-      return SessionStatus.COMPLETED;
+    if (!this.endTime) {
+      // If there's no end time, just check if the session has started yet
+      if (now < start) {
+        return SessionStatus.SCHEDULED;
+      } else {
+        return SessionStatus.ONGOING;
+      }
+    } else {
+      const end = new Date(this.endTime);
+      if (now < start) {
+        return SessionStatus.SCHEDULED;
+      } else if (now >= start && now <= end) {
+        return SessionStatus.ONGOING;
+      } else if (now > end) {
+        return SessionStatus.COMPLETED;
+      }
     }
     return SessionStatus.SCHEDULED;
   }
@@ -94,6 +103,4 @@ export class Session {
     }
     return this.games.length;
   }
-
-  
 }

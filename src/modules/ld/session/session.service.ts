@@ -73,13 +73,13 @@ export class SessionService {
   ): Promise<Session> {
     const session = await this.findOne(id);
     Object.assign(session, updateSessionDto);
+    session.updatedAt = new Date();
     return this.sessionRepository.save(session);
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.sessionRepository.softDelete(id);
-    if (result.affected === 0) {
-      throw new Error(`Session with id ${id} not found`);
-    }
+    const session = await this.findOne(id);
+    session.deletedAt = new Date();
+    await this.sessionRepository.save(session);
   }
 }

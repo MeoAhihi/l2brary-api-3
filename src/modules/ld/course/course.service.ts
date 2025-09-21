@@ -9,6 +9,7 @@ import { Course } from "./entities/course.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, ILike, Repository } from "typeorm";
 import { ScheduleDetail, ScheduleType } from "./types/schedule.types";
+import { UTC7EndOfDate, UTC7StartOfDate } from "src/common/datetime.utils";
 @Injectable()
 export class CourseService {
   constructor(
@@ -82,19 +83,23 @@ export class CourseService {
 
     // Transform enrollmentDeadlineDate, startDate, endDate from string to Date
     if (createCourseDto.enrollmentDeadlineDate) {
-      (createCourseDto as any).enrollmentDeadline = new Date(
+      (createCourseDto as any).enrollmentDeadline = UTC7EndOfDate(
         createCourseDto.enrollmentDeadlineDate
       );
       delete (createCourseDto as any).enrollmentDeadlineDate;
     }
     if (createCourseDto.startDate) {
-      (createCourseDto as any).startDate = new Date(createCourseDto.startDate);
+      (createCourseDto as any).startDate = UTC7StartOfDate(
+        createCourseDto.startDate
+      );
     }
     if (createCourseDto.endDate) {
-      (createCourseDto as any).endDate = new Date(createCourseDto.endDate);
+      (createCourseDto as any).endDate = UTC7EndOfDate(createCourseDto.endDate);
     }
 
     const course = this.courseRepository.create(createCourseDto);
+    course.createdAt = new Date();
+    course.updatedAt = new Date();
     return await this.courseRepository.save(course);
   }
 

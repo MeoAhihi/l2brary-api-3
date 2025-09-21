@@ -13,6 +13,7 @@ import { Type } from "class-transformer";
 import { ScheduleType, ScheduleDetail, Weekday } from "../types/schedule.types";
 
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsDateFormat } from "src/common/datetime.utils";
 
 export class CreateCourseDto {
   @ApiProperty({
@@ -87,9 +88,7 @@ export class CreateCourseDto {
     example: "2024-06-10",
   })
   @IsOptional()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: "Date must be in the format YYYY-MM-DD",
-  })
+  @IsDateFormat()
   enrollmentDeadlineDate?: string;
 
   @ApiProperty({ description: "Course group", example: "Computer Science" })
@@ -110,9 +109,7 @@ export class CreateCourseDto {
     format: "date",
     example: "2024-06-01",
   })
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: "Date must be in the format YYYY-MM-DD",
-  })
+  @IsDateFormat()
   startDate: string;
 
   @ApiPropertyOptional({
@@ -122,9 +119,7 @@ export class CreateCourseDto {
     example: "2024-08-01",
   })
   @IsOptional()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: "Date must be in the format YYYY-MM-DD",
-  })
+  @IsDateFormat()
   endDate?: string;
 
   @ApiProperty({

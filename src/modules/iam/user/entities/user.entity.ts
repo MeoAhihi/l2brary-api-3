@@ -38,9 +38,9 @@ export class User {
   @Expose()
   gender: Gender;
 
-  @Column({ type: "date" })
+  @Column()
   @Expose()
-  birthdate: Date;
+  birthdate: string;
 
   @Column()
   @Expose()

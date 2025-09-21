@@ -37,13 +37,15 @@ export class CreateUserDto {
   @ApiPropertyOptional({
     type: String,
     format: "date",
-    example: "1990-01-01",
-    description: "Birthdate of the user",
+    example: "2000-01-01",
+    description: "Birthdate of the user (format: YYYY-MM-DD)",
   })
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  birthdate?: Date;
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "birthdate must be in the format YYYY-MM-DD",
+  })
+  birthdate?: string;
 
   @ApiProperty({
     example: "+1234567890",
