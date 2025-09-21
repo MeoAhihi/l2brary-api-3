@@ -10,12 +10,7 @@ import {
   CreateDateColumn,
   OneToMany,
 } from "typeorm";
-
-export enum Gender {
-  MALE = "male",
-  FEMALE = "female",
-  OTHER = "other",
-}
+import { Gender } from "../../types/gender.enum";
 
 @Entity("user_profiles")
 export class User {
