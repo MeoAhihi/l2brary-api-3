@@ -1,26 +1,31 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
   ManyToOne,
+  OneToOne,
+  JoinColumn,
+  Column,
 } from "typeorm";
 import { Session } from "./session.entity";
+import { User } from "src/modules/iam/user/entities/user.entity";
 
 @Entity("attendance")
 export class Attendance {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  user: string;
+  @OneToOne(() => User)
+  @JoinColumn()
+  user: User;
 
-  @CreateDateColumn({ name: "attend_time" })
+  @Column({
+    name: "attend_time",
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+  })
   attendTime: Date;
 
-  @Column({ type: "enum", enum: ["online", "offline"] })
-  mode: "online" | "offline";
-
-  @ManyToOne(() => Session, (session) => session.attendances, { cascade: true })
+  @ManyToOne(() => Session, (session) => session.attendances)
   session: Session;
 }

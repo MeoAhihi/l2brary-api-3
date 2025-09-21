@@ -1,34 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { SessionService } from './session.service';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from "@nestjs/common";
+import { SessionService } from "./session.service";
+import { CreateSessionDto } from "./dto/create-session.dto";
+import { UpdateSessionDto } from "./dto/update-session.dto";
+import { ApiQuery } from "@nestjs/swagger";
 
-@Controller('session')
+@Controller()
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
-  @Post()
-  create(@Body() createSessionDto: CreateSessionDto) {
-    return this.sessionService.create(createSessionDto);
+  @Post("course/:courseId/session")
+  create(
+    @Param("courseId") courseId: string,
+    @Body() createSessionDto: CreateSessionDto
+  ) {
+    return this.sessionService.create(courseId, createSessionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.sessionService.findAll();
+  @Get("course/:courseId/session")
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Page number for pagination (optional)",
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Number of items per page for pagination (optional)",
+  })
+  findAll(
+    @Param("courseId") courseId: string,
+    @Query("page") page: number,
+    @Query("limit") limit: number
+  ) {
+    // Accepts optional pagination via body (or could be query, but keeping as body for now)
+    return this.sessionService.findAll({
+      courseId,
+      page: page,
+      limit: limit,
+    });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get("session/:id")
+  findOne(@Param("id") id: string) {
     return this.sessionService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSessionDto: UpdateSessionDto) {
+  @Patch("session/:id")
+  update(@Param("id") id: string, @Body() updateSessionDto: UpdateSessionDto) {
     return this.sessionService.update(+id, updateSessionDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete("session/:id")
+  remove(@Param("id") id: string) {
     return this.sessionService.remove(+id);
   }
 }

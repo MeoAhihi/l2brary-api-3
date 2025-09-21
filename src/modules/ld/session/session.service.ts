@@ -1,26 +1,85 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSessionDto } from './dto/create-session.dto';
-import { UpdateSessionDto } from './dto/update-session.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateSessionDto } from "./dto/create-session.dto";
+import { UpdateSessionDto } from "./dto/update-session.dto";
+import { Session } from "./entities/session.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { CourseService } from "../course/course.service";
 
 @Injectable()
 export class SessionService {
-  create(createSessionDto: CreateSessionDto) {
-    return 'This action adds a new session';
+  constructor(
+    // Inject the Session repository for database operations
+    @InjectRepository(Session)
+    private readonly sessionRepository: Repository<Session>,
+    private readonly courseService: CourseService
+  ) {}
+
+  async create(
+    courseId: string,
+    createSessionDto: CreateSessionDto
+  ): Promise<Session> {
+    // Fetch the course entity to ensure it exists and to associate it properly
+    const course = await this.courseService.findOne(courseId);
+
+    const session = this.sessionRepository.create({
+      ...createSessionDto,
+      course: course,
+    });
+
+    return this.sessionRepository.save(session);
   }
 
-  findAll() {
-    return `This action returns all session`;
+  async findAll({
+    courseId,
+    page = 1,
+    limit = 10,
+  }: {
+    courseId: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const skip = (page - 1) * limit;
+    const [sessions, total] = await this.sessionRepository.findAndCount({
+      where: { course: { id: courseId } },
+      skip,
+      take: limit,
+      order: { startTime: "DESC" },
+    });
+
+    return {
+      data: sessions,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} session`;
+  async findOne(id: number): Promise<Session> {
+    const session = await this.sessionRepository.findOne({
+      where: { id },
+      relations: ["course", "attendances", "games"],
+    });
+    if (!session) {
+      throw new NotFoundException(`Session with id ${id} not found`);
+    }
+    return session;
   }
 
-  update(id: number, updateSessionDto: UpdateSessionDto) {
-    return `This action updates a #${id} session`;
+  async update(
+    id: number,
+    updateSessionDto: UpdateSessionDto
+  ): Promise<Session> {
+    const session = await this.findOne(id);
+    Object.assign(session, updateSessionDto);
+    return this.sessionRepository.save(session);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} session`;
+  async remove(id: number): Promise<void> {
+    const result = await this.sessionRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new Error(`Session with id ${id} not found`);
+    }
   }
 }
