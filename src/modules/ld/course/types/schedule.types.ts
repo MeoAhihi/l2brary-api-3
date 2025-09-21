@@ -20,7 +20,7 @@ export interface WeeklySchedule {
 }
 
 export interface MonthlySchedule {
-  dayOfMonth: number; // 1–31
+  daysOfMonth: number[]; // 1–31
 }
 
 export interface OneTimeSchedule {
