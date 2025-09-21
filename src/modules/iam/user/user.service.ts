@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -14,6 +18,16 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    // Check for duplicate phone
+    const existingUser = await this.findByPhoneNumber(
+      createUserDto.phoneNumber
+    );
+    if (existingUser) {
+      throw new ConflictException(
+        `User with phone number ${createUserDto.phoneNumber} already exists`
+      );
+    }
+
     const saltRounds = 10;
     const hashedPassword = await hash(createUserDto.password, saltRounds);
 

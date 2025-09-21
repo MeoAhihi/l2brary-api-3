@@ -1,16 +1,16 @@
-import { Type } from "class-transformer";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
-  IsString,
+  IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsEnum,
-  IsDate,
+  IsString,
   Matches,
-  IsEmail,
   MinLength,
 } from "class-validator";
 import { Gender } from "../entities/user.entity";
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { removePhoneHeadCode } from "src/common/phone-number.utils";
+import { Transform } from "class-transformer";
 
 export class CreateUserDto {
   @ApiProperty({ example: "John Doe", description: "Full name of the user" })
@@ -48,14 +48,17 @@ export class CreateUserDto {
   birthdate?: string;
 
   @ApiProperty({
-    example: "+1234567890",
-    description: "Phone number of the user",
+    example: "+84123456789",
+    description:
+      "Phone number of the user. Accepts both E.164 format (e.g. +84123456789) and Vietnamese local format (e.g. 0123456789)",
   })
   @IsString()
   @IsNotEmpty()
-  @Matches(/^\+?[1-9]\d{1,14}$/, {
-    message: "phoneNumber must be a valid E.164 phone number",
+  @Matches(/^(\+84\d{9}|0\d{9})$/, {
+    message:
+      "phoneNumber must be a valid Vietnamese phone number in either +84XXXXXXXXX or 0XXXXXXXXX format",
   })
+  @Transform(({ value }) => removePhoneHeadCode(value))
   phoneNumber: string;
 
   @ApiPropertyOptional({

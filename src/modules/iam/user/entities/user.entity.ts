@@ -42,11 +42,11 @@ export class User {
   @Expose()
   birthdate: string;
 
-  @Column()
+  @Column({ unique: true })
   @Expose()
   phoneNumber: string;
 
-  @Column({ unique: true })
+  @Column()
   @Expose()
   email: string;
 
