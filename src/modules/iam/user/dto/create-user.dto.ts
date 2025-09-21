@@ -8,9 +8,10 @@ import {
   Matches,
   MinLength,
 } from "class-validator";
-import { Gender } from "../entities/user.entity";
+import { Gender } from "../../types/gender.enum";
 import { removePhoneHeadCode } from "src/common/phone-number.utils";
 import { Transform } from "class-transformer";
+import { IsDateFormat } from "src/common/datetime.utils";
 
 export class CreateUserDto {
   @ApiProperty({ example: "John Doe", description: "Full name of the user" })
@@ -42,9 +43,7 @@ export class CreateUserDto {
   })
   @IsOptional()
   @IsString()
-  @Matches(/^\d{4}-\d{2}-\d{2}$/, {
-    message: "birthdate must be in the format YYYY-MM-DD",
-  })
+  @IsDateFormat()
   birthdate?: string;
 
   @ApiProperty({
