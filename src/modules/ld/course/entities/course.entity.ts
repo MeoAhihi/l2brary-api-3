@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { ScheduleDetail, ScheduleType } from "../types/schedule.types";
+import { Session } from "../../session/entities/session.entity";
 
 @Entity({ name: "courses" })
 export class Course {
@@ -59,6 +61,9 @@ export class Course {
 
   @Column({ type: "text", nullable: true })
   chatGroupUrl: string;
+
+  @OneToMany(() => Session, (session) => session.course, { cascade: true })
+  sessions: Session[];
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

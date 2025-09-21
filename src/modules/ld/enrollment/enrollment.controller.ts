@@ -8,12 +8,9 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
-import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
-import { EnrollmentService } from "./enrollment.service";
-import { EnrollmentStatusEnum } from "./types/enrollment-status.enum";
-import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiQuery } from "@nestjs/swagger";
 import { ManageEnrollmentDto } from "./dto/manage-enrollment.dto";
+import { EnrollmentService } from "./enrollment.service";
 
 @Controller("enrollment")
 export class EnrollmentController {

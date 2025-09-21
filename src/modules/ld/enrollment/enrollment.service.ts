@@ -10,7 +10,7 @@ import { CourseService } from "../course/course.service";
 import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
 import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
 import { Enrollment } from "./entities/enrollment.entity";
-import { EnrollmentStatusEnum } from "./types/enrollment-status.enum";
+import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
 @Injectable()
 export class EnrollmentService {
   constructor(

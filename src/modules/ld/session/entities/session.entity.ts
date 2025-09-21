@@ -1,18 +1,17 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-  ManyToOne,
-  UpdateDateColumn,
-  DeleteDateColumn,
-} from "typeorm";
-import { Attendance } from "./attendance.entity";
-import { Game } from "../../game/entities/game.entity";
-import { Course } from "../../course/entities/course.entity";
-import { SessionStatus } from "../../types/session-status.enum";
 import { Exclude, Expose } from "class-transformer";
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
+import { Course } from "../../course/entities/course.entity";
+import { Game } from "../../game/entities/game.entity";
+import { SessionStatus } from "../../types/session-status.enum";
+import { Attendance } from "./attendance.entity";
 
 @Entity()
 export class Session {
