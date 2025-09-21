@@ -15,6 +15,7 @@ import { ArticleModule } from "./modules/ks/article/article.module";
 import { EnrollmentModule } from "./modules/ld/enrollment/enrollment.module";
 import { GameModule } from "./modules/ld/game/game.module";
 import { SessionModule } from "./modules/ld/session/session.module";
+import { AuthorizationModule } from './modules/iam/authorization/authorization.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { SessionModule } from "./modules/ld/session/session.module";
     SessionModule,
     GameModule,
     AuthenticationModule,
+    AuthorizationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
