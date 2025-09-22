@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -29,10 +31,10 @@ export class UserController {
     return plainToInstance(User, users, { excludeExtraneousValues: true });
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<User> {
-    const user = await this.userService.findOne(id);
-    return plainToInstance(User, user, { excludeExtraneousValues: true });
+    return await this.userService.findOne(id, ["roles"]);
   }
 
   @Patch(":id")
@@ -50,5 +52,27 @@ export class UserController {
   async remove(@Param("id") id: string): Promise<{ message: string }> {
     await this.userService.remove(id);
     return { message: `User with id ${id} has been deleted.` };
+  }
+
+  @Post(":id/roles/:roleId/assign")
+  async assignRole(
+    @Param("id") userId: string,
+    @Param("roleId") roleId: string
+  ): Promise<{ message: string }> {
+    await this.userService.assignRole(userId, roleId);
+    return {
+      message: `Role with id ${roleId} assigned to user with id ${userId}.`,
+    };
+  }
+
+  @Post(":id/roles/:roleId/unassign")
+  async unassignRole(
+    @Param("id") userId: string,
+    @Param("roleId") roleId: string
+  ): Promise<{ message: string }> {
+    await this.userService.unassignRole(userId, roleId);
+    return {
+      message: `Role with id ${roleId} unassigned from user with id ${userId}.`,
+    };
   }
 }

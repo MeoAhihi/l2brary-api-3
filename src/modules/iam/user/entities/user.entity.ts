@@ -9,8 +9,10 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   OneToMany,
+  ManyToMany,
 } from "typeorm";
 import { Gender } from "../../types/gender.enum";
+import { Role } from "../../authorization/entities/role.entity";
 
 @Entity("user_profiles")
 export class User {
@@ -62,8 +64,14 @@ export class User {
   deletedAt: Date;
 
   @OneToMany(() => ActivityLog, (activityLog) => activityLog.user)
+  @Expose()
   activityLogs: ActivityLog[];
 
   @OneToMany(() => Article, (article) => article.author)
+  @Expose()
   articles: Article[];
+
+  @ManyToMany(() => Role, (role) => role.users)
+  @Expose()
+  roles: Role[];
 }

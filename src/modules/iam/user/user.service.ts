@@ -9,12 +9,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import { hash } from "bcrypt";
+import { RoleService } from "../authorization/role.service";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    // RoleService injection for role management
+    private readonly roleService: RoleService
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -44,8 +47,14 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async findOne(
+    id: string,
+    relations?: ("roles" | "articles" | "activityLogs")[]
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations,
+    });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
@@ -66,6 +75,46 @@ export class UserService {
   async remove(id: string): Promise<void> {
     const user = await this.findOne(id);
     user.deletedAt = new Date();
+    await this.userRepository.save(user);
+  }
+
+  async assignRole(userId: string, roleId: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ["roles"],
+    });
+
+    // Check if user exists
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    // Find the role entity
+    const role = await this.roleService.findOne(roleId);
+
+    // Check if the user already has the role
+    if (!user.roles.some((r) => r.id === role.id)) {
+      // Role already assigned, do nothing or throw if you want
+      user.roles.push(role);
+    }
+
+    // Save the updated user entity
+    await this.userRepository.save(user);
+  }
+
+  async unassignRole(userId: string, roleId: string): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ["roles"],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    // Remove the role from the user's roles array
+    user.roles = (user.roles || []).filter((role) => role.id !== roleId);
+
     await this.userRepository.save(user);
   }
 }
