@@ -1,5 +1,6 @@
 // schedule.validation.ts
 import mongoose from "mongoose";
+
 import { Weekday } from "../types/schedule.types";
 
 const { Schema } = mongoose;
@@ -17,5 +18,5 @@ const scheduleDetailSchema = new Schema({
 
 export const ScheduleValidator = mongoose.model(
   "ScheduleValidation",
-  scheduleDetailSchema
+  scheduleDetailSchema,
 );

@@ -1,19 +1,20 @@
+import { Type } from "class-transformer";
 import {
-  IsString,
-  IsOptional,
   IsBoolean,
-  IsInt,
   IsDateString,
   IsEnum,
-  ValidateNested,
-  Matches,
+  IsInt,
   IsObject,
+  IsOptional,
+  IsString,
+  Matches,
+  ValidateNested,
 } from "class-validator";
-import { Type } from "class-transformer";
-import { ScheduleType, ScheduleDetail, Weekday } from "../types/schedule.types";
+import { IsDateFormat } from "src/common/datetime.utils";
 
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsDateFormat } from "src/common/datetime.utils";
+
+import { ScheduleDetail, ScheduleType, Weekday } from "../types/schedule.types";
 
 export class CreateCourseDto {
   @ApiProperty({

@@ -1,5 +1,7 @@
 import { DataSource } from "typeorm";
-import { ConfigService, ConfigModule } from "@nestjs/config";
+
+import { ConfigModule, ConfigService } from "@nestjs/config";
+
 import { parseConnectionString } from "../../common/utils";
 
 ConfigModule.forRoot({

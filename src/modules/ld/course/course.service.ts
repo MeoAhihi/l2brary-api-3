@@ -1,25 +1,28 @@
+import { UTC7EndOfDate, UTC7StartOfDate } from "src/common/datetime.utils";
+import { FindOptionsWhere, ILike, Repository } from "typeorm";
+
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { Course } from "./entities/course.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsWhere, ILike, Repository } from "typeorm";
 import { ScheduleDetail, ScheduleType } from "./types/schedule.types";
-import { UTC7EndOfDate, UTC7StartOfDate } from "src/common/datetime.utils";
+
 @Injectable()
 export class CourseService {
   constructor(
     @InjectRepository(Course)
-    private readonly courseRepository: Repository<Course>
+    private readonly courseRepository: Repository<Course>,
   ) {}
 
   isValidateSchedule(
     scheduleType: ScheduleType,
-    scheduleDetail: ScheduleDetail
+    scheduleDetail: ScheduleDetail,
   ): boolean {
     // Check if scheduleDetail matches the expected structure for the given scheduleType
     if (!scheduleDetail || !scheduleType) {
@@ -43,7 +46,7 @@ export class CourseService {
                 "FRIDAY",
                 "SATURDAY",
                 "SUNDAY",
-              ].includes(d)
+              ].includes(d),
           )
         );
       case ScheduleType.MONTHLY:
@@ -53,7 +56,7 @@ export class CourseService {
           Array.isArray((scheduleDetail as any).daysOfMonth) &&
           (scheduleDetail as any).daysOfMonth.length > 0 &&
           (scheduleDetail as any).daysOfMonth.every(
-            (d: any) => typeof d === "number" && d >= 1 && d <= 31
+            (d: any) => typeof d === "number" && d >= 1 && d <= 31,
           )
         );
       case ScheduleType.ONE_TIME:
@@ -64,7 +67,7 @@ export class CourseService {
           (scheduleDetail as any).dates.every(
             (d: any) =>
               d instanceof Date ||
-              (typeof d === "string" && !isNaN(Date.parse(d)))
+              (typeof d === "string" && !isNaN(Date.parse(d))),
           )
         );
       default:
@@ -77,20 +80,20 @@ export class CourseService {
     const { scheduleType, scheduleDetail } = createCourseDto;
     if (!this.isValidateSchedule(scheduleType, scheduleDetail)) {
       throw new ConflictException(
-        "Invalid scheduleDetail for the given scheduleType"
+        "Invalid scheduleDetail for the given scheduleType",
       );
     }
 
     // Transform enrollmentDeadlineDate, startDate, endDate from string to Date
     if (createCourseDto.enrollmentDeadlineDate) {
       (createCourseDto as any).enrollmentDeadline = UTC7EndOfDate(
-        createCourseDto.enrollmentDeadlineDate
+        createCourseDto.enrollmentDeadlineDate,
       );
       delete (createCourseDto as any).enrollmentDeadlineDate;
     }
     if (createCourseDto.startDate) {
       (createCourseDto as any).startDate = UTC7StartOfDate(
-        createCourseDto.startDate
+        createCourseDto.startDate,
       );
     }
     if (createCourseDto.endDate) {

@@ -1,9 +1,11 @@
+import { In, Repository } from "typeorm";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
-import { Role } from "./entities/role.entity";
-import { Permission } from "./entities/permission.entity";
+
 import { UserService } from "../user/user.service";
+import { Permission } from "./entities/permission.entity";
+import { Role } from "./entities/role.entity";
 
 @Injectable()
 export class RoleService {
@@ -42,16 +44,16 @@ export class RoleService {
 
   async attachPermissions(
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<Role> {
     const role = await this.findOne(roleId);
 
     // Avoid duplicates: only add permissions not already present
     const existingPermissionIds = new Set(
-      (role.permissions || []).map((p) => p.id)
+      (role.permissions || []).map((p) => p.id),
     );
     const newPermissionIds = permissionIds.filter(
-      (id) => !existingPermissionIds.has(id)
+      (id) => !existingPermissionIds.has(id),
     );
     const permissions = await this.permissionRepository.find({
       where: { id: In(newPermissionIds) },
@@ -64,11 +66,11 @@ export class RoleService {
 
   async detachPermissions(
     roleId: string,
-    permissionIds: string[]
+    permissionIds: string[],
   ): Promise<Role> {
     const role = await this.findOne(roleId);
     role.permissions = (role.permissions || []).filter(
-      (perm) => !permissionIds.includes(perm.id)
+      (perm) => !permissionIds.includes(perm.id),
     );
     return this.roleRepository.save(role);
   }

@@ -1,14 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { UserService } from "src/modules/iam/user/user.service";
-import { Course } from "src/modules/ld/course/entities/course.entity";
-import { Enrollment } from "src/modules/ld/enrollment/entities/enrollment.entity";
-import { Article } from "src/modules/ks/article/entities/article.entity";
+import { User } from "@/modules/iam/user/entities/user.entity";
+import { getLast12Months } from "src/common/utils";
 import { Activity } from "src/modules/ae/activity/entities/activity.entity";
 import { ActivityLog } from "src/modules/ae/gamification/entities/activity-log.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+import { UserService } from "src/modules/iam/user/user.service";
+import { Article } from "src/modules/ks/article/entities/article.entity";
+import { Course } from "src/modules/ld/course/entities/course.entity";
+import { Enrollment } from "src/modules/ld/enrollment/entities/enrollment.entity";
 import { Between, Repository } from "typeorm";
-import { User } from "src/modules/iam/user/entities/user.entity";
-import { getLast12Months } from "src/common/utils";
+
+import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class TrackGrowthService {
@@ -16,7 +17,7 @@ export class TrackGrowthService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(ActivityLog)
-    private readonly activityLogRepository: Repository<ActivityLog>
+    private readonly activityLogRepository: Repository<ActivityLog>,
   ) {}
 
   async countUsers(): Promise<number> {
@@ -119,7 +120,7 @@ export class TrackGrowthService {
    */
   async countInactiveUsers(maxScore = 0): Promise<number> {
     return this.getInactiveUsers(maxScore).then(
-      (inactiveMembers) => inactiveMembers.length
+      (inactiveMembers) => inactiveMembers.length,
     );
   }
 
@@ -138,7 +139,7 @@ export class TrackGrowthService {
     prevFrom: Date,
     prevTo: Date,
     currFrom: Date,
-    currTo: Date
+    currTo: Date,
   ): Promise<{
     totalRegistered: number;
     retained: number;
@@ -170,7 +171,7 @@ export class TrackGrowthService {
         {
           currFrom,
           currTo,
-        }
+        },
       )
       .select("user.id", "id")
       .groupBy("user.id")

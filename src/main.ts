@@ -1,12 +1,18 @@
+import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import { NestExpressApplication } from "@nestjs/platform-express";
+import {
+  DocumentBuilder,
+  SwaggerCustomOptions,
+  SwaggerModule,
+} from "@nestjs/swagger";
+
 import { AppModule } from "./app.module";
-import { ValidationPipe } from "@nestjs/common";
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const logger = new Logger();
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -15,18 +21,46 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    })
+    }),
   );
 
-  const config = new DocumentBuilder()
-    .setTitle("API")
-    .setDescription("The API description")
-    .setVersion("1.0")
-    .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api", app, document);
+  app.setGlobalPrefix("/v1/api");
 
-  await app.listen(process.env.PORT ?? 3000);
+  if (process.env.ENABLE_CORS === "true") {
+    app.enableCors({
+      origin: "*",
+      methods: "*",
+      credentials: true,
+    });
+  }
+
+  // Swagger config.
+  const enableSwagger = process.env.ENABLE_SWAGGER === "true";
+  if (enableSwagger) {
+    const config = new DocumentBuilder()
+      .setTitle("Backend APIs")
+      .setDescription("All backend APIs for the product.")
+      .setVersion("1.0")
+      .addBearerAuth({ type: "http", in: "header" })
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    const customOptions: SwaggerCustomOptions = {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    };
+    SwaggerModule.setup("docs", app, document, customOptions);
+  }
+
+  const port = process.env.PORT ?? 3000;
+  const mainUrl = `http://localhost:${port}`;
+
+  await app.listen(port, () =>
+    logger.log(`application is running on port ${port}`),
+  );
+
+  if (enableSwagger) {
+    console.log(`Swagger API documentation is running on ${mainUrl}/docs`);
+  }
 }
-bootstrap();
+void bootstrap();

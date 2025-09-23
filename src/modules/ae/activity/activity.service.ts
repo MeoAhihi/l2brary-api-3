@@ -1,15 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Activity } from "./entities/activity.entity";
+
+import { Injectable } from "@nestjs/common";
+import { NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
 import { CreateActivityDto } from "./dto/create-activity.dto";
 import { UpdateActivityDto } from "./dto/update-activity.dto";
-import { NotFoundException } from "@nestjs/common";
+import { Activity } from "./entities/activity.entity";
+
 @Injectable()
 export class ActivityService {
   constructor(
     @InjectRepository(Activity)
-    private readonly activityRepository: Repository<Activity>
+    private readonly activityRepository: Repository<Activity>,
   ) {}
 
   async create(createActivityDto: CreateActivityDto): Promise<Activity> {
@@ -31,7 +34,7 @@ export class ActivityService {
 
   async update(
     id: number,
-    updateActivityDto: UpdateActivityDto
+    updateActivityDto: UpdateActivityDto,
   ): Promise<Activity> {
     const activity = await this.findOne(id);
     Object.assign(activity, updateActivityDto);

@@ -6,8 +6,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { ScheduleDetail, ScheduleType } from "../types/schedule.types";
+
 import { Session } from "../../session/entities/session.entity";
+import { ScheduleDetail, ScheduleType } from "../types/schedule.types";
 
 @Entity({ name: "courses" })
 export class Course {

@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Query } from "@nestjs/common";
 import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
+
 import { TrackGrowthService } from "./analytics.track-growth.service";
 
 @Controller("analytics/track-growth")
@@ -69,7 +70,7 @@ export class TrackGrowthController {
   })
   async getInactiveUsers(@Query("maxscore") maxScore?: number) {
     return await this.trackGrowthservice.getInactiveUsers(
-      typeof maxScore === "number" ? maxScore : 0
+      typeof maxScore === "number" ? maxScore : 0,
     );
   }
 
@@ -89,7 +90,7 @@ export class TrackGrowthController {
   async countInactiveUsers(@Query("maxscore") maxScore?: number) {
     return {
       count: await this.trackGrowthservice.countInactiveUsers(
-        typeof maxScore === "number" ? maxScore : 0
+        typeof maxScore === "number" ? maxScore : 0,
       ),
     };
   }
@@ -99,7 +100,7 @@ export class TrackGrowthController {
     @Query("prevFrom") prevFrom: string,
     @Query("prevTo") prevTo: string,
     @Query("currFrom") currFrom: string,
-    @Query("currTo") currTo: string
+    @Query("currTo") currTo: string,
   ) {
     if (!prevFrom || !prevTo || !currFrom || !currTo) {
       return {
@@ -115,7 +116,7 @@ export class TrackGrowthController {
       prevFromDate,
       prevToDate,
       currFromDate,
-      currToDate
+      currToDate,
     );
   }
 

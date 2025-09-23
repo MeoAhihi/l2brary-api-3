@@ -1,17 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
+
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
-import { ApiQuery } from "@nestjs/swagger";
+
 @Controller("article")
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
@@ -26,7 +28,7 @@ export class ArticleController {
   })
   create(
     @Query("authorId") authorId: string,
-    @Body() createArticleDto: CreateArticleDto
+    @Body() createArticleDto: CreateArticleDto,
   ) {
     return this.articleService.create(authorId, createArticleDto);
   }
@@ -49,7 +51,7 @@ export class ArticleController {
     @Query("page") page?: number,
     @Query("limit") limit?: number,
     @Query("searchTitle") searchTitle?: string,
-    @Query("tags") tags?: string
+    @Query("tags") tags?: string,
   ) {
     // Support both space-separated and repeated query param for tags
     let tagsArray: string[] | undefined;

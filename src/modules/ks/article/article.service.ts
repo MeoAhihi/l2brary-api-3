@@ -1,21 +1,24 @@
+import { UserService } from "src/modules/iam/user/user.service";
+import { Repository } from "typeorm";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
-import { UserService } from "src/modules/iam/user/user.service";
 import { Article } from "./entities/article.entity";
-import { Repository } from "typeorm";
-import { InjectRepository } from "@nestjs/typeorm";
+
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   async create(
     authorId: string,
-    createArticleDto: CreateArticleDto
+    createArticleDto: CreateArticleDto,
   ): Promise<Article> {
     const author = await this.userService.findOne(authorId);
 
@@ -140,7 +143,7 @@ export class ArticleService {
 
     // Update fields
     Object.assign(article, updateArticleDto);
-    article.updatedAt = new Date()
+    article.updatedAt = new Date();
 
     await this.articleRepository.save(article);
 

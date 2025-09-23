@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import {
   IsEmail,
   IsEnum,
@@ -8,10 +8,12 @@ import {
   Matches,
   MinLength,
 } from "class-validator";
-import { removePhoneHeadCode } from "src/common/phone-number.utils";
-import { Transform } from "class-transformer";
-import { Gender } from "../../types/gender.enum";
 import { IsDateFormat } from "src/common/datetime.utils";
+import { removePhoneHeadCode } from "src/common/phone-number.utils";
+
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+
+import { Gender } from "../../types/gender.enum";
 
 export class RegisterDto {
   @ApiProperty({ example: "John Doe", description: "Full name of the user" })

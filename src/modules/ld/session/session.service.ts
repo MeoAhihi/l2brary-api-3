@@ -1,10 +1,12 @@
+import { Repository } from "typeorm";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { CourseService } from "../course/course.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session } from "./entities/session.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CourseService } from "../course/course.service";
 
 @Injectable()
 export class SessionService {
@@ -12,12 +14,12 @@ export class SessionService {
     // Inject the Session repository for database operations
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
-    private readonly courseService: CourseService
+    private readonly courseService: CourseService,
   ) {}
 
   async create(
     courseId: string,
-    createSessionDto: CreateSessionDto
+    createSessionDto: CreateSessionDto,
   ): Promise<Session> {
     // Fetch the course entity to ensure it exists and to associate it properly
     const course = await this.courseService.findOne(courseId);
@@ -71,7 +73,7 @@ export class SessionService {
 
   async update(
     id: number,
-    updateSessionDto: UpdateSessionDto
+    updateSessionDto: UpdateSessionDto,
   ): Promise<Session> {
     const session = await this.findOne(id);
     Object.assign(session, updateSessionDto);

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, ManyToOne } from "typeorm";
-import { GameLog } from "./game-log.entity";
+import { Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
 import { Session } from "../../session/entities/session.entity";
+import { GameLog } from "./game-log.entity";
 
 @Entity()
 export class Game {

@@ -1,3 +1,5 @@
+import { LessThan, Repository } from "typeorm";
+
 import {
   BadRequestException,
   Injectable,
@@ -6,14 +8,14 @@ import {
 } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
-import { LessThan, Repository } from "typeorm";
+
 import { InviteCode } from "./entities/invite-code.entity";
 
 @Injectable()
 export class InviteCodeService {
   constructor(
     @InjectRepository(InviteCode)
-    private readonly inviteCodeRepository: Repository<InviteCode>
+    private readonly inviteCodeRepository: Repository<InviteCode>,
   ) {}
 
   // This cron job runs every day at 0:00 AM
@@ -42,7 +44,7 @@ export class InviteCodeService {
     } catch (error) {
       // Throw 500 Internal Server Error if DB error occurs
       throw new InternalServerErrorException(
-        "Failed to create invite code. Please try again."
+        "Failed to create invite code. Please try again.",
       );
     }
   }
@@ -72,7 +74,7 @@ export class InviteCodeService {
 
     if (email) {
       console.log(
-        `Email sent to ${email}:\nPlease use this code to register: "${inviteCode.code}"`
+        `Email sent to ${email}:\nPlease use this code to register: "${inviteCode.code}"`,
       );
     }
 

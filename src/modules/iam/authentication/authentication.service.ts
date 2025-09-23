@@ -1,15 +1,17 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { UserService } from "../user/user.service";
 import { compare } from "bcrypt";
-import { User } from "../user/entities/user.entity";
-import { JwtService } from "@nestjs/jwt";
+import { PermissionEnum } from "src/common/permission.enum";
+
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
+
+import { PermissionService } from "../authorization/permission.service";
+import { User } from "../user/entities/user.entity";
+import { UserService } from "../user/user.service";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { AuthPayload } from "./interfaces/auth-payload.interface";
 import { InviteCodeService } from "./invite-code.service";
-import { RegisterDto } from "./dto/register.dto";
-import { PermissionService } from "../authorization/permission.service";
-import { PermissionEnum } from "src/common/permission.enum";
-import { LoginDto } from "./dto/login.dto";
 
 @Injectable()
 export class AuthenticationService {
@@ -18,7 +20,7 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly inviteCodeService: InviteCodeService,
-    private readonly permissionService: PermissionService
+    private readonly permissionService: PermissionService,
   ) {}
 
   async validateUser(phoneNumber: string, password: string): Promise<User> {
@@ -53,7 +55,7 @@ export class AuthenticationService {
   async login(loginDto: LoginDto) {
     const userExisted = await this.validateUser(
       loginDto.phoneNumber,
-      loginDto.password
+      loginDto.password,
     );
 
     const user = await this.userService.findOne(userExisted.id, ["roles"]);
@@ -67,7 +69,7 @@ export class AuthenticationService {
   }
 
   async refreshToken(
-    refreshToken: string
+    refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       // Verify the refresh token
@@ -75,7 +77,7 @@ export class AuthenticationService {
         refreshToken,
         {
           secret: this.configService.get<string>("JWT_REFRESH_SECRET"),
-        }
+        },
       );
 
       const user = await this.userService.findOne(payload.sub, ["roles"]);
@@ -84,7 +86,7 @@ export class AuthenticationService {
       // This is safe as permissions enum are synchronized on startup,
       // and permission entities are readonly
       const permissions = permissionEntities.map(
-        (p) => p.name as PermissionEnum
+        (p) => p.name as PermissionEnum,
       );
 
       // Generate new tokens

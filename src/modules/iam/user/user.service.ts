@@ -1,15 +1,17 @@
+import { hash } from "bcrypt";
+import { Repository } from "typeorm";
+
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { RoleService } from "../authorization/role.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
-import { hash } from "bcrypt";
-import { RoleService } from "../authorization/role.service";
 
 @Injectable()
 export class UserService {
@@ -17,17 +19,17 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     // RoleService injection for role management
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     // Check for duplicate phone
     const existingUser = await this.findByPhoneNumber(
-      createUserDto.phoneNumber
+      createUserDto.phoneNumber,
     );
     if (existingUser) {
       throw new ConflictException(
-        `User with phone number ${createUserDto.phoneNumber} already exists`
+        `User with phone number ${createUserDto.phoneNumber} already exists`,
       );
     }
 
@@ -49,7 +51,7 @@ export class UserService {
 
   async findOne(
     id: string,
-    relations?: ("roles" | "articles" | "activityLogs")[]
+    relations?: ("roles" | "articles" | "activityLogs")[],
   ): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },

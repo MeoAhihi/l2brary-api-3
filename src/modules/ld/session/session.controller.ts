@@ -1,20 +1,21 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
   ClassSerializerInterceptor,
   UseInterceptors,
   ParseIntPipe,
 } from "@nestjs/common";
-import { SessionService } from "./session.service";
+import { ApiQuery } from "@nestjs/swagger";
+
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
-import { ApiQuery } from "@nestjs/swagger";
+import { SessionService } from "./session.service";
 import { Session } from "./entities/session.entity";
 
 @Controller()
@@ -24,7 +25,7 @@ export class SessionController {
   @Post("course/:courseId/session")
   create(
     @Param("courseId") courseId: string,
-    @Body() createSessionDto: CreateSessionDto
+    @Body() createSessionDto: CreateSessionDto,
   ) {
     return this.sessionService.create(courseId, createSessionDto);
   }
@@ -46,7 +47,7 @@ export class SessionController {
   findAll(
     @Param("courseId") courseId: string,
     @Query("page") page: number,
-    @Query("limit") limit: number
+    @Query("limit") limit: number,
   ): Promise<{
     data: Session[];
     total: number;
