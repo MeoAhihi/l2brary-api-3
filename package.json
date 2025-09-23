@@ -47,7 +47,6 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "swagger": "^0.7.5",
-    "@nestjs/jwt": "^11.0.0",
     "mathjs": "^14.2.0",
     "random-js": "^2.1.0"
   },
