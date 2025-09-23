@@ -6,7 +6,7 @@ import {
   Column,
   CreateDateColumn,
 } from "typeorm";
-import { User } from "src/modules/iam/user/entities/user.entity";
+import { User } from "@/modules/iam/user/entities/user.entity";
 import { Course } from "../../course/entities/course.entity";
 import { EnrollmentStatusEnum } from "../../types/enrollment-status.enum";
 

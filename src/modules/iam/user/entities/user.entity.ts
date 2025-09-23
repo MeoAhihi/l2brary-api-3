@@ -1,6 +1,6 @@
 import { Exclude, Expose } from "class-transformer";
-import { ActivityLog } from "src/modules/ae/gamification/entities/activity-log.entity";
-import { Article } from "src/modules/ks/article/entities/article.entity";
+import { ActivityLog } from "@/modules/ae/gamification/entities/activity-log.entity";
+import { Article } from "@/modules/ks/article/entities/article.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,

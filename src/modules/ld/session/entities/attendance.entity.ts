@@ -8,7 +8,7 @@ import {
   Column,
 } from "typeorm";
 import { Session } from "./session.entity";
-import { User } from "src/modules/iam/user/entities/user.entity";
+import { User } from "@/modules/iam/user/entities/user.entity";
 
 @Entity("attendance")
 export class Attendance {
@@ -22,7 +22,7 @@ export class Attendance {
   @Column({
     name: "attend_time",
   })
-  attendTime: Date ;
+  attendTime: Date;
 
   @ManyToOne(() => Session, (session) => session.attendances)
   session: Session;
