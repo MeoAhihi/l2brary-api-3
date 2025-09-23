@@ -13,7 +13,7 @@ export class PermissionService implements OnModuleInit {
 
   async onModuleInit() {
     const enumPermissionNames = this.getEnumPermissionNames();
-    const dbPermissions = await this.getDbPermissions();
+    const dbPermissions = await this.findAll();
     const dbPermissionNames = dbPermissions.map((perm) => perm.name);
 
     const permissionsToDelete = this.findPermissionsToDelete(
@@ -33,8 +33,15 @@ export class PermissionService implements OnModuleInit {
     return Object.values(PermissionEnum);
   }
 
-  private async getDbPermissions(): Promise<Permission[]> {
-    return this.permissionRepository.find();
+  async findAll(roleIds?: string[]): Promise<Permission[]> {
+    if (!roleIds || roleIds.length === 0) {
+      return this.permissionRepository.find();
+    }
+    return this.permissionRepository
+      .createQueryBuilder("permission")
+      .leftJoinAndSelect("permission.roles", "role")
+      .where("role.id IN (:...roleIds)", { roleIds })
+      .getMany();
   }
 
   private findPermissionsToDelete(
@@ -66,9 +73,7 @@ export class PermissionService implements OnModuleInit {
   private async addPermissions(permissionsToAdd: string[]): Promise<void> {
     if (permissionsToAdd.length > 0) {
       const newPermissions = permissionsToAdd.map((name) => {
-        const permission = new Permission();
-        permission.name = name;
-        return permission;
+        return this.permissionRepository.create({ name });
       });
       await this.permissionRepository.save(newPermissions);
     }
