@@ -17,17 +17,17 @@ export class UserService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     // RoleService injection for role management
-    private readonly roleService: RoleService
+    private readonly roleService: RoleService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     // Check for duplicate phone
     const existingUser = await this.findByPhoneNumber(
-      createUserDto.phoneNumber
+      createUserDto.phoneNumber,
     );
     if (existingUser) {
       throw new ConflictException(
-        `User with phone number ${createUserDto.phoneNumber} already exists`
+        `User with phone number ${createUserDto.phoneNumber} already exists`,
       );
     }
 
@@ -49,7 +49,7 @@ export class UserService {
 
   async findOne(
     id: string,
-    relations?: ("roles" | "articles" | "activityLogs")[]
+    relations?: ("roles" | "articles" | "activityLogs")[],
   ): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },

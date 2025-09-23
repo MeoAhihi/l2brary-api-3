@@ -44,7 +44,7 @@ export class EnrollmentController {
   findAll(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
-    @Query("courseId") courseId?: string
+    @Query("courseId") courseId?: string,
   ) {
     return this.enrollmentService.findAll({
       page,
@@ -61,7 +61,7 @@ export class EnrollmentController {
   @Patch(":id")
   manageEnrollment(
     @Param("id") id: string,
-    @Body() manageEnrollmentDto: ManageEnrollmentDto
+    @Body() manageEnrollmentDto: ManageEnrollmentDto,
   ) {
     return this.enrollmentService.update(+id, manageEnrollmentDto.status);
   }

@@ -44,7 +44,7 @@ export class GamificationController {
   findAll(
     @Param("userId") userId: string,
     @Param("page") page: string = "1",
-    @Param("limit") limit: string = "10"
+    @Param("limit") limit: string = "10",
   ) {
     const pageNumber = parseInt(page, 10) || 1;
     const limitNumber = parseInt(limit, 10) || 10;
@@ -63,7 +63,7 @@ export class GamificationController {
   @Patch(":id")
   update(
     @Param("id") id: string,
-    @Body() updateGamificationDto: UpdateGamificationDto
+    @Body() updateGamificationDto: UpdateGamificationDto,
   ) {
     return this.gamificationService.update(+id, updateGamificationDto);
   }
@@ -87,12 +87,12 @@ export class GamificationController {
   //   description: "End date for filtering activity logs (ISO 8601 format)",
   // })
   async getActivityReportOfUser(
-    @Param("userId") userId: string
+    @Param("userId") userId: string,
     // @Query("startDate") startDate?: string,
     // @Query("endDate") endDate?: string
   ) {
     return this.gamificationService.getActivityReportOfUser(
-      userId
+      userId,
       // ,{
       // startDate: new Date(startDate),
       // endDate: new Date(),

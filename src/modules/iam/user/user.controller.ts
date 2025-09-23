@@ -40,7 +40,7 @@ export class UserController {
   @Patch(":id")
   async update(
     @Param("id") id: string,
-    @Body() updateUserDto: UpdateUserDto
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     const updatedUser = await this.userService.update(id, updateUserDto);
     return plainToInstance(User, updatedUser, {

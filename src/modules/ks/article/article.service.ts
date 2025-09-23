@@ -10,12 +10,12 @@ export class ArticleService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   async create(
     authorId: string,
-    createArticleDto: CreateArticleDto
+    createArticleDto: CreateArticleDto,
   ): Promise<Article> {
     const author = await this.userService.findOne(authorId);
 
@@ -140,7 +140,7 @@ export class ArticleService {
 
     // Update fields
     Object.assign(article, updateArticleDto);
-    article.updatedAt = new Date()
+    article.updatedAt = new Date();
 
     await this.articleRepository.save(article);
 

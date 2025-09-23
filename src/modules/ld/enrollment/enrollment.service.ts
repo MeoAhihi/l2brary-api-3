@@ -17,7 +17,7 @@ export class EnrollmentService {
     @InjectRepository(Enrollment)
     private readonly enrollmentRepository: Repository<Enrollment>, // Replace 'any' with the actual repository type when available
     private readonly userService: UserService,
-    private readonly courseService: CourseService
+    private readonly courseService: CourseService,
   ) {}
 
   create(createEnrollmentDto: CreateEnrollmentDto) {

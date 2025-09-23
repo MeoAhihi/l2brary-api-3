@@ -20,7 +20,7 @@ export class SessionController {
   @Post("course/:courseId/session")
   create(
     @Param("courseId") courseId: string,
-    @Body() createSessionDto: CreateSessionDto
+    @Body() createSessionDto: CreateSessionDto,
   ) {
     return this.sessionService.create(courseId, createSessionDto);
   }
@@ -41,7 +41,7 @@ export class SessionController {
   findAll(
     @Param("courseId") courseId: string,
     @Query("page") page: number,
-    @Query("limit") limit: number
+    @Query("limit") limit: number,
   ) {
     // Accepts optional pagination via body (or could be query, but keeping as body for now)
     return this.sessionService.findAll({

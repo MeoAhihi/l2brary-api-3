@@ -61,7 +61,7 @@ export class CourseController {
     @Query("search") search?: string,
     @Query("group") group?: string,
     @Query("scheduleType")
-    scheduleType?: ScheduleType
+    scheduleType?: ScheduleType,
   ) {
     return this.courseService.findAll({
       page,
