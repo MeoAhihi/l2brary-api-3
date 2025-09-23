@@ -7,6 +7,9 @@ import { ConfigService } from "@nestjs/config";
 import { AuthPayload } from "./interfaces/auth-payload.interface";
 import { InviteCodeService } from "./invite-code.service";
 import { RegisterDto } from "./dto/register.dto";
+import { PermissionService } from "../authorization/permission.service";
+import { PermissionEnum } from "src/common/permission.enum";
+import { LoginDto } from "./dto/login.dto";
 
 @Injectable()
 export class AuthenticationService {
@@ -14,7 +17,8 @@ export class AuthenticationService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly inviteCodeService: InviteCodeService
+    private readonly inviteCodeService: InviteCodeService,
+    private readonly permissionService: PermissionService
   ) {}
 
   async validateUser(phoneNumber: string, password: string): Promise<User> {
@@ -46,6 +50,22 @@ export class AuthenticationService {
     return { accessToken, refreshToken };
   }
 
+  async login(loginDto: LoginDto) {
+    const userExisted = await this.validateUser(
+      loginDto.phoneNumber,
+      loginDto.password
+    );
+
+    const user = await this.userService.findOne(userExisted.id, ["roles"]);
+    const roleIds = user.roles.map((role) => role.id);
+    const permissionEntities = await this.permissionService.findAll(roleIds);
+    // This is safe as permissions enum are synchronized on startup,
+    // and permission entities are readonly
+    const permissions = permissionEntities.map((p) => p.name as PermissionEnum);
+
+    return this.getTokens({ sub: user.id, permissions });
+  }
+
   async refreshToken(
     refreshToken: string
   ): Promise<{ accessToken: string; refreshToken: string }> {
@@ -58,11 +78,17 @@ export class AuthenticationService {
         }
       );
 
-      // Optionally, you can check if the user still exists or is active
-      const user = await this.userService.findOne(payload.sub);
+      const user = await this.userService.findOne(payload.sub, ["roles"]);
+      const roleIds = user.roles.map((role) => role.id);
+      const permissionEntities = await this.permissionService.findAll(roleIds);
+      // This is safe as permissions enum are synchronized on startup,
+      // and permission entities are readonly
+      const permissions = permissionEntities.map(
+        (p) => p.name as PermissionEnum
+      );
 
       // Generate new tokens
-      return this.getTokens({ sub: user.id });
+      return this.getTokens({ sub: user.id, permissions });
     } catch (error) {
       throw new UnauthorizedException("Invalid refresh token");
     }
@@ -73,9 +99,11 @@ export class AuthenticationService {
     await this.inviteCodeService.findOneByCode(inviteCode);
     // Create the user using the provided registration data
     const user = await this.userService.create(registerDto);
+
     // Optionally, you could mark the invite code as used or delete it
     await this.inviteCodeService.delete(inviteCode);
 
-    return this.getTokens({ sub: user.id });
+    // new members have no permissions
+    return this.getTokens({ sub: user.id, permissions: [] });
   }
 }

@@ -8,6 +8,7 @@ import { InviteCodeService } from "./invite-code.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { InviteCode } from "./entities/invite-code.entity";
 import { JwtStrategy } from "./strategies/jwt.strategy";
+import { AuthorizationModule } from "../authorization/authorization.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     PassportModule,
     JwtModule.register({}),
     TypeOrmModule.forFeature([InviteCode]),
+    AuthorizationModule,
   ],
   controllers: [AuthenticationController],
   providers: [AuthenticationService, InviteCodeService, JwtStrategy],

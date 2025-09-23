@@ -29,11 +29,7 @@ export class AuthenticationController {
   // POST /authentication/login
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authenticationService.validateUser(
-      loginDto.phoneNumber,
-      loginDto.password
-    );
-    return this.authenticationService.getTokens({ sub: user.id });
+    return this.authenticationService.login(loginDto);
   }
 
   // Endpoint to register a new user with invite code and registration data
