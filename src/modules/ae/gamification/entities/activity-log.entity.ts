@@ -1,11 +1,12 @@
 import { User } from "@/modules/iam/user/entities/user.entity";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Entity,
   ManyToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
+
 import { Activity } from "../../activity/entities/activity.entity";
 
 @Entity()

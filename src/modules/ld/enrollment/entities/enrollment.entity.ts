@@ -1,12 +1,13 @@
+import { User } from "@/modules/iam/user/entities/user.entity";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
   Column,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from "typeorm";
-import { User } from "@/modules/iam/user/entities/user.entity";
+
 import { Course } from "../../course/entities/course.entity";
 import { EnrollmentStatusEnum } from "../../types/enrollment-status.enum";
 

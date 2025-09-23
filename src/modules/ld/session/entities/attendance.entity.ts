@@ -1,14 +1,15 @@
+import { User } from "@/modules/iam/user/entities/user.entity";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
+  Column,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
-  JoinColumn,
-  Column,
+  PrimaryGeneratedColumn,
 } from "typeorm";
+
 import { Session } from "./session.entity";
-import { User } from "@/modules/iam/user/entities/user.entity";
 
 @Entity("attendance")
 export class Attendance {

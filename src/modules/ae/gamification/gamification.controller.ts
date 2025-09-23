@@ -1,17 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from "@nestjs/common";
-import { GamificationService } from "./gamification.service";
-import { UpdateGamificationDto } from "./dto/update-gamification.dto";
-import { LogActivityDto } from "./dto/log-activity.dto";
 import { ApiQuery } from "@nestjs/swagger";
+
+import { LogActivityDto } from "./dto/log-activity.dto";
+import { UpdateGamificationDto } from "./dto/update-gamification.dto";
+import { GamificationService } from "./gamification.service";
 
 @Controller("gamification")
 export class GamificationController {

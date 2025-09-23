@@ -5,6 +5,7 @@ import {
   ManyToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+
 import { User } from "../../user/entities/user.entity";
 import { Permission } from "./permission.entity";
 

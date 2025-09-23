@@ -1,11 +1,14 @@
+import { UserService } from "src/modules/iam/user/user.service";
+import { Repository } from "typeorm";
+
 import { Injectable } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { ActivityService } from "../activity/activity.service";
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { UpdateGamificationDto } from "./dto/update-gamification.dto";
 import { ActivityLog } from "./entities/activity-log.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { UserService } from "src/modules/iam/user/user.service";
-import { ActivityService } from "../activity/activity.service";
+
 @Injectable()
 export class GamificationService {
   constructor(

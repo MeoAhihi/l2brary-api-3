@@ -1,15 +1,16 @@
 import { Body, Controller, Param, Post, Query } from "@nestjs/common";
-import { AuthenticationService } from "./authentication.service";
-import { RegisterDto } from "./dto/register.dto";
 import { ApiBody, ApiQuery } from "@nestjs/swagger";
+
+import { AuthenticationService } from "./authentication.service";
 import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
 import { InviteCodeService } from "./invite-code.service";
 
 @Controller("authentication")
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
-    private readonly inviteCodeService: InviteCodeService
+    private readonly inviteCodeService: InviteCodeService,
   ) {}
 
   // Endpoint to generate an invite code, optionally with an email
@@ -37,7 +38,7 @@ export class AuthenticationController {
   @Post("register/:inviteCode")
   async register(
     @Param("inviteCode") inviteCode: string,
-    @Body() registerDto: RegisterDto
+    @Body() registerDto: RegisterDto,
   ) {
     return this.authenticationService.register(inviteCode, registerDto);
   }

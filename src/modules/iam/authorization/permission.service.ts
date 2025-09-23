@@ -1,14 +1,17 @@
+import { PermissionEnum } from "src/common/permission.enum";
+import { Repository } from "typeorm";
+
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PermissionEnum } from "src/common/permission.enum";
-import { Role } from "./entities/role.entity";
+
 import { Permission } from "./entities/permission.entity";
-import { Repository } from "typeorm";
+import { Role } from "./entities/role.entity";
+
 @Injectable()
 export class PermissionService implements OnModuleInit {
   constructor(
     @InjectRepository(Permission)
-    private readonly permissionRepository: Repository<Permission>
+    private readonly permissionRepository: Repository<Permission>,
   ) {}
 
   async onModuleInit() {
@@ -18,11 +21,11 @@ export class PermissionService implements OnModuleInit {
 
     const permissionsToDelete = this.findPermissionsToDelete(
       dbPermissions,
-      enumPermissionNames
+      enumPermissionNames,
     );
     const permissionsToAdd = this.findPermissionsToAdd(
       enumPermissionNames,
-      dbPermissionNames
+      dbPermissionNames,
     );
 
     await this.deletePermissions(permissionsToDelete);
@@ -46,24 +49,24 @@ export class PermissionService implements OnModuleInit {
 
   private findPermissionsToDelete(
     dbPermissions: Permission[],
-    enumPermissionNames: string[]
+    enumPermissionNames: string[],
   ): Permission[] {
     return dbPermissions.filter(
-      (perm) => !enumPermissionNames.includes(perm.name)
+      (perm) => !enumPermissionNames.includes(perm.name),
     );
   }
 
   private findPermissionsToAdd(
     enumPermissionNames: string[],
-    dbPermissionNames: string[]
+    dbPermissionNames: string[],
   ): string[] {
     return enumPermissionNames.filter(
-      (name) => !dbPermissionNames.includes(name)
+      (name) => !dbPermissionNames.includes(name),
     );
   }
 
   private async deletePermissions(
-    permissionsToDelete: Permission[]
+    permissionsToDelete: Permission[],
   ): Promise<void> {
     if (permissionsToDelete.length > 0) {
       await this.permissionRepository.remove(permissionsToDelete);

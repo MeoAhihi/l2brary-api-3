@@ -1,19 +1,21 @@
+import { plainToInstance } from "class-transformer";
+
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  UseInterceptors,
   ClassSerializerInterceptor,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseInterceptors,
 } from "@nestjs/common";
-import { UserService } from "./user.service";
+
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { plainToInstance } from "class-transformer";
 import { User } from "./entities/user.entity";
+import { UserService } from "./user.service";
 
 @Controller("user")
 export class UserController {
@@ -57,7 +59,7 @@ export class UserController {
   @Post(":id/roles/:roleId/assign")
   async assignRole(
     @Param("id") userId: string,
-    @Param("roleId") roleId: string
+    @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
     await this.userService.assignRole(userId, roleId);
     return {
@@ -68,7 +70,7 @@ export class UserController {
   @Post(":id/roles/:roleId/unassign")
   async unassignRole(
     @Param("id") userId: string,
-    @Param("roleId") roleId: string
+    @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
     await this.userService.unassignRole(userId, roleId);
     return {
