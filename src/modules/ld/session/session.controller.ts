@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   Query,
+  ClassSerializerInterceptor,
+  UseInterceptors,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { SessionService } from "./session.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { ApiQuery } from "@nestjs/swagger";
+import { Session } from "./entities/session.entity";
 
 @Controller()
 export class SessionController {
@@ -38,12 +42,18 @@ export class SessionController {
     type: Number,
     description: "Number of items per page for pagination (optional)",
   })
+  @UseInterceptors(ClassSerializerInterceptor)
   findAll(
     @Param("courseId") courseId: string,
     @Query("page") page: number,
     @Query("limit") limit: number
-  ) {
-    // Accepts optional pagination via body (or could be query, but keeping as body for now)
+  ): Promise<{
+    data: Session[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
     return this.sessionService.findAll({
       courseId,
       page: page,
@@ -52,17 +62,20 @@ export class SessionController {
   }
 
   @Get("session/:id")
-  findOne(@Param("id") id: string) {
-    return this.sessionService.findOne(+id);
+  findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.sessionService.findOne(id);
   }
 
   @Patch("session/:id")
-  update(@Param("id") id: string, @Body() updateSessionDto: UpdateSessionDto) {
-    return this.sessionService.update(+id, updateSessionDto);
+  update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateSessionDto: UpdateSessionDto
+  ) {
+    return this.sessionService.update(id, updateSessionDto);
   }
 
   @Delete("session/:id")
-  remove(@Param("id") id: string) {
-    return this.sessionService.remove(+id);
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.sessionService.remove(id);
   }
 }

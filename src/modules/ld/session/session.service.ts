@@ -24,6 +24,8 @@ export class SessionService {
 
     const session = this.sessionRepository.create({
       ...createSessionDto,
+      startTime: createSessionDto.startTime ?? new Date(),
+      updatedAt: new Date(),
       course: course,
     });
 

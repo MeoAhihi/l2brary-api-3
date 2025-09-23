@@ -36,12 +36,12 @@ export class Session {
   startTime: Date;
 
   @Expose()
-  @Column()
+  @Column({ nullable: true })
   endTime?: Date;
 
   @Expose()
-  @Column()
-  presenterName: string;
+  @Column({ nullable: true })
+  presenterName?: string;
 
   @Expose()
   @OneToMany(() => Attendance, (attendance) => attendance.session, {
