@@ -9,7 +9,7 @@ import { NotFoundException } from "@nestjs/common";
 export class ActivityService {
   constructor(
     @InjectRepository(Activity)
-    private readonly activityRepository: Repository<Activity>
+    private readonly activityRepository: Repository<Activity>,
   ) {}
 
   async create(createActivityDto: CreateActivityDto): Promise<Activity> {
@@ -31,7 +31,7 @@ export class ActivityService {
 
   async update(
     id: number,
-    updateActivityDto: UpdateActivityDto
+    updateActivityDto: UpdateActivityDto,
   ): Promise<Activity> {
     const activity = await this.findOne(id);
     Object.assign(activity, updateActivityDto);

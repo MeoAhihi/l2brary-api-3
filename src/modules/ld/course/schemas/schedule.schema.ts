@@ -17,5 +17,5 @@ const scheduleDetailSchema = new Schema({
 
 export const ScheduleValidator = mongoose.model(
   "ScheduleValidation",
-  scheduleDetailSchema
+  scheduleDetailSchema,
 );

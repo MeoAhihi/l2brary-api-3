@@ -12,12 +12,12 @@ export class SessionService {
     // Inject the Session repository for database operations
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
-    private readonly courseService: CourseService
+    private readonly courseService: CourseService,
   ) {}
 
   async create(
     courseId: string,
-    createSessionDto: CreateSessionDto
+    createSessionDto: CreateSessionDto,
   ): Promise<Session> {
     // Fetch the course entity to ensure it exists and to associate it properly
     const course = await this.courseService.findOne(courseId);
@@ -69,7 +69,7 @@ export class SessionService {
 
   async update(
     id: number,
-    updateSessionDto: UpdateSessionDto
+    updateSessionDto: UpdateSessionDto,
   ): Promise<Session> {
     const session = await this.findOne(id);
     Object.assign(session, updateSessionDto);

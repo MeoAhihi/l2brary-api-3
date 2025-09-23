@@ -26,7 +26,7 @@ export class ArticleController {
   })
   create(
     @Query("authorId") authorId: string,
-    @Body() createArticleDto: CreateArticleDto
+    @Body() createArticleDto: CreateArticleDto,
   ) {
     return this.articleService.create(authorId, createArticleDto);
   }
@@ -49,7 +49,7 @@ export class ArticleController {
     @Query("page") page?: number,
     @Query("limit") limit?: number,
     @Query("searchTitle") searchTitle?: string,
-    @Query("tags") tags?: string
+    @Query("tags") tags?: string,
   ) {
     // Support both space-separated and repeated query param for tags
     let tagsArray: string[] | undefined;

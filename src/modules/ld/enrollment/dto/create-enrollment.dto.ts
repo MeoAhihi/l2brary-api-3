@@ -1,3 +1,1 @@
-export class CreateEnrollmentDto {
-  
-}
+export class CreateEnrollmentDto {}

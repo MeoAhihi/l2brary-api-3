@@ -12,18 +12,18 @@ export class GamificationService {
     @InjectRepository(ActivityLog)
     private readonly activityLogRepository: Repository<ActivityLog>,
     private readonly activityService: ActivityService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   async create(
     loggedBy: string,
-    logActivityDto: LogActivityDto
+    logActivityDto: LogActivityDto,
   ): Promise<ActivityLog> {
     // Find the user by ID to ensure it exists and to get the full entity
     const user = await this.userService.findOne(logActivityDto.userId);
 
     const activity = await this.activityService.findOne(
-      logActivityDto.activityId
+      logActivityDto.activityId,
     );
 
     // Create a new ActivityLog entity
@@ -39,7 +39,7 @@ export class GamificationService {
   }
 
   async findAll(
-    options: { userId?: string; page?: number; limit?: number } = {}
+    options: { userId?: string; page?: number; limit?: number } = {},
   ) {
     const { userId, page = 1, limit = 10 } = options;
 
@@ -80,9 +80,7 @@ export class GamificationService {
     return `This action removes a #${id} gamification`;
   }
 
-  async getActivityReportOfUser(
-    userId: string,
-  ) {
+  async getActivityReportOfUser(userId: string) {
     // Get all activity logs for the user
     const activityLogs = await this.activityLogRepository.find({
       where: { user: { id: userId } },

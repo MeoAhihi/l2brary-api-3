@@ -19,7 +19,7 @@ export function parseConnectionString(connectionString: string) {
  */
 export function normalizePhoneNumber(
   phoneNumber: string,
-  countryCode: string
+  countryCode: string,
 ): string {
   // Remove all non-digit characters
   let digits = phoneNumber.replace(/\D/g, "");
@@ -48,7 +48,7 @@ export function isValidPhoneNumber(phoneNumber: string): boolean {
 
 export function getFirstDateOfMonth(
   currentDate: Date | string,
-  timezoneOffset: number
+  timezoneOffset: number,
 ): Date {
   const date = new Date(currentDate);
   // Get the first day of the month in UTC, then apply the timezone offset
@@ -59,7 +59,7 @@ export function getFirstDateOfMonth(
 
 export function getEndDateOfMonth(
   currentDate: Date | string,
-  timezoneOffset: number
+  timezoneOffset: number,
 ): Date {
   const date = new Date(currentDate);
   // Get the last day of the month in UTC, then apply the timezone offset and set to 23:59:59.999
@@ -70,7 +70,7 @@ export function getEndDateOfMonth(
     23,
     59,
     59,
-    999
+    999,
   );
   return new Date(utc - timezoneOffset * 60 * 1000);
 }
