@@ -1,7 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, Matches } from "class-validator";
 import { Transform } from "class-transformer";
+import { IsNotEmpty, IsString, Matches } from "class-validator";
 import { removePhoneHeadCode } from "src/common/phone-number.utils";
+
+import { ApiProperty } from "@nestjs/swagger";
 
 export class LoginDto {
   @ApiProperty({

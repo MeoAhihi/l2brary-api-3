@@ -1,14 +1,15 @@
 import { Module } from "@nestjs/common";
-import { AuthenticationService } from "./authentication.service";
-import { AuthenticationController } from "./authentication.controller";
-import { UserModule } from "../user/user.module";
-import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt";
-import { InviteCodeService } from "./invite-code.service";
+import { PassportModule } from "@nestjs/passport";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { InviteCode } from "./entities/invite-code.entity";
-import { JwtStrategy } from "./strategies/jwt.strategy";
+
 import { AuthorizationModule } from "../authorization/authorization.module";
+import { UserModule } from "../user/user.module";
+import { AuthenticationController } from "./authentication.controller";
+import { AuthenticationService } from "./authentication.service";
+import { InviteCode } from "./entities/invite-code.entity";
+import { InviteCodeService } from "./invite-code.service";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 
 @Module({
   imports: [

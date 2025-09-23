@@ -1,15 +1,17 @@
+import { hash } from "bcrypt";
+import { Repository } from "typeorm";
+
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { RoleService } from "../authorization/role.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
 import { User } from "./entities/user.entity";
-import { hash } from "bcrypt";
-import { RoleService } from "../authorization/role.service";
 
 @Injectable()
 export class UserService {

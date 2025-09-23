@@ -1,17 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
+
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
 import { UpdateArticleDto } from "./dto/update-article.dto";
-import { ApiQuery } from "@nestjs/swagger";
+
 @Controller("article")
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}

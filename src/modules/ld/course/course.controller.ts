@@ -1,17 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from "@nestjs/common";
+import { ApiOperation, ApiQuery, ApiQueryOptions } from "@nestjs/swagger";
+
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
-import { ApiOperation, ApiQuery, ApiQueryOptions } from "@nestjs/swagger";
 import { ScheduleType } from "./types/schedule.types";
 
 @Controller("course")

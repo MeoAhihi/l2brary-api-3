@@ -1,6 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsOptional, IsDate, IsInt } from "class-validator";
 import { Type } from "class-transformer";
+import { IsDate, IsInt, IsOptional, IsString } from "class-validator";
+
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class LogActivityDto {
   @ApiProperty({ description: "User identifier", example: "user123" })

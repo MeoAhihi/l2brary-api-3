@@ -63,4 +63,4 @@ async function bootstrap() {
     console.log(`Swagger API documentation is running on ${mainUrl}/docs`);
   }
 }
-bootstrap();
+void bootstrap();

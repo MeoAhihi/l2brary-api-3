@@ -7,9 +7,10 @@ import {
   Patch,
   Post,
 } from "@nestjs/common";
+import { ApiBody } from "@nestjs/swagger";
+
 import { PermissionService } from "./permission.service";
 import { RoleService } from "./role.service";
-import { ApiBody } from "@nestjs/swagger";
 
 @Controller("authorization")
 export class AuthorizationController {
@@ -51,7 +52,7 @@ export class AuthorizationController {
   @Patch("roles/:id")
   async updateRole(
     @Param("id") id: string,
-    @Body() updateRoleDto: { name: string }
+    @Body() updateRoleDto: { name: string },
   ) {
     return this.roleService.rename(id, updateRoleDto.name);
   }
@@ -78,7 +79,7 @@ export class AuthorizationController {
   @Post("roles/:roleId/permissions/attach")
   async attachPermissionsToRole(
     @Param("roleId") roleId: string,
-    @Body("permissionIds") permissionIds: string[]
+    @Body("permissionIds") permissionIds: string[],
   ) {
     return this.roleService.attachPermissions(roleId, permissionIds);
   }
@@ -99,7 +100,7 @@ export class AuthorizationController {
   @Post("roles/:roleId/permissions/detach")
   async detachPermissionsFromRole(
     @Param("roleId") roleId: string,
-    @Body("permissionIds") permissionIds: string[]
+    @Body("permissionIds") permissionIds: string[],
   ) {
     return this.roleService.detachPermissions(roleId, permissionIds);
   }

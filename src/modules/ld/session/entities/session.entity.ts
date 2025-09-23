@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
+
 import { Course } from "../../course/entities/course.entity";
 import { Game } from "../../game/entities/game.entity";
 import { SessionStatus } from "../../types/session-status.enum";

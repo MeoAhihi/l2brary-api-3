@@ -1,18 +1,19 @@
-import { Exclude, Expose } from "class-transformer";
 import { ActivityLog } from "@/modules/ae/gamification/entities/activity-log.entity";
 import { Article } from "@/modules/ks/article/entities/article.entity";
+import { Exclude, Expose } from "class-transformer";
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  DeleteDateColumn,
-  UpdateDateColumn,
   CreateDateColumn,
-  OneToMany,
+  DeleteDateColumn,
+  Entity,
   ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
-import { Gender } from "../../types/gender.enum";
+
 import { Role } from "../../authorization/entities/role.entity";
+import { Gender } from "../../types/gender.enum";
 
 @Entity("user_profiles")
 export class User {

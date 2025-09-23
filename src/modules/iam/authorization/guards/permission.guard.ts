@@ -1,14 +1,16 @@
 // auth/guards/roles.guard.ts
+import { PermissionEnum } from "src/common/permission.enum";
+
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Injectable,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { PERMISSION_KEY } from "../decorators/permission.decorator";
-import { PermissionEnum } from "src/common/permission.enum";
+
 import { AuthPayload } from "../../authentication/interfaces/auth-payload.interface";
+import { PERMISSION_KEY } from "../decorators/permission.decorator";
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -17,7 +19,7 @@ export class PermissionGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSION_KEY,
-      [context.getHandler(), context.getClass()]
+      [context.getHandler(), context.getClass()],
     );
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true; // no role restriction
@@ -29,7 +31,7 @@ export class PermissionGuard implements CanActivate {
       !user ||
       !user.permissions ||
       !requiredPermissions.every((permission) =>
-        user.permissions.includes(permission)
+        user.permissions.includes(permission),
       )
     ) {
       throw new ForbiddenException("You do not have access to this resource");

@@ -1,16 +1,19 @@
+import { UserService } from "src/modules/iam/user/user.service";
+import { FindOptionsWhere, Repository } from "typeorm";
+
 import {
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserService } from "src/modules/iam/user/user.service";
-import { FindOptionsWhere, Repository } from "typeorm";
+
 import { CourseService } from "../course/course.service";
+import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
 import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
 import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
 import { Enrollment } from "./entities/enrollment.entity";
-import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
+
 @Injectable()
 export class EnrollmentService {
   constructor(

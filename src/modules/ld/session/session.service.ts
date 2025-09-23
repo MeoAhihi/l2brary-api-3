@@ -1,10 +1,12 @@
+import { Repository } from "typeorm";
+
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { CourseService } from "../course/course.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session } from "./entities/session.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { CourseService } from "../course/course.service";
 
 @Injectable()
 export class SessionService {
