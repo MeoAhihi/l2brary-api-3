@@ -37,7 +37,7 @@ export class Session {
   startTime: Date;
 
   @Expose()
-  @Column()
+  @Column({ nullable: true })
   endTime?: Date;
 
   @Expose()

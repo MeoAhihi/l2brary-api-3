@@ -14,14 +14,13 @@ import { parseConnectionString } from "../../common/utils";
           config.get<string>("MYSQL_DATABASE_URL") ?? "";
         const databaseConfig = parseConnectionString(CONNECTION_STRING);
         return {
-          type: "mysql",
-          host: databaseConfig.host,
-          port: databaseConfig.port,
-          username: databaseConfig.username,
-          password: databaseConfig.password,
-          database: databaseConfig.database,
+          type: "postgres",
+          url: CONNECTION_STRING,
           autoLoadEntities: true,
           synchronize: true,
+          ssl: {
+            rejectUnauthorized: false,  // allow self-signed certs (needed for many cloud DBs)
+          },
         };
       },
     }),
