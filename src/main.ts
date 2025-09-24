@@ -24,7 +24,7 @@ async function bootstrap() {
     }),
   );
 
-  app.setGlobalPrefix("/v1/api");
+  // app.setGlobalPrefix("/v1/api");
 
   if (process.env.ENABLE_CORS === "true") {
     app.enableCors({
