@@ -37,7 +37,7 @@ importers:
         version: 11.2.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)
       '@nestjs/typeorm':
         specifier: ^11.0.0
-        version: 11.0.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)))
+        version: 11.0.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)))
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -50,9 +50,6 @@ importers:
       dayjs:
         specifier: ^1.11.18
         version: 1.11.18
-      mathjs:
-        specifier: ^14.2.0
-        version: 14.7.0
       mongoose:
         specifier: ^8.18.1
         version: 8.18.1
@@ -68,6 +65,9 @@ importers:
       passport-local:
         specifier: ^1.0.0
         version: 1.0.0
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
       random-js:
         specifier: ^2.1.0
         version: 2.1.0
@@ -170,7 +170,7 @@ importers:
         version: 4.2.0
       typeorm:
         specifier: ^0.3.26
-        version: 0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2))
+        version: 0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2))
       typescript:
         specifier: ^5.7.3
         version: 5.9.2
@@ -344,10 +344,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-
-  '@babel/runtime@7.28.4':
-    resolution: {integrity: sha512-Q/N6JNWvIvPnLDvjlE1OUBLPQHH6l3CltCEsHIujp45zQUSSh8K+gHnaEX45yAT1nyngnINhvWtzN+Nb9D8RAQ==}
-    engines: {node: '>=6.9.0'}
 
   '@babel/template@7.27.2':
     resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
@@ -1942,9 +1938,6 @@ packages:
     resolution: {integrity: sha512-bKw/r35jR3HGt5PEPm1ljsQQGyCrR8sFGNiN5L+ykDHdpO8Smxkrkla9Yi6NkQyUrb8V54PGhfMs6NrIwtxtdw==}
     engines: {node: '>= 6'}
 
-  complex.js@2.4.2:
-    resolution: {integrity: sha512-qtx7HRhPGSCBtGiST4/WGHuW+zeaND/6Ld+db6PbrulIB1i2Ev/2UPiqcmpQNPSyfBKraC0EOvOKCB5dGZKt3g==}
-
   component-emitter@1.2.1:
     resolution: {integrity: sha512-jPatnhd33viNplKjqXKRkGU345p263OIWzDL2wH3LGIGp5Kojo+uXizHmOADRvhGFFTnJqX3jBAKP6vvmSDKcA==}
 
@@ -2107,9 +2100,6 @@ packages:
     peerDependenciesMeta:
       supports-color:
         optional: true
-
-  decimal.js@10.6.0:
-    resolution: {integrity: sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==}
 
   decode-uri-component@0.2.2:
     resolution: {integrity: sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==}
@@ -2304,9 +2294,6 @@ packages:
 
   escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
-
-  escape-latex@1.2.0:
-    resolution: {integrity: sha512-nV5aVWW1K0wEiUIEdZ4erkGGH8mDxGyxSeqPzRNtWP7ataw+/olFObw7hujFWlVjNsaDFw5VZ5NzVSIqRgfTiw==}
 
   escape-string-regexp@1.0.2:
     resolution: {integrity: sha512-cQpUid7bdTUnFin8S7BnNdOk+/eDqQmKgCANSyd/jAhrKEvxUvr9VQ8XZzXiOtest8NLfk3FSBZzwvemZNQ6Vg==}
@@ -2600,9 +2587,6 @@ packages:
   forwarded@0.2.0:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
-
-  fraction.js@5.3.4:
-    resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
   fragment-cache@0.2.1:
     resolution: {integrity: sha512-GMBAbW9antB8iZRHLoGw0b3HANt57diZYFO/HL1JGIC1MjKrdmhxvrJbupnVvpys0zsz7yBApXdQyfepKly2kA==}
@@ -3659,11 +3643,6 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mathjs@14.7.0:
-    resolution: {integrity: sha512-RaMhb+9MSESjDZNox/FzzuFpIUI+oxGLyOy1t3BMoW53pGWnTzZtlucJ5cvbit0dIMYlCq00gNbW1giZX4/1Rg==}
-    engines: {node: '>= 18'}
-    hasBin: true
-
   md5@2.2.1:
     resolution: {integrity: sha512-PlGG4z5mBANDGCKsYQe0CaUYHdZYZt8ZPZLmEt+Urf0W4GlpTX4HescwHU+dc9+Z/G/vZKYZYFrwgm9VxK6QOQ==}
 
@@ -4127,6 +4106,40 @@ packages:
   pend@1.2.0:
     resolution: {integrity: sha512-F3asv42UuXchdzt+xXqfW1OGlVBe+mxa2mqI0pg5yAHZPvFmY3Y6drSf/GQ1A86WgWEN9Kzh/WrgKa6iGcHXLg==}
 
+  pg-cloudflare@1.2.7:
+    resolution: {integrity: sha512-YgCtzMH0ptvZJslLM1ffsY4EuGaU0cx4XSdXLRFae8bPP4dS5xL1tNB3k2o/N64cHJpwU7dxKli/nZ2lUa5fLg==}
+
+  pg-connection-string@2.9.1:
+    resolution: {integrity: sha512-nkc6NpDcvPVpZXxrreI/FOtX3XemeLl8E0qFr6F2Lrm/I8WOnaWNhIPK2Z7OHpw7gh5XJThi6j6ppgNoaT1w4w==}
+
+  pg-int8@1.0.1:
+    resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
+    engines: {node: '>=4.0.0'}
+
+  pg-pool@3.10.1:
+    resolution: {integrity: sha512-Tu8jMlcX+9d8+QVzKIvM/uJtp07PKr82IUOYEphaWcoBhIYkoHpLXN3qO59nAI11ripznDsEzEv8nUxBVWajGg==}
+    peerDependencies:
+      pg: '>=8.0'
+
+  pg-protocol@1.10.3:
+    resolution: {integrity: sha512-6DIBgBQaTKDJyxnXaLiLR8wBpQQcGWuAESkRBX/t6OwA8YsqP+iVSiond2EDy6Y/dsGk8rh/jtax3js5NeV7JQ==}
+
+  pg-types@2.2.0:
+    resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
+    engines: {node: '>=4'}
+
+  pg@8.16.3:
+    resolution: {integrity: sha512-enxc1h0jA/aq5oSDMvqyW3q89ra6XIIDZgCX9vkMrnz5DFTw/Ny3Li2lFQ+pt3L6MCgm/5o2o8HW9hiJji+xvw==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      pg-native: '>=3.0.1'
+    peerDependenciesMeta:
+      pg-native:
+        optional: true
+
+  pgpass@1.0.5:
+    resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
+
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
@@ -4164,6 +4177,22 @@ packages:
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
     engines: {node: '>= 0.4'}
+
+  postgres-array@2.0.0:
+    resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
+    engines: {node: '>=4'}
+
+  postgres-bytea@1.0.0:
+    resolution: {integrity: sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==}
+    engines: {node: '>=0.10.0'}
+
+  postgres-date@1.0.7:
+    resolution: {integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==}
+    engines: {node: '>=0.10.0'}
+
+  postgres-interval@1.2.0:
+    resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
+    engines: {node: '>=0.10.0'}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -4430,9 +4459,6 @@ packages:
     resolution: {integrity: sha512-Gn/JaSk/Mt9gYubxTtSn/QCV4em9mpAPiR1rqy/Ocu19u/G9J5WWdNoUT4SiV6mFC3y6cxyFcFwdzPM3FgxGAQ==}
     engines: {node: '>= 10.13.0'}
 
-  seedrandom@3.0.5:
-    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
-
   seek-bzip@2.0.0:
     resolution: {integrity: sha512-SMguiTnYrhpLdk3PwfzHeotrcwi8bNV4iemL9tx9poR/yeaMYwB9VzR1w7b57DuWpuqR8n6oZboi0hj3AxZxQg==}
     hasBin: true
@@ -4623,6 +4649,10 @@ packages:
   split-string@3.1.0:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
     engines: {node: '>=0.10.0'}
+
+  split2@4.2.0:
+    resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
+    engines: {node: '>= 10.x'}
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
@@ -4880,9 +4910,6 @@ packages:
     resolution: {integrity: sha512-G7r3AhovYtr5YKOWQkta8RKAPb+J9IsO4uVmzjl8AZwfhs8UcUwTiD6gcJYSgOtzyjvQKrKYn41syHbUWMkafA==}
     engines: {node: '>=0.10.0'}
 
-  tiny-emitter@2.1.0:
-    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
-
   tmpl@1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
 
@@ -5041,10 +5068,6 @@ packages:
   typed-array-length@1.0.7:
     resolution: {integrity: sha512-3KS2b+kL7fsuk/eJZ7EQdnEmQoaho/r6KUef7hxvltNA5DR8NAUM+8wJMbJyZ4G9/7i3v5zPBIMN5aybAh2/Jg==}
     engines: {node: '>= 0.4'}
-
-  typed-function@4.2.1:
-    resolution: {integrity: sha512-EGjWssW7Tsk4DGfE+5yluuljS1OGYWiI1J6e8puZz9nTMM51Oug8CD5Zo4gWMsOhq5BI+1bF+rWTm4Vbj3ivRA==}
-    engines: {node: '>= 18'}
 
   typedarray.prototype.slice@1.0.5:
     resolution: {integrity: sha512-q7QNVDGTdl702bVFiI5eY4l/HkgCM6at9KhcFbgUAzezHFbOVy4+0O/lCjsABEQwbZPravVfBIiBVGo89yzHFg==}
@@ -5575,8 +5598,6 @@ snapshots:
     dependencies:
       '@babel/core': 7.28.4
       '@babel/helper-plugin-utils': 7.27.1
-
-  '@babel/runtime@7.28.4': {}
 
   '@babel/template@7.27.2':
     dependencies:
@@ -6259,13 +6280,13 @@ snapshots:
     optionalDependencies:
       '@nestjs/platform-express': 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)
 
-  '@nestjs/typeorm@11.0.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)))':
+  '@nestjs/typeorm@11.0.0(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)(typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)))':
     dependencies:
       '@nestjs/common': 11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.6(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.6)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
       rxjs: 7.8.2
-      typeorm: 0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2))
+      typeorm: 0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2))
 
   '@noble/hashes@1.8.0': {}
 
@@ -7430,8 +7451,6 @@ snapshots:
       has-own-prop: 2.0.0
       repeat-string: 1.6.1
 
-  complex.js@2.4.2: {}
-
   component-emitter@1.2.1: {}
 
   component-emitter@1.3.1: {}
@@ -7597,8 +7616,6 @@ snapshots:
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
-
-  decimal.js@10.6.0: {}
 
   decode-uri-component@0.2.2: {}
 
@@ -7807,8 +7824,6 @@ snapshots:
   escalade@3.2.0: {}
 
   escape-html@1.0.3: {}
-
-  escape-latex@1.2.0: {}
 
   escape-string-regexp@1.0.2: {}
 
@@ -8206,8 +8221,6 @@ snapshots:
       once: 1.4.0
 
   forwarded@0.2.0: {}
-
-  fraction.js@5.3.4: {}
 
   fragment-cache@0.2.1:
     dependencies:
@@ -9486,18 +9499,6 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mathjs@14.7.0:
-    dependencies:
-      '@babel/runtime': 7.28.4
-      complex.js: 2.4.2
-      decimal.js: 10.6.0
-      escape-latex: 1.2.0
-      fraction.js: 5.3.4
-      javascript-natural-sort: 0.7.1
-      seedrandom: 3.0.5
-      tiny-emitter: 2.1.0
-      typed-function: 4.2.1
-
   md5@2.2.1:
     dependencies:
       charenc: 0.0.2
@@ -9965,6 +9966,41 @@ snapshots:
 
   pend@1.2.0: {}
 
+  pg-cloudflare@1.2.7:
+    optional: true
+
+  pg-connection-string@2.9.1: {}
+
+  pg-int8@1.0.1: {}
+
+  pg-pool@3.10.1(pg@8.16.3):
+    dependencies:
+      pg: 8.16.3
+
+  pg-protocol@1.10.3: {}
+
+  pg-types@2.2.0:
+    dependencies:
+      pg-int8: 1.0.1
+      postgres-array: 2.0.0
+      postgres-bytea: 1.0.0
+      postgres-date: 1.0.7
+      postgres-interval: 1.2.0
+
+  pg@8.16.3:
+    dependencies:
+      pg-connection-string: 2.9.1
+      pg-pool: 3.10.1(pg@8.16.3)
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
+      pgpass: 1.0.5
+    optionalDependencies:
+      pg-cloudflare: 1.2.7
+
+  pgpass@1.0.5:
+    dependencies:
+      split2: 4.2.0
+
   picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
@@ -9988,6 +10024,16 @@ snapshots:
   posix-character-classes@0.1.1: {}
 
   possible-typed-array-names@1.1.0: {}
+
+  postgres-array@2.0.0: {}
+
+  postgres-bytea@1.0.0: {}
+
+  postgres-date@1.0.7: {}
+
+  postgres-interval@1.2.0:
+    dependencies:
+      xtend: 4.0.2
 
   prelude-ls@1.2.1: {}
 
@@ -10278,8 +10324,6 @@ snapshots:
       ajv-formats: 2.1.1(ajv@8.17.1)
       ajv-keywords: 5.1.0(ajv@8.17.1)
 
-  seedrandom@3.0.5: {}
-
   seek-bzip@2.0.0:
     dependencies:
       commander: 6.2.1
@@ -10517,6 +10561,8 @@ snapshots:
   split-string@3.1.0:
     dependencies:
       extend-shallow: 3.0.2
+
+  split2@4.2.0: {}
 
   sprintf-js@1.0.3: {}
 
@@ -10842,8 +10888,6 @@ snapshots:
 
   timed-out@4.0.1: {}
 
-  tiny-emitter@2.1.0: {}
-
   tmpl@1.0.5: {}
 
   to-buffer@1.2.1:
@@ -11023,8 +11067,6 @@ snapshots:
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
 
-  typed-function@4.2.1: {}
-
   typedarray.prototype.slice@1.0.5:
     dependencies:
       call-bind: 1.0.8
@@ -11038,7 +11080,7 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)):
+  typeorm@0.3.26(mongodb@6.18.0)(mysql2@3.15.0)(pg@8.16.3)(reflect-metadata@0.2.2)(ts-node@10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)):
     dependencies:
       '@sqltools/formatter': 1.2.5
       ansis: 3.17.0
@@ -11058,6 +11100,7 @@ snapshots:
     optionalDependencies:
       mongodb: 6.18.0
       mysql2: 3.15.0
+      pg: 8.16.3
       ts-node: 10.9.2(@swc/core@1.13.5)(@types/node@22.18.4)(typescript@5.9.2)
     transitivePeerDependencies:
       - babel-plugin-macros
