@@ -1,22 +1,22 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
-  ClassSerializerInterceptor,
   UseInterceptors,
-  ParseIntPipe,
 } from "@nestjs/common";
 import { ApiQuery } from "@nestjs/swagger";
 
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
-import { SessionService } from "./session.service";
 import { Session } from "./entities/session.entity";
+import { SessionService } from "./session.service";
 
 @Controller()
 export class SessionController {
@@ -63,6 +63,7 @@ export class SessionController {
   }
 
   @Get("session/:id")
+  @UseInterceptors(ClassSerializerInterceptor)
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.sessionService.findOne(id);
   }
@@ -70,7 +71,7 @@ export class SessionController {
   @Patch("session/:id")
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateSessionDto: UpdateSessionDto
+    @Body() updateSessionDto: UpdateSessionDto,
   ) {
     return this.sessionService.update(id, updateSessionDto);
   }
