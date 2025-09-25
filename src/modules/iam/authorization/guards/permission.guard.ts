@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 
-import { AuthPayload } from "../../authentication/interfaces/auth-payload.interface";
+import { AuthPayload } from "../../types/auth-payload.interface";
 import { PERMISSION_KEY } from "../decorators/permission.decorator";
 
 @Injectable()

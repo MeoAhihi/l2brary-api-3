@@ -9,13 +9,18 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
+import { ApiBearerAuth } from "@nestjs/swagger";
 
+import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
+import { AuthRequest } from "../types/auth-request.type";
 
 @Controller("user")
 export class UserController {
@@ -31,6 +36,14 @@ export class UserController {
   async findAll(): Promise<User[]> {
     const users = await this.userService.findAll();
     return plainToInstance(User, users, { excludeExtraneousValues: true });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get("profile")
+  async getProfile(@Req() req: AuthRequest) {
+    return await this.userService.findOne(req.user.sub, ["roles"]);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

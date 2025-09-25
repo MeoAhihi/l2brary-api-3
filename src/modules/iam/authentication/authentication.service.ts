@@ -10,7 +10,7 @@ import { User } from "../user/entities/user.entity";
 import { UserService } from "../user/user.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-import { AuthPayload } from "./interfaces/auth-payload.interface";
+import { AuthPayload } from "../types/auth-payload.interface";
 import { InviteCodeService } from "./invite-code.service";
 
 @Injectable()
