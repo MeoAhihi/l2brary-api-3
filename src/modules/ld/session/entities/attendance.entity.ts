@@ -1,4 +1,5 @@
 import { User } from "@/modules/iam/user/entities/user.entity";
+import { Expose } from "class-transformer";
 import {
   Column,
   CreateDateColumn,
@@ -16,10 +17,12 @@ export class Attendance {
   @PrimaryGeneratedColumn()
   id: number;
 
+  // @Expose()
   @OneToOne(() => User)
   @JoinColumn()
   user: User;
 
+  @Expose()
   @Column({
     name: "attend_time",
   })

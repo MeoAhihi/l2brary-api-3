@@ -11,6 +11,7 @@ import {
 
 import { Course } from "../../course/entities/course.entity";
 import { Game } from "../../game/entities/game.entity";
+import { LocationTypeEnum } from "../../types/location-type.enum";
 import { SessionStatus } from "../../types/session-status.enum";
 import { Attendance } from "./attendance.entity";
 
@@ -33,6 +34,10 @@ export class Session {
   course: Course;
 
   @Expose()
+  @Column("text", { nullable: true })
+  description?: string;
+
+  @Expose()
   @Column()
   startTime: Date;
 
@@ -43,6 +48,66 @@ export class Session {
   @Expose()
   @Column({ nullable: true })
   presenterName?: string;
+
+  @Expose()
+  @Column({
+    enum: LocationTypeEnum,
+    nullable: true,
+    default: LocationTypeEnum.PHYSICAL,
+  })
+  locationType?: LocationTypeEnum;
+
+  @Expose()
+  @Column({ nullable: true, default: "" })
+  roomInfo?: string;
+
+  @Expose()
+  @Column({ nullable: true, default: "" })
+  address?: string;
+
+  @Expose()
+  @Column({ nullable: true, type: "int" })
+  maxParticipant?: number;
+
+  @Expose()
+  @Column({ nullable: true, type: "int", default: 0 })
+  lateThreshold?: number;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: true })
+  autoCheckIn?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: true })
+  allowLateJoin?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: false })
+  enableGame?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: false })
+  autoScoring?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "int", default: 1 })
+  maxGamePerSession?: number;
+
+  @Expose()
+  @Column({ nullable: true, type: "int", default: 30 })
+  gameTimeout?: number;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: false })
+  emailNotification?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: false })
+  smsNotification?: boolean;
+
+  @Expose()
+  @Column({ nullable: true, type: "boolean", default: false })
+  reminderNotification?: boolean;
 
   @Expose()
   @OneToMany(() => Attendance, (attendance) => attendance.session, {
