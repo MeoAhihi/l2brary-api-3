@@ -1,5 +1,5 @@
 import { hash } from "bcrypt";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 import {
   ConflictException,
@@ -45,7 +45,12 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(options?: { ids?: string[] }): Promise<User[]> {
+    if (options && options.ids && options.ids.length > 0) {
+      return this.userRepository.find({
+        where: { id: In(options.ids) },
+      });
+    }
     return this.userRepository.find();
   }
 
