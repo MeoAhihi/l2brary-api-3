@@ -1,5 +1,5 @@
 import { GamificationService } from "@/modules/ae/gamification/gamification.service";
-import { SystemActivityKey } from "@/modules/ae/types/system-activities";
+import { SystemActivity } from "@/modules/ae/types/system-activities";
 import { UserService } from "src/modules/iam/user/user.service";
 import { FindOptionsWhere, Repository } from "typeorm";
 
@@ -118,7 +118,7 @@ export class EnrollmentService {
     await this.enrollmentRepository.save(enrollment);
     await this.gamificationService.systemLogActivity(
       userId,
-      SystemActivityKey.ENROLLMENT_APPROVED,
+      SystemActivity.ENROLLMENT_APPROVED,
       "Action completed from L&D Domain",
     );
     return enrollment;
