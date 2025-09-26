@@ -7,7 +7,7 @@ export class Activity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column("int")
@@ -15,6 +15,9 @@ export class Activity {
 
   @Column()
   category: string;
+
+  @Column({ default: false })
+  isManual: boolean;
 
   @OneToMany(() => ActivityLog, (activityLog) => activityLog.activity)
   activityLogs: ActivityLog[];

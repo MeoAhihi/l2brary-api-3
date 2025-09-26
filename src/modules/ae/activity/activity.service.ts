@@ -6,7 +6,7 @@ import { NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import {
-  SystemActivityKey,
+  SystemActivity,
   systemActivity,
   systemActivityCategories,
   systemActivityNames,
@@ -24,12 +24,12 @@ export class ActivityService {
 
   async onModuleInit(): Promise<void> {
     const existingActivities = await this.findExistingSystemActivities();
-    const existingKeys = this.getActivityKeys(existingActivities);
-    const systemActivityKeys = Object.values<string>(SystemActivityKey);
+    const existingNames = existingActivities.map((a) => a.name);
+    const systemActivities = Object.values<string>(SystemActivity);
 
     const missingActivityKeys = getMissing<string>(
-      systemActivityKeys,
-      existingKeys,
+      systemActivities,
+      new Set(existingNames),
     );
 
     if (missingActivityKeys.length > 0) {
@@ -47,20 +47,16 @@ export class ActivityService {
     });
   }
 
-  private getActivityKeys(activities: Activity[]): Set<string> {
-    return new Set(activities.map((a) => `${a.name}||${a.category}`));
-  }
-
   private createMissingSystemActivities(
     missingActivityKeys: string[],
   ): Activity[] {
-    return missingActivityKeys.map((key) => {
-      const [name, category] = key.split("||");
-      const point = systemActivity[key as SystemActivityKey];
+    return missingActivityKeys.map((name) => {
+      const { point, category } = systemActivity[name as SystemActivity];
       return this.activityRepository.create({
         name,
         category,
         point,
+        isManual: false,
       });
     });
   }
@@ -78,6 +74,7 @@ export class ActivityService {
       );
     }
     const activity = this.activityRepository.create(createActivityDto);
+    activity.isManual = true;
     return this.activityRepository.save(activity);
   }
 
@@ -97,17 +94,12 @@ export class ActivityService {
     return activity;
   }
 
-  async findByNameAndCategory(
-    name: string,
-    category: string,
-  ): Promise<Activity> {
+  async findByName(name: string): Promise<Activity> {
     const activity = await this.activityRepository.findOne({
-      where: { name, category },
+      where: { name },
     });
     if (!activity) {
-      throw new NotFoundException(
-        `Activity with name "${name}" and category "${category}" not found`,
-      );
+      throw new NotFoundException(`Activity with name "${name}" not found`);
     }
     return activity;
   }

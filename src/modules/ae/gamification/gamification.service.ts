@@ -6,7 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { ActivityService } from "../activity/activity.service";
-import { SystemActivityKey } from "../types/system-activities";
+import { SystemActivity } from "../types/system-activities";
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { UpdateGamificationDto } from "./dto/update-gamification.dto";
 import { ActivityLog } from "./entities/activity-log.entity";
@@ -45,7 +45,7 @@ export class GamificationService {
 
   async systemLogActivity(
     user: string | User,
-    systemActivityKey: SystemActivityKey,
+    systemActivity: SystemActivity,
     note?: string,
   ): Promise<void> {
     try {
@@ -55,13 +55,7 @@ export class GamificationService {
       const userEntity =
         typeof user === "string" ? await this.userService.findOne(user) : user;
 
-      // Find the activity entity by name and category
-      // Get the key, split by "||", before is name, after is category
-      const [name, category] = systemActivityKey.split("||");
-      const activity = await this.activityService.findByNameAndCategory(
-        name,
-        category,
-      );
+      const activity = await this.activityService.findByName(systemActivity);
 
       // Create and save the ActivityLog entity
       const activityLog = this.activityLogRepository.create({
