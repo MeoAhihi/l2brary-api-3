@@ -167,8 +167,29 @@ export class CourseService {
     return course;
   }
 
-  update(id: string, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(id: string, updateCourseDto: UpdateCourseDto): Promise<Course> {
+    const course = await this.findOne(id);
+
+    // Transform enrollmentDeadlineDate, startDate, endDate from string to Date
+    if (updateCourseDto.enrollmentDeadlineDate) {
+      (updateCourseDto as any).enrollmentDeadline = UTC7EndOfDate(
+        updateCourseDto.enrollmentDeadlineDate,
+      );
+      delete (updateCourseDto as any).enrollmentDeadlineDate;
+    }
+    if (updateCourseDto.startDate) {
+      (updateCourseDto as any).startDate = UTC7StartOfDate(
+        updateCourseDto.startDate,
+      );
+    }
+    if (updateCourseDto.endDate) {
+      (updateCourseDto as any).endDate = UTC7EndOfDate(updateCourseDto.endDate);
+    }
+
+    Object.assign(course, updateCourseDto);
+
+    course.updatedAt = new Date();
+    return this.courseRepository.save(course);
   }
 
   remove(id: string) {

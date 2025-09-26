@@ -75,8 +75,17 @@ export class EnrollmentService {
     return enrollment;
   }
 
-  update(id: number, updateEnrollmentDto: UpdateEnrollmentDto) {
-    return `This action updates a #${id} enrollment`;
+  async update(id: number, status: EnrollmentStatusEnum): Promise<Enrollment> {
+    const enrollment = await this.enrollmentRepository.findOne({
+      where: { id },
+      relations: ["user", "course"],
+    });
+    if (!enrollment) {
+      throw new NotFoundException(`Enrollment with id ${id} not found`);
+    }
+    enrollment.status = status;
+    await this.enrollmentRepository.save(enrollment);
+    return enrollment;
   }
 
   remove(id: number) {
