@@ -1,14 +1,16 @@
+import { UserModule } from "@/modules/iam/user/user.module";
+
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { CourseModule } from "../course/course.module";
 import { GameLog } from "../game/entities/game-log.entity";
 import { Game } from "../game/entities/game.entity";
+import { AttendanceService } from "./attendace.service";
 import { Attendance } from "./entities/attendance.entity";
 import { Session } from "./entities/session.entity";
 import { SessionController } from "./session.controller";
 import { SessionService } from "./session.service";
-import { UserModule } from "@/modules/iam/user/user.module";
 
 @Module({
   imports: [
@@ -17,6 +19,6 @@ import { UserModule } from "@/modules/iam/user/user.module";
     UserModule,
   ],
   controllers: [SessionController],
-  providers: [SessionService],
+  providers: [SessionService, AttendanceService],
 })
 export class SessionModule {}

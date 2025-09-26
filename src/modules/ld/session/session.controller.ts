@@ -1,3 +1,5 @@
+import { plainToInstance } from "class-transformer";
+
 import {
   Body,
   ClassSerializerInterceptor,
@@ -13,14 +15,20 @@ import {
 } from "@nestjs/common";
 import { ApiQuery } from "@nestjs/swagger";
 
+import { AttendanceService } from "./attendace.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
+import { MarkAttendanceDto } from "./dto/mark-attendance.dto";
+import { SessionDto } from "./dto/session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session } from "./entities/session.entity";
 import { SessionService } from "./session.service";
 
 @Controller()
 export class SessionController {
-  constructor(private readonly sessionService: SessionService) {}
+  constructor(
+    private readonly sessionService: SessionService,
+    private readonly attendanceService: AttendanceService,
+  ) {}
 
   @Post("course/:courseId/session")
   create(
@@ -63,9 +71,12 @@ export class SessionController {
   }
 
   @Get("session/:id")
-  @UseInterceptors(ClassSerializerInterceptor)
-  findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.sessionService.findOne(id);
+  async findOne(@Param("id", ParseIntPipe) id: number): Promise<SessionDto> {
+    const session = await this.sessionService.findOne(id);
+    return plainToInstance(SessionDto, session, {
+      excludeExtraneousValues: true,
+    });
+    return session;
   }
 
   @Patch("session/:id")
@@ -79,5 +90,25 @@ export class SessionController {
   @Delete("session/:id")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.sessionService.remove(id);
+  }
+
+  @Post("session/:id/attendance")
+  async markAttendance(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() markAttendanceDto: MarkAttendanceDto,
+  ) {
+    // Assumes user is authenticated and user id is available in req.user.id
+    return this.attendanceService.markAttendance(id, markAttendanceDto);
+  }
+
+  @Get("session/:id/attendance")
+  async getSessionAttendances(@Param("id", ParseIntPipe) id: number) {
+    return this.attendanceService.getSessionAttendances(id);
+  }
+
+  @Delete("attendance/:id")
+  async removeAttendance(@Param("id", ParseIntPipe) id: number) {
+    await this.attendanceService.removeAttendance(id);
+    return { message: "Attendance removed successfully" };
   }
 }
