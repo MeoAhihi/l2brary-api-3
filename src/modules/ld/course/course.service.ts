@@ -109,20 +109,22 @@ export class CourseService {
   async findAll({
     page = 1,
     limit = 10,
-    search,
+    title,
     group,
     scheduleType,
+    isPublic,
   }: {
     page?: number;
     limit?: number;
-    search?: string;
+    title?: string;
     group?: string;
     scheduleType?: ScheduleType;
+    isPublic?: boolean;
   } = {}) {
     const where: FindOptionsWhere<Course> = {};
 
-    if (search) {
-      where.title = ILike(`%${search}%`);
+    if (title) {
+      where.title = ILike(`%${title}%`);
     }
 
     if (group) {
@@ -131,6 +133,10 @@ export class CourseService {
 
     if (scheduleType) {
       where.scheduleType = scheduleType;
+    }
+
+    if (typeof isPublic === "boolean") {
+      where.isPublic = isPublic;
     }
 
     const [items, total] = await this.courseRepository.findAndCount({

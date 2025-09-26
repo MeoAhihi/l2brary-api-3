@@ -23,18 +23,16 @@ export class EnrollmentService {
     private readonly courseService: CourseService,
   ) {}
 
-  create(createEnrollmentDto: CreateEnrollmentDto) {
-    return "This action adds a new enrollment";
-  }
-
   async findAll({
     page = 1,
     limit = 10,
     courseId,
+    status,
   }: {
     page?: number;
     limit?: number;
     courseId?: string;
+    status?: EnrollmentStatusEnum;
   } = {}): Promise<{
     items: Enrollment[];
     total: number;
@@ -45,6 +43,9 @@ export class EnrollmentService {
     const where: FindOptionsWhere<Enrollment> = {};
     if (courseId) {
       where.course = { id: courseId };
+    }
+    if (status) {
+      where.status = status;
     }
 
     const [items, total] = await this.enrollmentRepository.findAndCount({

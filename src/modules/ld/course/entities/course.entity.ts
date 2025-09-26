@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import {
   Column,
   CreateDateColumn,
@@ -81,6 +82,7 @@ export class Course {
     );
   }
 
+  @Expose()
   get isEnrollable(): boolean {
     // Returns true if the course is open for enrollment (before the enrollmentDeadline, or no deadline)
     if (!this.enrollmentDeadline) {
