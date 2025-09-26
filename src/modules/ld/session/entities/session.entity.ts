@@ -109,13 +109,13 @@ export class Session {
   @Column({ nullable: true, type: "boolean", default: false })
   reminderNotification?: boolean;
 
-  @Expose()
+  @Exclude()
   @OneToMany(() => Attendance, (attendance) => attendance.session, {
     cascade: true,
   })
   attendances: Attendance[];
 
-  @Expose()
+  @Exclude()
   @OneToMany(() => Game, (game) => game.session, { cascade: true })
   games: Game[];
 

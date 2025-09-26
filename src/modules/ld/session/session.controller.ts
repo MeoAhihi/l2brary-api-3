@@ -71,12 +71,9 @@ export class SessionController {
   }
 
   @Get("session/:id")
+  @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param("id", ParseIntPipe) id: number): Promise<SessionDto> {
-    const session = await this.sessionService.findOne(id);
-    return plainToInstance(SessionDto, session, {
-      excludeExtraneousValues: true,
-    });
-    return session;
+    return await this.sessionService.findOne(id);
   }
 
   @Patch("session/:id")
