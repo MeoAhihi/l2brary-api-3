@@ -1,3 +1,5 @@
+import { GamificationService } from "@/modules/ae/gamification/gamification.service";
+import { SystemActivityKey } from "@/modules/ae/types/system-activities";
 import { UserService } from "src/modules/iam/user/user.service";
 import { FindOptionsWhere, Repository } from "typeorm";
 
@@ -10,8 +12,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 import { CourseService } from "../course/course.service";
 import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
-import { CreateEnrollmentDto } from "./dto/create-enrollment.dto";
-import { UpdateEnrollmentDto } from "./dto/update-enrollment.dto";
 import { Enrollment } from "./entities/enrollment.entity";
 
 @Injectable()
@@ -21,6 +21,7 @@ export class EnrollmentService {
     private readonly enrollmentRepository: Repository<Enrollment>, // Replace 'any' with the actual repository type when available
     private readonly userService: UserService,
     private readonly courseService: CourseService,
+    private readonly gamificationService: GamificationService,
   ) {}
 
   async findAll({
@@ -115,6 +116,11 @@ export class EnrollmentService {
       status: EnrollmentStatusEnum.PENDING, // or EnrollmentStatusEnum.PENDING if imported
     });
     await this.enrollmentRepository.save(enrollment);
+    await this.gamificationService.systemLogActivity(
+      userId,
+      SystemActivityKey.ENROLLMENT_APPROVED,
+      "Action completed from L&D Domain",
+    );
     return enrollment;
   }
 

@@ -6,7 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { ActivityService } from "../activity/activity.service";
-import { SystemActivity } from "../types/system-activity.type";
+import { SystemActivityKey } from "../types/system-activities";
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { UpdateGamificationDto } from "./dto/update-gamification.dto";
 import { ActivityLog } from "./entities/activity-log.entity";
@@ -44,30 +44,36 @@ export class GamificationService {
   }
 
   async systemLogActivity(
-    user: User,
-    systemActivity: SystemActivity,
+    user: string | User,
+    systemActivityKey: SystemActivityKey,
     note?: string,
   ): Promise<void> {
     try {
-      // Use a special identifier for system actions, e.g., "system"
       const loggedBy = "system";
 
-      // Find the activity and user in parallel
+      // If user is a string (userId), fetch the User entity
+      const userEntity =
+        typeof user === "string" ? await this.userService.findOne(user) : user;
+
+      // Find the activity entity by name and category
+      // Get the key, split by "||", before is name, after is category
+      const [name, category] = systemActivityKey.split("||");
       const activity = await this.activityService.findByNameAndCategory(
-        systemActivity.name,
-        systemActivity.category,
+        name,
+        category,
       );
 
-      // Create a new ActivityLog entity
-      this.activityLogRepository.create({
-        user,
+      // Create and save the ActivityLog entity
+      const activityLog = this.activityLogRepository.create({
+        user: userEntity,
         activity,
         loggedBy,
         note,
         createdAt: new Date(),
       });
+
+      await this.activityLogRepository.save(activityLog);
     } catch (error) {
-      // log the error here
       // DO NOT THROW ERROR, system log activity must not block main action
       console.error("Error in systemLogActivity:", error);
     }
