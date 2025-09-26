@@ -1,9 +1,10 @@
-import { Repository } from "typeorm";
+import { FindOptionsWhere, In, Repository } from "typeorm";
 
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
+import { SystemActivities } from "../types/system-activities";
 import { CreateActivityDto } from "./dto/create-activity.dto";
 import { UpdateActivityDto } from "./dto/update-activity.dto";
 import { Activity } from "./entities/activity.entity";
@@ -15,13 +16,60 @@ export class ActivityService {
     private readonly activityRepository: Repository<Activity>,
   ) {}
 
+  async onModuleInit() {
+    // Get all existing activities from the DB (by category)
+    const systemActivityNames = SystemActivities.map((a) => a.name);
+    const existingSystemActivities = await this.activityRepository.find({
+      where: {
+        name: In(systemActivityNames),
+      },
+    });
+
+    // Create a set of unique keys for existing activities (name + category)
+    const existingActivityKeys = new Set(
+      existingSystemActivities.map((a) => `${a.name}||${a.category}`),
+    );
+
+    // Find missing activities (by name + category)
+    const missingActivities = SystemActivities.filter(
+      (activity) =>
+        !existingActivityKeys.has(`${activity.name}||${activity.category}`),
+    );
+
+    if (missingActivities.length > 0) {
+      const newActivities = missingActivities.map((activity) =>
+        this.activityRepository.create({
+          name: activity.name,
+          point: activity.point,
+          category: activity.category,
+        }),
+      );
+      await this.activityRepository.save(newActivities);
+    }
+  }
+
   async create(createActivityDto: CreateActivityDto): Promise<Activity> {
+    const existing = await this.activityRepository.findOne({
+      where: {
+        name: createActivityDto.name,
+        category: createActivityDto.category,
+      },
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Activity with name "${createActivityDto.name}" and category "${createActivityDto.category}" already exists`,
+      );
+    }
     const activity = this.activityRepository.create(createActivityDto);
     return this.activityRepository.save(activity);
   }
 
-  async findAll(): Promise<Activity[]> {
-    return this.activityRepository.find();
+  async findAll(options: { category?: string } = {}): Promise<Activity[]> {
+    const where: FindOptionsWhere<Activity> = {};
+    if (options.category) {
+      where.category = options.category;
+    }
+    return this.activityRepository.find({ where });
   }
 
   async findOne(id: number): Promise<Activity> {
