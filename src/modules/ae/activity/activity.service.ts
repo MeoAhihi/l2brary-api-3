@@ -80,6 +80,21 @@ export class ActivityService {
     return activity;
   }
 
+  async findByNameAndCategory(
+    name: string,
+    category: string,
+  ): Promise<Activity> {
+    const activity = await this.activityRepository.findOne({
+      where: { name, category },
+    });
+    if (!activity) {
+      throw new NotFoundException(
+        `Activity with name "${name}" and category "${category}" not found`,
+      );
+    }
+    return activity;
+  }
+
   async update(
     id: number,
     updateActivityDto: UpdateActivityDto,

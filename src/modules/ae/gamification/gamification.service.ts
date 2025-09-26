@@ -1,3 +1,4 @@
+import { User } from "@/modules/iam/user/entities/user.entity";
 import { UserService } from "src/modules/iam/user/user.service";
 import { Repository } from "typeorm";
 
@@ -5,6 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { ActivityService } from "../activity/activity.service";
+import { SystemActivity } from "../types/system-activity.type";
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { UpdateGamificationDto } from "./dto/update-gamification.dto";
 import { ActivityLog } from "./entities/activity-log.entity";
@@ -39,6 +41,36 @@ export class GamificationService {
     });
 
     return this.activityLogRepository.save(activityLog);
+  }
+
+  async systemLogActivity(
+    user: User,
+    systemActivity: SystemActivity,
+    note?: string,
+  ): Promise<void> {
+    try {
+      // Use a special identifier for system actions, e.g., "system"
+      const loggedBy = "system";
+
+      // Find the activity and user in parallel
+      const activity = await this.activityService.findByNameAndCategory(
+        systemActivity.name,
+        systemActivity.category,
+      );
+
+      // Create a new ActivityLog entity
+      this.activityLogRepository.create({
+        user,
+        activity,
+        loggedBy,
+        note,
+        createdAt: new Date(),
+      });
+    } catch (error) {
+      // log the error here
+      // DO NOT THROW ERROR, system log activity must not block main action
+      console.error("Error in systemLogActivity:", error);
+    }
   }
 
   async findAll(
@@ -76,10 +108,12 @@ export class GamificationService {
   }
 
   update(id: number, updateGamificationDto: UpdateGamificationDto) {
+    // forbide mutating system activity
     return `This action updates a #${id} gamification`;
   }
 
   remove(id: number) {
+    // forbide removing system activity
     return `This action removes a #${id} gamification`;
   }
 
