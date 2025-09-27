@@ -8,6 +8,9 @@ import { Enrollment } from "src/modules/ld/enrollment/entities/enrollment.entity
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { DemographicModule } from "./demographic/demographic.module";
+import { AnalyticsOptimizationController } from "./optimization/analytics.optimization.controller";
+import { AnalyticsOptimizationService } from "./optimization/analytics.optimization.service";
 import { TrackGrowthController } from "./track-growth/analytics.track-growth.controller";
 import { TrackGrowthService } from "./track-growth/analytics.track-growth.service";
 
@@ -21,8 +24,9 @@ import { TrackGrowthService } from "./track-growth/analytics.track-growth.servic
       Activity,
       ActivityLog,
     ]),
+    DemographicModule,
   ],
-  controllers: [TrackGrowthController],
-  providers: [TrackGrowthService],
+  controllers: [TrackGrowthController, AnalyticsOptimizationController],
+  providers: [TrackGrowthService, AnalyticsOptimizationService],
 })
 export class AnalyticsModule {}
