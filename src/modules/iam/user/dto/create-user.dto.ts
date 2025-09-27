@@ -1,5 +1,6 @@
 import { Transform } from "class-transformer";
 import {
+  IsArray,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -78,4 +79,42 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(8)
   password: string;
+
+  @ApiPropertyOptional({
+    type: [String],
+    example: ["course-cert-1", "course-cert-2"],
+    description: "List of course certificate IDs associated with the user",
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  courseCertificates?: string[];
+
+  @ApiPropertyOptional({
+    type: [String],
+    example: ["event-cert-1", "event-cert-2"],
+    description: "List of event certificate IDs associated with the user",
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  eventCertificates?: string[];
+
+  @ApiPropertyOptional({
+    type: [String],
+    example: ["Intern at Company A", "Volunteer at Event B"],
+    description: "List of experiences of the user",
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  experiences?: string[];
+
+  @ApiPropertyOptional({
+    example: "Junior",
+    description: "Rank or position of the user",
+  })
+  @IsOptional()
+  @IsString()
+  rank?: string;
 }

@@ -52,6 +52,22 @@ export class User {
   @Exclude()
   password: string;
 
+  @Column({ nullable: true })
+  @Expose()
+  rank: string;
+
+  @Column("simple-array", { nullable: true })
+  @Expose()
+  courseCertificates: string[];
+
+  @Column("simple-array", { nullable: true })
+  @Expose()
+  eventCertificates: string[];
+
+  @Column("simple-array", { nullable: true })
+  @Expose()
+  experiences: string[];
+
   @CreateDateColumn()
   @Expose()
   createdAt: Date;
