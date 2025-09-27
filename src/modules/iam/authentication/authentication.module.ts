@@ -8,7 +8,9 @@ import { UserModule } from "../user/user.module";
 import { AuthenticationController } from "./authentication.controller";
 import { AuthenticationService } from "./authentication.service";
 import { InviteCode } from "./entities/invite-code.entity";
+import { ResetPasswordCode } from "./entities/reset-password-code.entity";
 import { InviteCodeService } from "./invite-code.service";
+import { ResetPasswordCodeService } from "./reset-password-code.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 
 @Module({
@@ -16,11 +18,16 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     UserModule,
     PassportModule,
     JwtModule.register({}),
-    TypeOrmModule.forFeature([InviteCode]),
+    TypeOrmModule.forFeature([InviteCode, ResetPasswordCode]),
     AuthorizationModule,
   ],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService, InviteCodeService, JwtStrategy],
+  providers: [
+    AuthenticationService,
+    InviteCodeService,
+    ResetPasswordCodeService,
+    JwtStrategy,
+  ],
   exports: [AuthenticationService],
 })
 export class AuthenticationModule {}

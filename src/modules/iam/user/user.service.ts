@@ -1,4 +1,4 @@
-import { hash, hashSync } from "bcrypt";
+import { compareSync, hash, hashSync } from "bcrypt";
 import { In, Repository } from "typeorm";
 
 import {
@@ -88,6 +88,10 @@ export class UserService {
 
   findByPhoneNumber(phoneNumber: string): Promise<User | null> {
     return this.userRepository.findOne({ where: { phoneNumber } });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {

@@ -13,6 +13,7 @@ import { ChangePasswordDto } from "./dto/change-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { InviteCodeService } from "./invite-code.service";
+import { ResetPasswordCodeService } from "./reset-password-code.service";
 
 @Injectable()
 export class AuthenticationService {
@@ -22,6 +23,7 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
     private readonly inviteCodeService: InviteCodeService,
     private readonly permissionService: PermissionService,
+    private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
   async validateUser(phoneNumber: string, password: string): Promise<User> {
@@ -129,5 +131,22 @@ export class AuthenticationService {
     );
 
     return { message: "Password changed successfully" };
+  }
+
+  async resetPassword(resetPasswordCode: string, newPassword: string) {
+    // Find the reset password code entity
+    const resetPasswordCodeEntity =
+      await this.resetPasswordCodeService.findOneByCode(resetPasswordCode);
+    const email = resetPasswordCodeEntity.email;
+    // Find the user by email
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException("User not found for this reset code");
+    }
+    // Update the user's password
+    await this.userService.updatePassword(user.id, newPassword);
+    // Delete the reset password code after use
+    await this.resetPasswordCodeService.delete(resetPasswordCode);
+    return { message: "Password reset successfully" };
   }
 }
