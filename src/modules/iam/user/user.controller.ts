@@ -9,18 +9,19 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
+import { AuthRequest } from "../types/auth-request.type";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
-import { AuthRequest } from "../types/auth-request.type";
 
 @Controller("user")
 export class UserController {
@@ -33,8 +34,37 @@ export class UserController {
   }
 
   @Get()
-  async findAll(): Promise<User[]> {
-    const users = await this.userService.findAll();
+  @ApiQuery({
+    name: "gender",
+    required: false,
+    type: String,
+    description: "Filter users by gender",
+  })
+  @ApiQuery({
+    name: "ranks",
+    required: false,
+    type: [String],
+    description: "Filter users by an array of ranks",
+  })
+  @ApiQuery({
+    name: "sortByRank",
+    required: false,
+    type: Boolean,
+    description: "Sort users by rank in ascending order",
+    example: true,
+    default: false,
+    allowEmptyValue: true,
+  })
+  async findAll(
+    @Query("gender") gender?: string,
+    @Query("ranks") ranks?: string[],
+    @Query("sortByRank") sortByRank?: boolean,
+  ): Promise<User[]> {
+    const users = await this.userService.findAll({
+      gender,
+      ranks,
+      sortByRank,
+    });
     return plainToInstance(User, users, { excludeExtraneousValues: true });
   }
 
