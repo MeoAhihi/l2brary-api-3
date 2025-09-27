@@ -192,6 +192,24 @@ export class CourseService {
       (updateCourseDto as any).endDate = UTC7EndOfDate(updateCourseDto.endDate);
     }
 
+    // Validate scheduleType and scheduleDetail if either is being updated
+    const scheduleTypeToValidate =
+      updateCourseDto.scheduleType !== undefined
+        ? updateCourseDto.scheduleType
+        : course.scheduleType;
+    const scheduleDetailToValidate =
+      updateCourseDto.scheduleDetail !== undefined
+        ? updateCourseDto.scheduleDetail
+        : course.scheduleDetail;
+
+    if (
+      !this.isValidateSchedule(scheduleTypeToValidate, scheduleDetailToValidate)
+    ) {
+      throw new ConflictException(
+        "Invalid scheduleDetail for the given scheduleType",
+      );
+    }
+
     Object.assign(course, updateCourseDto);
 
     course.updatedAt = new Date();
