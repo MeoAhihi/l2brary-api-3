@@ -14,7 +14,7 @@ import { Session } from "./session.entity";
 
 @Entity("attendance")
 export class Attendance {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   // @Expose()

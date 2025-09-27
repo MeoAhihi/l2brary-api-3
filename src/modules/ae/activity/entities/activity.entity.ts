@@ -4,7 +4,7 @@ import { ActivityLog } from "../../gamification/entities/activity-log.entity";
 
 @Entity()
 export class Activity {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @Column({ unique: true })

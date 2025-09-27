@@ -11,7 +11,7 @@ import { Activity } from "../../activity/entities/activity.entity";
 
 @Entity()
 export class ActivityLog {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @ManyToOne(() => User, (user) => user.activityLogs)

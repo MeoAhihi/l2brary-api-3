@@ -5,7 +5,7 @@ import { GameLog } from "./game-log.entity";
 
 @Entity()
 export class Game {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   // Assuming Session is another entity, you may need to import it and set up the relation.

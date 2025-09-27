@@ -5,7 +5,7 @@ import { Game } from "./game.entity";
 
 @Entity()
 export class GameLog {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @ManyToOne(() => User, { nullable: false })
