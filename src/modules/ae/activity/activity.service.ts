@@ -27,6 +27,8 @@ export class ActivityService {
     const existingNames = existingActivities.map((a) => a.name);
     const systemActivities = Object.values<string>(SystemActivity);
 
+    console.log("🚀 ~ ActivityService ~ onModuleInit ~ systemActivities:", systemActivities)
+    console.log("🚀 ~ ActivityService ~ onModuleInit ~ existingNames:", existingNames)
     // Insert missing activities
     const missingActivityKeys = getMissing<string>(
       systemActivities,
@@ -60,7 +62,6 @@ export class ActivityService {
     return this.activityRepository.find({
       where: {
         name: In(systemActivityNames),
-        category: In(systemActivityCategories),
       },
     });
   }
