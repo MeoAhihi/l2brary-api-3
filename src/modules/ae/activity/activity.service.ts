@@ -8,7 +8,6 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
   SystemActivity,
   systemActivity,
-  systemActivityCategories,
   systemActivityNames,
 } from "../types/system-activities";
 import { CreateActivityDto } from "./dto/create-activity.dto";
@@ -27,8 +26,6 @@ export class ActivityService {
     const existingNames = existingActivities.map((a) => a.name);
     const systemActivities = Object.values<string>(SystemActivity);
 
-    console.log("🚀 ~ ActivityService ~ onModuleInit ~ systemActivities:", systemActivities)
-    console.log("🚀 ~ ActivityService ~ onModuleInit ~ existingNames:", existingNames)
     // Insert missing activities
     const missingActivityKeys = getMissing<string>(
       systemActivities,
