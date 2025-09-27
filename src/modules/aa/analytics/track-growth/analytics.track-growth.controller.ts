@@ -56,41 +56,88 @@ export class TrackGrowthController {
   }
 
   @Get("users/inactive")
-  @ApiOperation({ summary: "Get inactive users with maximum score" })
+  @ApiOperation({
+    summary: "Get inactive users with maximum score and optional date interval",
+  })
   @ApiQuery({
     name: "maxscore",
     required: false,
     type: Number,
     description: "Maximum total score to be considered inactive (default 0)",
+  })
+  @ApiQuery({
+    name: "from",
+    required: false,
+    type: Date,
+    description:
+      "Start date (ISO string) for filtering users by inactivity period",
+  })
+  @ApiQuery({
+    name: "to",
+    required: false,
+    type: Date,
+    description:
+      "End date (ISO string) for filtering users by inactivity period",
   })
   @ApiResponse({
     status: 200,
     description: "List of inactive users",
     type: [Object],
   })
-  async getInactiveUsers(@Query("maxscore") maxScore?: number) {
+  async getInactiveUsers(
+    @Query("maxscore") maxScore?: number,
+    @Query("from") from?: string,
+    @Query("to") to?: string,
+  ) {
+    const fromDate = from ? new Date(from) : undefined;
+    const toDate = to ? new Date(to) : undefined;
     return await this.trackGrowthservice.getInactiveUsers(
       typeof maxScore === "number" ? maxScore : 0,
+      fromDate,
+      toDate,
     );
   }
 
   @Get("users/inactive/count")
-  @ApiOperation({ summary: "Count of inactive users with maximum score" })
+  @ApiOperation({
+    summary:
+      "Count of inactive users with maximum score and optional date interval",
+  })
   @ApiQuery({
     name: "maxscore",
     required: false,
     type: Number,
     description: "Maximum total score to be considered inactive (default 0)",
   })
+  @ApiQuery({
+    name: "from",
+    required: false,
+    type: Date,
+    description:
+      "Start date (ISO string) for filtering users by inactivity period",
+  })
+  @ApiQuery({
+    name: "to",
+    required: false,
+    type: Date,
+    description:
+      "End date (ISO string) for filtering users by inactivity period",
+  })
   @ApiResponse({
     status: 200,
     description: "Count of inactive users",
     type: Number,
   })
-  async countInactiveUsers(@Query("maxscore") maxScore?: number) {
+  async countInactiveUsers(
+    @Query("maxscore") maxScore?: number,
+    @Query("from") from?: Date,
+    @Query("to") to?: Date,
+  ) {
     return {
       count: await this.trackGrowthservice.countInactiveUsers(
         typeof maxScore === "number" ? maxScore : 0,
+        from,
+        to,
       ),
     };
   }

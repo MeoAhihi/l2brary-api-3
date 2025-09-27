@@ -95,12 +95,21 @@ export class TrackGrowthService {
    * Inactive users are those who have not performed any activity (no ActivityLog entries)
    * or whose total activity points are less than or equal to the given maxScore (default 0).
    */
-  async getInactiveUsers(maxScore = 0) {
-    // Users with no activity logs or total points <= maxScore
+  async getInactiveUsers(
+    maxScore = 0,
+    from: Date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    to: Date = new Date(),
+  ) {
+    // Users with no activity logs or total points <= maxScore in the interval
     // Left join ActivityLog and Activity, group by user, sum points, filter
     return this.userRepository
       .createQueryBuilder("user")
-      .leftJoin("user.activityLogs", "activityLog")
+      .leftJoin(
+        "user.activityLogs",
+        "activityLog",
+        "activityLog.createdAt >= :from AND activityLog.createdAt <= :to",
+        { from, to },
+      )
       .leftJoin("activityLog.activity", "activity")
       .select([
         "user.id AS id",
@@ -118,10 +127,13 @@ export class TrackGrowthService {
    * Inactive users are those who have not performed any activity (no ActivityLog entries)
    * or whose total activity points are less than or equal to the given maxScore (default 0).
    */
-  async countInactiveUsers(maxScore = 0): Promise<number> {
-    return this.getInactiveUsers(maxScore).then(
-      (inactiveMembers) => inactiveMembers.length,
-    );
+  async countInactiveUsers(
+    maxScore = 0,
+    from: Date = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    to: Date = new Date(),
+  ): Promise<number> {
+    const inactiveUsers = await this.getInactiveUsers(maxScore, from, to);
+    return inactiveUsers.length;
   }
 
   /**
