@@ -68,6 +68,7 @@ export class ArticleController {
       limit,
       searchTitle,
       tags: tagsArray,
+      isPublish: true,
     });
   }
 
@@ -84,5 +85,16 @@ export class ArticleController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.articleService.remove(id);
+  }
+
+  @Patch(":id/review")
+  @ApiQuery({
+    name: "isPublished",
+    required: true,
+    type: Boolean,
+    description: "Set to true to publish the article, false to unpublish",
+  })
+  review(@Param("id") id: string, @Query("isPublished") isPublished: boolean) {
+    return this.articleService.review(id, isPublished);
   }
 }

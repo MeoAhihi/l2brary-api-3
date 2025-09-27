@@ -39,11 +39,13 @@ export class ArticleService {
     limit = 10,
     searchTitle,
     tags,
+    isPublish = true,
   }: {
     page?: number;
     limit?: number;
     searchTitle?: string;
     tags?: string[];
+    isPublish?: boolean;
   } = {}): Promise<{
     data: Partial<Article>[];
     total: number;
@@ -76,22 +78,24 @@ export class ArticleService {
     let whereExpr = "";
     let params: Record<string, any> = {};
 
+    if (typeof isPublish === "boolean") {
+      whereExpr = "article.isPublished = :isPublish";
+      params.isPublish = isPublish;
+    }
+
     if (searchTitle) {
-      whereExpr = "article.title LIKE :searchTitle";
+      if (whereExpr) {
+        whereExpr += " AND ";
+      }
+      whereExpr += "article.title LIKE :searchTitle";
       params.searchTitle = `%${searchTitle}%`;
     }
 
     if (tags && tags.length > 0) {
       // Filter articles that have ALL the specified tags
-      // For each tag, add a condition: FIND_IN_SET(:tagN, article.tags) > 0
       const tagConds = tags.map((tag, idx) => {
         const paramName = `tag${idx}`;
         params[paramName] = tag;
-        // For Postgres, use array position; for MySQL, use FIND_IN_SET
-        // Since article.tags is a simple-array, we can use LIKE for each tag
-        // e.g. ','||article.tags||',' LIKE '%,tag,%'
-        // But for simplicity, use LIKE '%,tag,%' or LIKE 'tag,%' or LIKE '%,tag' or = 'tag'
-        // But here, we use: article.tags LIKE :tagPatternN
         params[`${paramName}Pattern`] = `%${tag}%`;
         return `article.tags LIKE :${paramName}Pattern`;
       });
@@ -132,17 +136,11 @@ export class ArticleService {
   }
 
   async update(id: string, updateArticleDto: UpdateArticleDto) {
-    const article = await this.articleRepository.findOne({
-      where: { id },
-      relations: ["author"],
-    });
-
-    if (!article) {
-      throw new NotFoundException(`Article with id ${id} does not exist`);
-    }
+    const article = await this.findOne(id);
 
     // Update fields
     Object.assign(article, updateArticleDto);
+    article.isPublished = false;
     article.updatedAt = new Date();
 
     await this.articleRepository.save(article);
@@ -152,5 +150,15 @@ export class ArticleService {
 
   remove(id: string) {
     return `This action removes a #${id} article`;
+  }
+
+  async review(id: string, isPublished: boolean) {
+    const article = await this.findOne(id);
+    article.isPublished = isPublished;
+    article.updatedAt = new Date();
+
+    await this.articleRepository.save(article);
+
+    return article;
   }
 }
