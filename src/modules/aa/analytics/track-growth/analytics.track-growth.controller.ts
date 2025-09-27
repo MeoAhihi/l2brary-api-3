@@ -124,14 +124,4 @@ export class TrackGrowthController {
   async countUsersByMonthLast12() {
     return await this.trackGrowthservice.countNewUsersByMonthLast12();
   }
-
-  @Get("users/gender-breakdown")
-  async getUserBreakdownByGender() {
-    return await this.trackGrowthservice.getUserBreakdownByGender();
-  }
-
-  @Get("users/age-breakdown")
-  async getUserBreakdownByAge() {
-    return await this.trackGrowthservice.getUserBreakdownByAge();
-  }
 }

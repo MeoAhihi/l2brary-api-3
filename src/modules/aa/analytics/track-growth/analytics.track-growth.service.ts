@@ -188,35 +188,4 @@ export class TrackGrowthService {
       retentionRate,
     };
   }
-
-  /**
-   * Returns a breakdown of users by gender.
-   * Assumes User entity has a 'gender' field.
-   */
-  async getUserBreakdownByGender() {
-    return this.userRepository
-      .createQueryBuilder("user")
-      .select("user.gender", "gender")
-      .addSelect("COUNT(*)", "count")
-      .groupBy("user.gender")
-      .getRawMany();
-  }
-
-  async getUserBreakdownByAge(): Promise<{ age: string; count: number }[]> {
-    // This query is for MySQL. Aggregate by exact age, not by bucket.
-    // TIMESTAMPDIFF(YEAR, dateOfBirth, CURDATE()) gives age in years in MySQL.
-    const raw = await this.userRepository
-      .createQueryBuilder("user")
-      .select(`FLOOR(TIMESTAMPDIFF(YEAR, user.birthdate, CURDATE()))`, "age")
-      .addSelect("COUNT(*)", "count")
-      .groupBy("age")
-      .orderBy("age", "ASC")
-      .getRawMany<{ age: string; count: string }>();
-
-    // Convert age and count to numbers
-    return raw.map((r) => ({
-      age: r.age,
-      count: Number(r.count),
-    }));
-  }
 }
