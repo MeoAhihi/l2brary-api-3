@@ -1,4 +1,4 @@
-import { hash } from "bcrypt";
+import { hash, hashSync } from "bcrypt";
 import { In, Repository } from "typeorm";
 
 import {
@@ -45,13 +45,31 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async findAll(options?: { ids?: string[] }): Promise<User[]> {
-    if (options && options.ids && options.ids.length > 0) {
-      return this.userRepository.find({
-        where: { id: In(options.ids) },
-      });
+  async findAll(options?: {
+    ids?: string[];
+    gender?: string;
+    ranks?: string[];
+    sortByRank?: boolean;
+  }): Promise<User[]> {
+    const where: any = {};
+
+    if (options?.ids && options.ids.length > 0) {
+      where.id = In(options.ids);
     }
-    return this.userRepository.find();
+    if (options?.gender) {
+      where.gender = options.gender;
+    }
+    if (options?.ranks && options.ranks.length > 0) {
+      where.rank = In(options.ranks);
+    }
+
+    const findOptions: any = { where };
+
+    if (options?.sortByRank) {
+      findOptions.order = { rank: "ASC" };
+    }
+
+    return this.userRepository.find(findOptions);
   }
 
   async findOne(
@@ -122,6 +140,16 @@ export class UserService {
     // Remove the role from the user's roles array
     user.roles = (user.roles || []).filter((role) => role.id !== roleId);
 
+    await this.userRepository.save(user);
+  }
+
+  async updatePassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.findOne(userId);
+
+    // Hash new password and update
+    const saltRounds = 10;
+    const hashedPassword = hashSync(newPassword, saltRounds);
+    user.password = hashedPassword;
     await this.userRepository.save(user);
   }
 }

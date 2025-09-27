@@ -1,4 +1,4 @@
-import { compare } from "bcrypt";
+import { compare, compareSync } from "bcrypt";
 import { PermissionEnum } from "src/common/permission.enum";
 
 import { Injectable, UnauthorizedException } from "@nestjs/common";
@@ -6,11 +6,12 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
 import { PermissionService } from "../authorization/permission.service";
+import { AuthPayload } from "../types/auth-payload.interface";
 import { User } from "../user/entities/user.entity";
 import { UserService } from "../user/user.service";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
-import { AuthPayload } from "../types/auth-payload.interface";
 import { InviteCodeService } from "./invite-code.service";
 
 @Injectable()
@@ -107,5 +108,26 @@ export class AuthenticationService {
 
     // new members have no permissions
     return this.getTokens({ sub: user.id, permissions: [] });
+  }
+
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    const user = await this.userService.findOne(userId);
+
+    // Check if current password matches
+    const isMatch = compareSync(
+      changePasswordDto.currentPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new UnauthorizedException("Current password is incorrect");
+    }
+
+    // Update password
+    await this.userService.updatePassword(
+      userId,
+      changePasswordDto.newPassword,
+    );
+
+    return { message: "Password changed successfully" };
   }
 }
