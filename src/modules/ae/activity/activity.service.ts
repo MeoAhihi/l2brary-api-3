@@ -27,14 +27,32 @@ export class ActivityService {
     const existingNames = existingActivities.map((a) => a.name);
     const systemActivities = Object.values<string>(SystemActivity);
 
+    // Insert missing activities
     const missingActivityKeys = getMissing<string>(
       systemActivities,
       new Set(existingNames),
     );
-
     if (missingActivityKeys.length > 0) {
       const toInsert = this.createMissingSystemActivities(missingActivityKeys);
       await this.activityRepository.save(toInsert);
+    }
+
+    // Update existing activities if their definition has changed
+    for (const activity of existingActivities) {
+      const sysDef = systemActivity[activity.name as SystemActivity];
+      if (
+        sysDef &&
+        (activity.point !== sysDef.point ||
+          activity.category !== sysDef.category ||
+          activity.isManual !== false)
+      ) {
+        Object.assign(activity, {
+          point: sysDef.point,
+          category: sysDef.category,
+          isManual: false,
+        });
+        await this.activityRepository.save(activity);
+      }
     }
   }
 
