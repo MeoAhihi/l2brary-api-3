@@ -1,9 +1,10 @@
-import { IsInt, IsString, IsUUID } from "class-validator";
+import { IsInt, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateScoreColDto {
   @IsString()
   name: string;
 
   @IsInt()
-  coefficient: number;
+  @IsOptional()
+  coefficient?: number;
 }
