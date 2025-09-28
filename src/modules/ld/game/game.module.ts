@@ -3,6 +3,7 @@ import { UserModule } from "@/modules/iam/user/user.module";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
+import { ScoreModule } from "../score/score.module";
 import { SessionModule } from "../session/session.module";
 import { GameLog } from "./entities/game-log.entity";
 import { Game } from "./entities/game.entity";
@@ -17,6 +18,7 @@ import { PlusScoreLogService } from "./plus-score-log.service";
     TypeOrmModule.forFeature([Game, GameLog, PlusScoreLog]),
     SessionModule,
     UserModule,
+    ScoreModule,
   ],
   controllers: [GameController],
   providers: [GameService, GameLogService, PlusScoreLogService],

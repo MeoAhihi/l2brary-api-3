@@ -20,8 +20,8 @@ import {
 } from "@nestjs/swagger";
 
 import { CreateScoreColDto } from "./dto/create-score-col.dto";
-import { ScoreDto } from "./dto/score.dto";
 import { ScoreTableDto } from "./dto/score-table.dto";
+import { ScoreDto } from "./dto/score.dto";
 import { UpdateScoreColDto } from "./dto/update-score-col.dto";
 import { ScoreColumnService } from "./score-column.service";
 import { ScoreService } from "./score.service";
@@ -110,7 +110,7 @@ export class ScoreController {
     @Query("scoreColumnId") scoreColumnId: number,
     @Body("scores") scores: ScoreDto[],
   ) {
-    return this.scoreService.upsert(scoreColumnId, scores);
+    return this.scoreService.upsertBulkByScoreColumn(scoreColumnId, scores);
   }
 
   @Get("table")

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
 } from "@nestjs/common";
@@ -33,6 +34,12 @@ export class GameController {
       throw new Error("sessionId query parameter is required");
     }
     return this.gameService.create(+sessionId);
+  }
+
+  // Submit a game (mark as submitted and process plus score logs)
+  @Post(":id/submit")
+  async submit(@Param("id", ParseIntPipe) id: number) {
+    return this.gameService.submit(id);
   }
 
   // Get all games, optionally filter by sessionId
