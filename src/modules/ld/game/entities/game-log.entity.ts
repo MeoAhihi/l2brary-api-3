@@ -1,15 +1,27 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 import { User } from "../../../iam/user/entities/user.entity";
 import { Game } from "./game.entity";
 
 @Entity()
 export class GameLog {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryColumn()
+  userId: string;
+
+  @PrimaryColumn()
+  gameId: number;
 
   @ManyToOne(() => User, { nullable: false })
   user: User;
+
+  @ManyToOne(() => Game, { nullable: false })
+  game: Game;
 
   @Column("int")
   score: number;
@@ -19,7 +31,4 @@ export class GameLog {
 
   @Column("int", { name: "tried_times" })
   triedTimes: number;
-
-  @ManyToOne(() => Game, { nullable: false })
-  game: Game;
 }

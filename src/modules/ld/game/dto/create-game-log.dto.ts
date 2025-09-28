@@ -1,12 +1,11 @@
-import { IsInt, IsPositive, Min } from "class-validator";
+import { IsInt, IsPositive, IsUUID, Min } from "class-validator";
 
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateGameLogDto {
   @ApiProperty({ description: "ID of the user", example: 1 })
-  @IsInt()
-  @IsPositive()
-  userId: number;
+  @IsUUID()
+  userId: string;
 
   @ApiProperty({ description: "Score achieved by the user", example: 100 })
   @IsInt()

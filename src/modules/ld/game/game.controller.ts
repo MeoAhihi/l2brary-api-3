@@ -7,13 +7,18 @@ import {
   Post,
   Query,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { ApiBody, ApiQuery } from "@nestjs/swagger";
 
+import { CreateGameLogDto } from "./dto/create-game-log.dto";
+import { GameLogService } from "./game-log.service";
 import { GameService } from "./game.service";
 
 @Controller("game")
 export class GameController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly gameLogService: GameLogService,
+  ) {}
 
   // Create a new game for a given sessionId
   @Post()
@@ -52,5 +57,18 @@ export class GameController {
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.gameService.remove(+id);
+  }
+
+  // Bulk upsert game logs for a game
+  @Post(":id/logs")
+  @ApiBody({
+    type: CreateGameLogDto,
+    isArray: true,
+  })
+  async upsertGameLogs(
+    @Param("id") id: string,
+    @Body() createGameLogDtos: CreateGameLogDto[],
+  ) {
+    return this.gameLogService.upsertBulk(+id, createGameLogDtos);
   }
 }
