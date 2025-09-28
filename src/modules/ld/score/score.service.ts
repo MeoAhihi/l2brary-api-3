@@ -1,6 +1,7 @@
 import { getMissing } from "@/common/compare-arrays";
 import { User } from "@/modules/iam/user/entities/user.entity";
 import { UserService } from "@/modules/iam/user/user.service";
+import { NotFoundError } from "rxjs";
 import { In, Repository } from "typeorm";
 
 import { Inject, Injectable } from "@nestjs/common";
@@ -19,7 +20,7 @@ export class ScoreService {
     private readonly userService: UserService,
   ) {}
 
-  async upsert(scoreColumnId: number, scoreDtos: ScoreDto[]) {
+  async upsertBulkByScoreColumn(scoreColumnId: number, scoreDtos: ScoreDto[]) {
     const scoreColumn = await this.scoreColumnService.findOne(scoreColumnId);
 
     // Prepare data for upsert
@@ -116,5 +117,36 @@ export class ScoreService {
     const userScores = this.buildUserScoreMap(scores);
     const result = this.toScoreTable(userScores);
     return result;
+  }
+
+  /**
+   * Finds a single score entry for a given user and scoreColumn.
+   * @param userId - The ID of the user.
+   * @param scoreColumnId - The ID of the score column.
+   * @returns The Score entity if found, otherwise undefined.
+   */
+  async findOneOrCreate(userId: string, scoreColumnId: number): Promise<Score> {
+    const score = await this.scoreRepository.findOne({
+      where: { userId, scoreColumnId },
+    });
+    if (!score) {
+      const user = await this.userService.findOne(userId);
+      const scoreColumn = await this.scoreColumnService.findOne(scoreColumnId);
+
+      return this.scoreRepository.create({ user, scoreColumn, score: 0 });
+    }
+    return score;
+  }
+
+  async increase(
+    userId: string,
+    scoreColumnId: number,
+    amount: number,
+  ): Promise<Score> {
+    let score = await this.findOneOrCreate(userId, scoreColumnId);
+
+    score.score += amount;
+
+    return this.scoreRepository.save(score);
   }
 }

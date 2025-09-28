@@ -30,6 +30,13 @@ export class PlusScoreLogService {
     return plusScoreLog;
   }
 
+  async findAll(gameId?: number) {
+    const where = gameId ? { gameLogGameId: gameId } : {};
+    return this.plusScoreLogRepository.find({
+      where,
+    });
+  }
+
   async upsert(
     gameLogUserId: string,
     gameLogGameId: number,

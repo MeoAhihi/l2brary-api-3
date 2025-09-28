@@ -1,7 +1,11 @@
 import { UserService } from "@/modules/iam/user/user.service";
 import { Repository } from "typeorm";
 
-import { ConflictException, Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { CreateGameLogDto } from "./dto/create-game-log.dto";
@@ -21,6 +25,10 @@ export class GameLogService {
 
   async upsertBulk(gameId: number, createGameLogDtos: CreateGameLogDto[]) {
     const game = await this.gameService.findOne(gameId);
+    if (game.isSubmitted)
+      throw new ForbiddenException(
+        "Game already submitted. You cannot modify game logs.",
+      );
 
     // Check for duplicate userId in createGameLogDtos
     const userIds = createGameLogDtos.map((dto) => dto.userId);
@@ -31,13 +39,7 @@ export class GameLogService {
 
     const data: GameLog[] = await Promise.all(
       createGameLogDtos.map(
-        async ({
-          score,
-          timePlayed,
-          triedTimes,
-          userId,
-          plusScores = [],
-        }) => {
+        async ({ score, timePlayed, triedTimes, userId, plusScores = [] }) => {
           // Upsert plus score logs for this user/game if any plusScoreDtos are provided
           const plusScoreLogs = await this.plusScoreLogService.upsertBulk(
             userId,
