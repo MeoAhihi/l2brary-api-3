@@ -69,7 +69,7 @@ export class Course {
   @OneToMany(() => Session, (session) => session.course, { cascade: true })
   sessions: Session[];
 
-  @OneToMany(() => ScoreColumn, (scoreColumn) => scoreColumn.courses)
+  @OneToMany(() => ScoreColumn, (scoreColumn) => scoreColumn.course)
   scoreColumns: ScoreColumn[];
 
   @CreateDateColumn({ type: "timestamp" })

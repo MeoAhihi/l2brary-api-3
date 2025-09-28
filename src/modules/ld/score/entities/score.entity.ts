@@ -1,12 +1,16 @@
 import { User } from "@/modules/iam/user/entities/user.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { PrimaryColumn } from "typeorm";
 
 import { ScoreColumn } from "./score-column.entity";
 
 @Entity()
 export class Score {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  userId: string;
+
+  @PrimaryColumn()
+  scoreColumnId: number;
 
   @ManyToOne(() => User, { eager: true })
   user: User;

@@ -4,7 +4,7 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from "typeorm";
 
 import { Course } from "../../course/entities/course.entity";
@@ -18,7 +18,7 @@ export class ScoreColumn {
   @Column()
   name: string;
 
-  @Column("int")
+  @Column("int", { default: 1 })
   coefficient: number;
 
   @Column({ default: false })
