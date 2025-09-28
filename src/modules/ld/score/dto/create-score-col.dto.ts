@@ -1,8 +1,4 @@
-import {
-  IsInt,
-  IsString,
-  IsUUID
-} from "class-validator";
+import { IsInt, IsString, IsUUID } from "class-validator";
 
 export class CreateScoreColDto {
   @IsString()
@@ -10,7 +6,4 @@ export class CreateScoreColDto {
 
   @IsInt()
   coefficient: number;
-
-  @IsUUID()
-  courseId: string;
 }
