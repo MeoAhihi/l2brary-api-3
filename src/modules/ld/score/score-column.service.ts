@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, Repository } from "typeorm";
 
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -30,17 +30,42 @@ export class ScoreColumnService {
     return this.scoreColumnRepository.save(scoreColumn);
   }
 
-  async findAll(courseId: string): Promise<ScoreColumn[]> {
-    return this.scoreColumnRepository.find({
-      where: {
-        course: { id: courseId },
-      },
-    });
+  async findAll(
+    courseId: string,
+    summarize: boolean = false,
+  ): Promise<ScoreColumn[]> {
+    if (!summarize) {
+      return this.scoreColumnRepository.find({
+        where: {
+          course: { id: courseId },
+        },
+      });
+    }
+    // Use query builder to fetch columns and their averages in one query
+    // Use query builder to fetch columns and their averages in one query
+    // The result will be: [{ id, name, coefficient, isLocked, average }]
+    const qb = this.scoreColumnRepository
+      .createQueryBuilder("score_column")
+      .leftJoin("score_column.scores", "score")
+      .select([
+        "score_column.id AS id",
+        "score_column.name AS name",
+        "score_column.coefficient AS coefficient",
+        "score_column.isLocked AS isLocked",
+        "AVG(score.score) AS average",
+      ])
+      .where("score_column.courseId = :courseId", { courseId })
+      .groupBy("score_column.id");
+
+    // Return as array of objects with the selected fields
+    const result = await qb.getRawMany();
+    return result;
   }
 
   async findOne(id: number): Promise<ScoreColumn> {
     const scoreColumn = await this.scoreColumnRepository.findOne({
       where: { id },
+      relations: ["scores"],
     });
     if (!scoreColumn) {
       throw new NotFoundException(`ScoreColumn with id ${id} not found`);
