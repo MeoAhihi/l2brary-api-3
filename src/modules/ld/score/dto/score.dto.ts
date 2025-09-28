@@ -1,5 +1,3 @@
-import { Type } from "class-transformer";
-import { IsArray, ValidateNested } from "class-validator";
 import { IsInt, IsNumber } from "class-validator";
 
 import { ApiProperty } from "@nestjs/swagger";
