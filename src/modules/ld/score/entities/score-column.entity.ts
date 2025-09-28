@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -24,8 +25,7 @@ export class ScoreColumn {
   @Column({ default: false })
   isLocked: boolean;
 
-  @ManyToMany(() => Course, (course) => course.scoreColumns)
-  @JoinTable()
+  @ManyToOne(() => Course, (course) => course.scoreColumns)
   courses: Course[];
 
   @OneToMany(() => Score, (score) => score.scoreColumn, { cascade: true })
