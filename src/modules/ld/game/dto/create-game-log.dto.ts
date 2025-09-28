@@ -1,6 +1,18 @@
+import { Type } from "class-transformer";
 import { IsInt, IsPositive, IsUUID, Min } from "class-validator";
 
 import { ApiProperty } from "@nestjs/swagger";
+
+export class PlusScoreDto {
+  @ApiProperty({ description: "ID of the score column", example: 1 })
+  @IsInt()
+  @IsPositive()
+  scoreColumnId: number;
+
+  @ApiProperty({ description: "Score to add for this column", example: 10 })
+  @IsInt()
+  score: number;
+}
 
 export class CreateGameLogDto {
   @ApiProperty({ description: "ID of the user", example: 1 })
@@ -24,4 +36,17 @@ export class CreateGameLogDto {
   @IsInt()
   @Min(1)
   triedTimes: number;
+
+  @ApiProperty({
+    description: "List of additional (plus) scores for specific columns",
+    type: PlusScoreDto,
+    isArray: true,
+    required: false,
+    example: [
+      { scoreColumnId: 1, score: 10 },
+      { scoreColumnId: 2, score: 5 },
+    ],
+  })
+  @Type(() => PlusScoreDto)
+  plusScores?: PlusScoreDto[];
 }
