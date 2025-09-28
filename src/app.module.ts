@@ -15,6 +15,7 @@ import { CourseModule } from "./modules/ld/course/course.module";
 import { EnrollmentModule } from "./modules/ld/enrollment/enrollment.module";
 import { GameModule } from "./modules/ld/game/game.module";
 import { SessionModule } from "./modules/ld/session/session.module";
+import { ScoreModule } from './modules/ld/score/score.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SessionModule } from "./modules/ld/session/session.module";
     GamificationModule,
     ArticleModule,
     AnalyticsModule,
+    ScoreModule,
   ],
   controllers: [AppController],
   providers: [AppService],
