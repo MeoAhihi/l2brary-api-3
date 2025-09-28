@@ -3,11 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 
+import { ScoreColumn } from "../../score/entities/score-column.entity";
 import { Session } from "../../session/entities/session.entity";
 import { ScheduleDetail, ScheduleType } from "../types/schedule.types";
 
@@ -66,6 +68,9 @@ export class Course {
 
   @OneToMany(() => Session, (session) => session.course, { cascade: true })
   sessions: Session[];
+
+  @ManyToMany(() => ScoreColumn, (scoreColumn) => scoreColumn.courses)
+  scoreColumns: ScoreColumn[];
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;
