@@ -1,27 +1,58 @@
-import { Injectable } from "@nestjs/common";
+import { Repository } from "typeorm";
 
-import { CreateGameDto } from "./dto/create-game.dto";
-import { UpdateGameDto } from "./dto/update-game.dto";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+
+import { SessionService } from "../session/session.service";
+import { Game } from "./entities/game.entity";
 
 @Injectable()
 export class GameService {
-  create(createGameDto: CreateGameDto) {
-    return "This action adds a new game";
+  constructor(
+    @InjectRepository(Game)
+    private readonly gameRepository: Repository<Game>,
+    private readonly sessionService: SessionService,
+  ) {}
+
+  async create(sessionId: number): Promise<Game> {
+    const session = await this.sessionService.findOne(sessionId);
+    const game = this.gameRepository.create({
+      session,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return this.gameRepository.save(game);
   }
 
-  findAll() {
-    return `This action returns all game`;
+  async findAll(sessionId?: number): Promise<Game[]> {
+    const where = sessionId ? { session: { id: sessionId } } : {};
+    return this.gameRepository.find({
+      where,
+      relations: ["gameLogs"],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} game`;
+  async findOne(id: number): Promise<Game> {
+    const game = await this.gameRepository.findOne({
+      where: { id },
+      relations: ["session", "gameLogs"],
+    });
+    if (!game) {
+      throw new NotFoundException(`Game with id ${id} not found`);
+    }
+    return game;
   }
 
-  update(id: number, updateGameDto: UpdateGameDto) {
-    return `This action updates a #${id} game`;
+  async update(id: number, updateGameDto: Partial<Game>): Promise<Game> {
+    const game = await this.findOne(id);
+    Object.assign(game, updateGameDto);
+    game.updatedAt = new Date();
+    return this.gameRepository.save(game);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} game`;
+  async remove(id: number): Promise<void> {
+    const game = await this.findOne(id);
+    game.deletedAt = new Date();
+    await this.gameRepository.save(game);
   }
 }

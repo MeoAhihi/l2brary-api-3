@@ -4,38 +4,51 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
+  Query,
 } from "@nestjs/common";
+import { ApiQuery } from "@nestjs/swagger";
 
-import { CreateGameDto } from "./dto/create-game.dto";
-import { UpdateGameDto } from "./dto/update-game.dto";
 import { GameService } from "./game.service";
 
 @Controller("game")
 export class GameController {
   constructor(private readonly gameService: GameService) {}
 
+  // Create a new game for a given sessionId
   @Post()
-  create(@Body() createGameDto: CreateGameDto) {
-    return this.gameService.create(createGameDto);
+  @ApiQuery({
+    name: "sessionId",
+    type: "string",
+    required: true,
+    description: "The ID of the session to create a game for",
+  })
+  create(@Query("sessionId") sessionId: string) {
+    if (!sessionId) {
+      throw new Error("sessionId query parameter is required");
+    }
+    return this.gameService.create(+sessionId);
   }
 
+  // Get all games, optionally filter by sessionId
   @Get()
-  findAll() {
-    return this.gameService.findAll();
+  @ApiQuery({
+    name: "sessionId",
+    type: "string",
+    required: false,
+    description: "Optional session id to filter games by session",
+  })
+  findAll(@Query("sessionId") sessionId?: string) {
+    return this.gameService.findAll(sessionId ? +sessionId : undefined);
   }
 
+  // Get a single game by id
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.gameService.findOne(+id);
   }
 
-  @Patch(":id")
-  update(@Param("id") id: string, @Body() updateGameDto: UpdateGameDto) {
-    return this.gameService.update(+id, updateGameDto);
-  }
-
+  // Soft-delete a game by id
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.gameService.remove(+id);
