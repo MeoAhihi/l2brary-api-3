@@ -6,7 +6,7 @@ import { ScoreColumn } from "./score-column.entity";
 
 @Entity()
 export class Score {
-  @PrimaryColumn()
+  @PrimaryColumn("uuid")
   userId: string;
 
   @PrimaryColumn()

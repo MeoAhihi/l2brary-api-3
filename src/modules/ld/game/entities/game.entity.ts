@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -24,6 +25,9 @@ export class Game {
 
   @OneToMany(() => GameLog, (gameLog) => gameLog.game)
   gameLogs: GameLog[];
+
+  @Column({ type: "bool", default: false })
+  isSubmitted: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
