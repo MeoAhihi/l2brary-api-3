@@ -62,13 +62,15 @@ export class AuthenticationService {
     );
 
     const user = await this.userService.findOne(userExisted.id, ["roles"]);
+    console.log("🚀 ~ AuthenticationService ~ login ~ user:", user);
+    const roles = user.roles.map((role) => role.name);
     const roleIds = user.roles.map((role) => role.id);
     const permissionEntities = await this.permissionService.findAll(roleIds);
     // This is safe as permissions enum are synchronized on startup,
     // and permission entities are readonly
     const permissions = permissionEntities.map((p) => p.name as PermissionEnum);
 
-    return this.getTokens({ sub: user.id, permissions });
+    return this.getTokens({ sub: user.id, permissions, roles });
   }
 
   async refreshToken(
@@ -84,6 +86,7 @@ export class AuthenticationService {
       );
 
       const user = await this.userService.findOne(payload.sub, ["roles"]);
+      const roles = user.roles.map((role) => role.name);
       const roleIds = user.roles.map((role) => role.id);
       const permissionEntities = await this.permissionService.findAll(roleIds);
       // This is safe as permissions enum are synchronized on startup,
@@ -93,7 +96,7 @@ export class AuthenticationService {
       );
 
       // Generate new tokens
-      return this.getTokens({ sub: user.id, permissions });
+      return this.getTokens({ sub: user.id, permissions, roles });
     } catch (error) {
       throw new UnauthorizedException("Invalid refresh token");
     }
@@ -109,7 +112,7 @@ export class AuthenticationService {
     await this.inviteCodeService.delete(inviteCode);
 
     // new members have no permissions
-    return this.getTokens({ sub: user.id, permissions: [] });
+    return this.getTokens({ sub: user.id, permissions: [], roles: [] });
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
