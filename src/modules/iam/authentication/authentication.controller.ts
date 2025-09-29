@@ -1,9 +1,21 @@
-import { Body, Controller, Param, Post, Query } from "@nestjs/common";
+import { PermissionEnum } from "@/common/permission.enum";
+
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { ApiBody, ApiQuery } from "@nestjs/swagger";
 
+import { RequirePermission } from "../authorization/decorators/permission.decorator";
+import { PermissionGuard } from "../authorization/guards/permission.guard";
 import { AuthenticationService } from "./authentication.service";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { JwtAuthGuard } from "./guards/jwt.guard";
 import { InviteCodeService } from "./invite-code.service";
 import { ResetPasswordCodeService } from "./reset-password-code.service";
 
@@ -15,8 +27,8 @@ export class AuthenticationController {
     private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
-  // Endpoint to generate an invite code, optionally with an email
-  // POST /authentication/invite
+  @RequirePermission(PermissionEnum.AUTH_INVITE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "email",
     required: false,
@@ -43,15 +55,13 @@ export class AuthenticationController {
     return this.resetPasswordCodeService.resetPassword(email);
   }
 
-  // Endpoint to login a user with phone number and password
-  // POST /authentication/login
+  /* Intentional No Guard */
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
     return this.authenticationService.login(loginDto);
   }
 
-  // Endpoint to register a new user with invite code and registration data
-  // POST /authentication/register
+  /* Intentional No Guard */
   @Post("register/:inviteCode")
   async register(
     @Param("inviteCode") inviteCode: string,

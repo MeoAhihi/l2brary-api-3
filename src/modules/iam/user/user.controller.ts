@@ -1,3 +1,4 @@
+import { PermissionEnum } from "@/common/permission.enum";
 import { plainToInstance } from "class-transformer";
 
 import {
@@ -17,6 +18,8 @@ import {
 import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
+import { RequirePermission } from "../authorization/decorators/permission.decorator";
+import { PermissionGuard } from "../authorization/guards/permission.guard";
 import { AuthRequest } from "../types/auth-request.type";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
@@ -82,6 +85,8 @@ export class UserController {
     return await this.userService.findOne(id, ["roles"]);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   async update(
     @Param("id") id: string,
@@ -93,8 +98,10 @@ export class UserController {
     });
   }
 
+  @RequirePermission(PermissionEnum.USER_OFFBOARD)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
-  async remove(@Param("id") id: string): Promise<{ message: string }> {
+  async offboard(@Param("id") id: string): Promise<{ message: string }> {
     await this.userService.remove(id);
     return { message: `User with id ${id} has been deleted.` };
   }
