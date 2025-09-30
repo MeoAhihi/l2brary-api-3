@@ -1,3 +1,8 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
 import {
   Body,
   Controller,
@@ -7,8 +12,9 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
@@ -18,6 +24,8 @@ import { UpdateArticleDto } from "./dto/update-article.dto";
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiQuery({
     name: "authorId",
@@ -33,6 +41,7 @@ export class ArticleController {
     return this.articleService.create(authorId, createArticleDto);
   }
 
+  /* Intentional No Guard */
   @Get()
   @ApiQuery({ name: "page", required: false, type: Number, example: 1 })
   @ApiQuery({ name: "limit", required: false, type: Number, example: 10 })
@@ -72,21 +81,29 @@ export class ArticleController {
     });
   }
 
+  /* Intentional No Guard */
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.articleService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateArticleDto: UpdateArticleDto) {
     return this.articleService.update(id, updateArticleDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.articleService.remove(id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ARTICLE_REVIEW_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id/review")
   @ApiQuery({
     name: "isPublished",
