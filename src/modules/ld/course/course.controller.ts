@@ -1,3 +1,8 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
 import {
   Body,
   ClassSerializerInterceptor,
@@ -8,9 +13,15 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiQueryOptions } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiQueryOptions,
+} from "@nestjs/swagger";
 
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -21,12 +32,18 @@ import { ScheduleType } from "./types/schedule.types";
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   create(@Body() createCourseDto: CreateCourseDto) {
     return this.courseService.create(createCourseDto);
   }
 
-  @Get()
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_READ_ALL)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @ApiOperation({ summary: "Get and manage courses for admin" })
   @ApiQuery({
     name: "page",
     required: false,
@@ -63,7 +80,7 @@ export class CourseController {
     type: Boolean,
     description: "Filter by public courses",
   })
-  // for authenticated user's course catalog
+  @Get()
   findAll(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
@@ -88,7 +105,7 @@ export class CourseController {
     });
   }
 
-  @Get("public")
+  /* Intentional No Guard */
   @ApiOperation({ summary: "Get public courses" })
   @ApiQuery({
     name: "page",
@@ -120,7 +137,7 @@ export class CourseController {
     enum: ScheduleType,
     description: "Filter by schedule type",
   })
-  // for guest to view catalog of courses
+  @Get("public")
   findPublicCourses(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
@@ -138,6 +155,7 @@ export class CourseController {
     });
   }
 
+  /* Intentional No Guard */
   @Get("groups")
   @ApiOperation({ summary: "Get unique course groups" })
   async getCourseGroups() {
@@ -145,17 +163,24 @@ export class CourseController {
     return groups;
   }
 
+  /* Intentional No Guard */
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.courseService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateCourseDto: UpdateCourseDto) {
     return this.courseService.update(id, updateCourseDto);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.courseService.remove(id);

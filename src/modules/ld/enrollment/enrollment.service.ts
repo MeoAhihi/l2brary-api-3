@@ -77,6 +77,24 @@ export class EnrollmentService {
     return enrollment;
   }
 
+  async findByUserAndCourse(
+    userId: string,
+    courseId: string,
+  ): Promise<{ message: string; enrollment: Enrollment | null }> {
+    const enrollment = await this.enrollmentRepository.findOne({
+      where: {
+        user: { id: userId },
+        course: { id: courseId },
+      },
+      relations: ["user", "course"],
+    });
+
+    return {
+      message: enrollment ? "Enrollment found" : "No Enrollment found",
+      enrollment,
+    };
+  }
+
   async update(id: number, status: EnrollmentStatusEnum): Promise<Enrollment> {
     const enrollment = await this.enrollmentRepository.findOne({
       where: { id },

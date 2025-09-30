@@ -1,14 +1,21 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+import { AuthRequest } from "@/modules/iam/types/auth-request.type";
+
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { ManageEnrollmentDto } from "./dto/manage-enrollment.dto";
 import { EnrollmentService } from "./enrollment.service";
@@ -17,12 +24,17 @@ import { EnrollmentService } from "./enrollment.service";
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Query("courseId") courseId: string, @Query("userId") userId: string) {
+  create(@Query("courseId") courseId: string, @Req() req: AuthRequest) {
     // You may want to use courseId in your service call or logic
-    return this.enrollmentService.enroll(userId, courseId);
+    return this.enrollmentService.enroll(req.user.sub, courseId);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ENROLLMENT_READ_ALL)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get()
   @ApiQuery({
     name: "page",
@@ -54,21 +66,32 @@ export class EnrollmentController {
     });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get("my")
+  getMyEnrollment(
+    @Query("courseId") courseId: string,
+    @Req() req: AuthRequest,
+  ) {
+    return this.enrollmentService.findByUserAndCourse(req.user.sub, courseId);
+  }
+
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ENROLLMENT_READ_ONE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.enrollmentService.findOne(+id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ENROLLMENT_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
   manageEnrollment(
     @Param("id") id: string,
     @Body() manageEnrollmentDto: ManageEnrollmentDto,
   ) {
     return this.enrollmentService.update(+id, manageEnrollmentDto.status);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.enrollmentService.remove(+id);
   }
 }
