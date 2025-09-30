@@ -15,13 +15,15 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
 import { PermissionGuard } from "../authorization/guards/permission.guard";
+import { AuthPayload } from "../types/auth-payload.interface";
 import { AuthRequest } from "../types/auth-request.type";
 import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
@@ -91,14 +93,33 @@ export class UserController {
     return await this.userService.findOne(id, ["roles"]);
   }
 
+  @ApiOperation({ summary: "Admin modify user profile" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @RequirePermission(PermissionEnum.USER_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
   async update(
     @Param("id") id: string,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
     const updatedUser = await this.userService.update(id, updateUserDto);
+    return plainToInstance(User, updatedUser, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @ApiOperation({ summary: "User modify self profile" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch()
+  async updateProfile(
+    @Req() req: AuthRequest,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<User> {
+    const updatedUser = await this.userService.update(
+      req.user.sub,
+      updateProfileDto,
+    );
     return plainToInstance(User, updatedUser, {
       excludeExtraneousValues: true,
     });
