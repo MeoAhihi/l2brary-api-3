@@ -1,28 +1,27 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { LogActivityDto } from "./dto/log-activity.dto";
-import { UpdateGamificationDto } from "./dto/update-gamification.dto";
 import { GamificationService } from "./gamification.service";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("gamification")
 export class GamificationController {
   constructor(private readonly gamificationService: GamificationService) {}
 
+  @RequirePermission(PermissionEnum.GAMIFICATION_LOG_ACTIVITY)
   @Post("log-activity")
   create(@Body() logActivityDto: LogActivityDto) {
     return this.gamificationService.create("user", logActivityDto);
   }
 
+  @RequirePermission(PermissionEnum.GAMIFICATION_READ_ALL)
   @Get()
   @ApiQuery({
     name: "userId",
@@ -56,26 +55,8 @@ export class GamificationController {
     });
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.gamificationService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateGamificationDto: UpdateGamificationDto,
-  ) {
-    return this.gamificationService.update(+id, updateGamificationDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.gamificationService.remove(+id);
-  }
-
   @Get("report/:userId")
-  // @ApiQuery({
+  // @ApiQuery({s
   //   name: "startDate",
   //   required: false,
   //   type: String,
