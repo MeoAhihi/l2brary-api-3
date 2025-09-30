@@ -36,7 +36,9 @@ export class UserController {
     return plainToInstance(User, newUser, { excludeExtraneousValues: true });
   }
 
-  @Get()
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_READ_MANY)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "gender",
     required: false,
@@ -58,7 +60,8 @@ export class UserController {
     default: false,
     allowEmptyValue: true,
   })
-  async findAll(
+  @Get()
+  async findMany(
     @Query("gender") gender?: string,
     @Query("ranks") ranks?: string[],
     @Query("sortByRank") sortByRank?: boolean,
@@ -79,6 +82,9 @@ export class UserController {
     return await this.userService.findOne(req.user.sub, ["roles"]);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_READ_ONE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<User> {
@@ -98,6 +104,7 @@ export class UserController {
     });
   }
 
+  @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_OFFBOARD)
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
@@ -106,6 +113,9 @@ export class UserController {
     return { message: `User with id ${id} has been deleted.` };
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_ASSIGN_ROLE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/roles/:roleId/assign")
   async assignRole(
     @Param("id") userId: string,
@@ -117,6 +127,9 @@ export class UserController {
     };
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_UNASSIGN_ROLE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/roles/:roleId/unassign")
   async unassignRole(
     @Param("id") userId: string,

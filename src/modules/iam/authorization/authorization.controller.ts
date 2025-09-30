@@ -1,3 +1,5 @@
+import { PermissionEnum } from "@/common/permission.enum";
+
 import {
   Body,
   Controller,
@@ -6,26 +8,34 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 
-import { PermissionService } from "./permission.service";
+import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
+import { RequirePermission } from "./decorators/permission.decorator";
+import { PermissionGuard } from "./guards/permission.guard";
 import { RoleService } from "./role.service";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("authorization")
 export class AuthorizationController {
   constructor(private readonly roleService: RoleService) {}
 
+  @RequirePermission(PermissionEnum.ROLE_READ_ALL)
   @Get("roles")
   async getAllRoles() {
     return this.roleService.findAll();
   }
 
+  @RequirePermission(PermissionEnum.ROLE_READ_ONE)
   @Get("roles/:id")
   async getRoleById(@Param("id") id: string) {
     return this.roleService.findOne(id);
   }
 
+  @RequirePermission(PermissionEnum.ROLE_CREATE)
   @ApiBody({
     schema: {
       type: "object",
@@ -40,6 +50,7 @@ export class AuthorizationController {
     return this.roleService.create(createRoleDto.name);
   }
 
+  @RequirePermission(PermissionEnum.ROLE_UPDATE)
   @ApiBody({
     schema: {
       type: "object",
@@ -57,13 +68,13 @@ export class AuthorizationController {
     return this.roleService.rename(id, updateRoleDto.name);
   }
 
-  // Example: DELETE /authorization/roles/:id
+  @RequirePermission(PermissionEnum.ROLE_DELETE)
   @Delete("roles/:id")
   async deleteRole(@Param("id") id: string) {
     return this.roleService.delete(id);
   }
 
-  // Attach permissions to a role
+  @RequirePermission(PermissionEnum.ROLE_ATTACH_PERMISSIONS)
   @ApiBody({
     schema: {
       type: "object",
@@ -84,7 +95,7 @@ export class AuthorizationController {
     return this.roleService.attachPermissions(roleId, permissionIds);
   }
 
-  // Detach permissions from a role
+  @RequirePermission(PermissionEnum.ROLE_DETACH_PERMISSIONS)
   @ApiBody({
     schema: {
       type: "object",

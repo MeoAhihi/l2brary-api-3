@@ -6,13 +6,16 @@ import {
   Param,
   Post,
   Query,
+  Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
 
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
 import { PermissionGuard } from "../authorization/guards/permission.guard";
+import { AuthRequest } from "../types/auth-request.type";
 import { AuthenticationService } from "./authentication.service";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { JwtAuthGuard } from "./guards/jwt.guard";
@@ -27,6 +30,7 @@ export class AuthenticationController {
     private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
+  @ApiBearerAuth()
   @RequirePermission(PermissionEnum.AUTH_INVITE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
@@ -40,8 +44,7 @@ export class AuthenticationController {
     return this.inviteCodeService.invite(email);
   }
 
-  // Endpoint to request a password reset (forgot password)
-  // POST /authentication/forgot-password
+  /* Intentional No Guard */
   @Post("forgot-password")
   @ApiQuery({
     name: "email",
@@ -70,6 +73,7 @@ export class AuthenticationController {
     return this.authenticationService.register(inviteCode, registerDto);
   }
 
+  /* Intentional No Guard */
   @Post("reset-password/:resetPasswordCode")
   @ApiBody({
     schema: {
@@ -94,8 +98,21 @@ export class AuthenticationController {
     );
   }
 
-  // Endpoint to refresh tokens
-  // POST /authentication/refresh-token
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post("change-password")
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req: AuthRequest,
+  ) {
+    // Assumes req.user.sub contains the user ID (populated by authentication guard)
+    return this.authenticationService.changePassword(
+      req.user.sub,
+      changePasswordDto,
+    );
+  }
+
+  /* Intentional No Guard */
   @Post("refresh-token")
   @ApiBody({
     schema: {

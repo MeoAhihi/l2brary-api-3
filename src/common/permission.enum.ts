@@ -1,7 +1,7 @@
 export enum PermissionEnum {
   // IAM - User
   USER_CREATE = "user:create", // POST /user
-  USER_READ_ALL = "user:readAll", // GET /user
+  USER_READ_MANY = "user:readMany", // GET /user
   USER_READ_ONE = "user:readOne", // GET /user/:id
   USER_UPDATE = "user:update", // PATCH /user/:id
   USER_OFFBOARD = "user:offboard", // DELETE /user/:id
