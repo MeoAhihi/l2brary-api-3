@@ -1,3 +1,8 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
 import {
   Body,
   Controller,
@@ -7,8 +12,9 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
 
 import { CreateGameLogDto } from "./dto/create-game-log.dto";
 import { GameLogService } from "./game-log.service";
@@ -22,13 +28,16 @@ export class GameController {
   ) {}
 
   // Create a new game for a given sessionId
-  @Post()
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "sessionId",
     type: "string",
     required: true,
     description: "The ID of the session to create a game for",
   })
+  @Post()
   create(@Query("sessionId") sessionId: string) {
     if (!sessionId) {
       throw new Error("sessionId query parameter is required");
@@ -36,13 +45,15 @@ export class GameController {
     return this.gameService.create(+sessionId);
   }
 
-  // Submit a game (mark as submitted and process plus score logs)
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_SUBMIT)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/submit")
   async submit(@Param("id", ParseIntPipe) id: number) {
     return this.gameService.submit(id);
   }
 
-  // Get all games, optionally filter by sessionId
+  /* Intentional No Guard */
   @Get()
   @ApiQuery({
     name: "sessionId",
@@ -54,19 +65,23 @@ export class GameController {
     return this.gameService.findAll(sessionId ? +sessionId : undefined);
   }
 
-  // Get a single game by id
+  /* Intentional No Guard */
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.gameService.findOne(+id);
   }
 
-  // Soft-delete a game by id
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.gameService.remove(+id);
   }
 
-  // Bulk upsert game logs for a game
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_LOG)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/logs")
   @ApiBody({
     type: CreateGameLogDto,

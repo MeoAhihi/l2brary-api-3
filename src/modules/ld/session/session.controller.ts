@@ -1,4 +1,7 @@
-import { plainToInstance } from "class-transformer";
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
 
 import {
   Body,
@@ -11,9 +14,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 
 import { AttendanceService } from "./attendace.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
@@ -30,6 +34,9 @@ export class SessionController {
     private readonly attendanceService: AttendanceService,
   ) {}
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.SESSION_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post("course/:courseId/session")
   create(
     @Param("courseId") courseId: string,
@@ -38,6 +45,7 @@ export class SessionController {
     return this.sessionService.create(courseId, createSessionDto);
   }
 
+  /* Intentional No Guard */
   @Get("course/:courseId/session")
   @ApiQuery({
     name: "page",
@@ -70,12 +78,16 @@ export class SessionController {
     });
   }
 
+  /* Intentional No Guard */
   @Get("session/:id")
   @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param("id", ParseIntPipe) id: number): Promise<SessionDto> {
     return await this.sessionService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.SESSION_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch("session/:id")
   update(
     @Param("id", ParseIntPipe) id: number,
@@ -84,11 +96,17 @@ export class SessionController {
     return this.sessionService.update(id, updateSessionDto);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.SESSION_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete("session/:id")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.sessionService.remove(id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.SESSION_ATTENDANCE_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post("session/:id/attendance")
   async markAttendance(
     @Param("id", ParseIntPipe) id: number,
@@ -98,11 +116,17 @@ export class SessionController {
     return this.attendanceService.markAttendance(id, markAttendanceDto);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_READ_ALL)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get("session/:id/attendance")
   async getSessionAttendances(@Param("id", ParseIntPipe) id: number) {
     return this.attendanceService.getSessionAttendances(id);
   }
 
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ATTENDANCE_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete("attendance/:id")
   async removeAttendance(@Param("id", ParseIntPipe) id: number) {
     await this.attendanceService.removeAttendance(id);

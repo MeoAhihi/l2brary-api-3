@@ -1,3 +1,7 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
 import { plainToInstance } from "class-transformer";
 
 import {
@@ -9,8 +13,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -26,6 +32,8 @@ import { UpdateScoreColDto } from "./dto/update-score-col.dto";
 import { ScoreColumnService } from "./score-column.service";
 import { ScoreService } from "./score.service";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("score")
 @ApiTags("Score")
 export class ScoreController {
@@ -35,7 +43,7 @@ export class ScoreController {
   ) {}
 
   // Score Column endpoints
-
+  @RequirePermission(PermissionEnum.SCORE_COLUMN_CREATE)
   @Post("column/:courseId")
   @ApiOperation({ summary: "Create a new score column for a course" })
   @ApiParam({ name: "courseId", type: String, description: "ID of the course" })
@@ -47,6 +55,7 @@ export class ScoreController {
     return this.scoreColumnService.create(courseId, createScoreColDto);
   }
 
+  @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ALL)
   @Get("column/:courseId")
   @ApiOperation({ summary: "Get all score columns for a course" })
   @ApiParam({ name: "courseId", type: String, description: "ID of the course" })
@@ -64,6 +73,7 @@ export class ScoreController {
     return this.scoreColumnService.findAll(courseId, summarize);
   }
 
+  @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ONE)
   @Get("column/detail/:id")
   @ApiOperation({ summary: "Get details of a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
@@ -72,6 +82,7 @@ export class ScoreController {
     return this.scoreColumnService.findOne(id);
   }
 
+  @RequirePermission(PermissionEnum.SCORE_COLUMN_UPDATE)
   @Patch("column/:id")
   @ApiOperation({ summary: "Update a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
@@ -83,6 +94,7 @@ export class ScoreController {
     return this.scoreColumnService.update(id, updateScoreColDto);
   }
 
+  @RequirePermission(PermissionEnum.SCORE_COLUMN_DELETE)
   @Delete("column/:id")
   @ApiOperation({ summary: "Delete a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
@@ -92,7 +104,7 @@ export class ScoreController {
   }
 
   // Score endpoints
-
+  @RequirePermission(PermissionEnum.SCORE_UPSERT)
   @Post()
   @ApiOperation({ summary: "Upsert scores for a score column" })
   @ApiQuery({
@@ -113,6 +125,7 @@ export class ScoreController {
     return this.scoreService.upsertBulkByScoreColumn(scoreColumnId, scores);
   }
 
+  @RequirePermission(PermissionEnum.SCORE_TABLE_READ)
   @Get("table")
   @ApiOperation({ summary: "Get score table for given score column IDs" })
   @ApiQuery({
