@@ -26,6 +26,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -71,7 +72,8 @@ export class UserController {
       ranks,
       sortByRank,
     });
-    return plainToInstance(User, users, { excludeExtraneousValues: true });
+    return users;
+    // return plainToInstance(User, users, { excludeExtraneousValues: true });
   }
 
   @ApiOperation({
@@ -172,10 +174,7 @@ export class UserController {
     @Param("id") userId: string,
     @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
-    await this.userService.assignRole(userId, roleId);
-    return {
-      message: `Role with id ${roleId} assigned to user with id ${userId}.`,
-    };
+    return this.userService.assignRole(userId, roleId);
   }
 
   @ApiOperation({
@@ -191,9 +190,6 @@ export class UserController {
     @Param("id") userId: string,
     @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
-    await this.userService.unassignRole(userId, roleId);
-    return {
-      message: `Role with id ${roleId} unassigned from user with id ${userId}.`,
-    };
+    return this.userService.unassignRole(userId, roleId);
   }
 }

@@ -107,7 +107,10 @@ export class UserService {
     await this.userRepository.save(user);
   }
 
-  async assignRole(userId: string, roleId: string): Promise<void> {
+  async assignRole(
+    userId: string,
+    roleId: string,
+  ): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ["roles"],
@@ -129,9 +132,15 @@ export class UserService {
 
     // Save the updated user entity
     await this.userRepository.save(user);
+    return {
+      message: `Role "${role.name}" assigned to user "${user.fullName}" successfully`,
+    };
   }
 
-  async unassignRole(userId: string, roleId: string): Promise<void> {
+  async unassignRole(
+    userId: string,
+    roleId: string,
+  ): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ["roles"],
@@ -140,11 +149,14 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with id ${userId} not found`);
     }
-
+    const roleToUnassign = user.roles.find((role) => role.id === roleId);
     // Remove the role from the user's roles array
     user.roles = (user.roles || []).filter((role) => role.id !== roleId);
 
     await this.userRepository.save(user);
+    return {
+      message: `Role "${roleToUnassign?.name}" unassigned from user "${user.fullName}" successfully`,
+    };
   }
 
   async updatePassword(userId: string, newPassword: string): Promise<void> {
