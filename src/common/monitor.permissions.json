@@ -1,0 +1,30 @@
+[
+  "enrollment:update",
+  "enrollment:delete",
+
+  "game:create",
+  "game:readAll",
+  "game:readOne",
+  "game:delete",
+  "game:submit",
+  "game:logs",
+
+  "scoreColumn:create",
+  "scoreColumn:readAll",
+  "scoreColumn:readOne",
+  "scoreColumn:update",
+  "scoreColumn:delete",
+  "score:upsert",
+
+  "session:create",
+  "session:update",
+  "session:delete",
+  "sessionAttendance:create",
+  "sessionAttendance:read",
+
+  "gamification:logActivity",
+  "gamification:readAll",
+  "gamification:readOne",
+  "gamification:update",
+  "gamification:delete"
+]

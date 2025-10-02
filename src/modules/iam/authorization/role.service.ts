@@ -3,7 +3,8 @@ import { In, Repository } from "typeorm";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
-import { UserService } from "../user/user.service";
+import { CreateRoleDto } from "./dto/create-role.dto";
+import { UpdateRoleDto } from "./dto/update-role.dto";
 import { Permission } from "./entities/permission.entity";
 import { Role } from "./entities/role.entity";
 
@@ -16,8 +17,8 @@ export class RoleService {
     private readonly permissionRepository: Repository<Permission>,
   ) {}
 
-  async create(name: string): Promise<Role> {
-    const role = this.roleRepository.create({ name });
+  async create(createRoleDto: CreateRoleDto): Promise<Role> {
+    const role = this.roleRepository.create(createRoleDto);
     return this.roleRepository.save(role);
   }
 
@@ -36,13 +37,13 @@ export class RoleService {
     return role;
   }
 
-  async rename(id: string, newName: string): Promise<Role> {
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<Role> {
     const role = await this.findOne(id);
-    role.name = newName;
+    Object.assign(role, updateRoleDto);
     return this.roleRepository.save(role);
   }
 
-  async attachPermissions(
+  async attachPermissionIds(
     roleId: string,
     permissionIds: string[],
   ): Promise<Role> {
@@ -57,6 +58,31 @@ export class RoleService {
     );
     const permissions = await this.permissionRepository.find({
       where: { id: In(newPermissionIds) },
+    });
+
+    role.permissions.push(...permissions);
+
+    return this.roleRepository.save(role);
+  }
+
+  async attachPermissionNames(
+    roleId: string,
+    permissionNames: string[],
+  ): Promise<Role> {
+    const role = await this.findOne(roleId);
+
+    // Avoid duplicates: only add permissions not already present
+    const existingPermissionNames = new Set(
+      (role.permissions || []).map((p) => p.name),
+    );
+    const newPermissionNames = permissionNames.filter(
+      (name) => !existingPermissionNames.has(name),
+    );
+    if (newPermissionNames.length === 0) {
+      return role;
+    }
+    const permissions = await this.permissionRepository.find({
+      where: { name: In(newPermissionNames) },
     });
 
     role.permissions.push(...permissions);
