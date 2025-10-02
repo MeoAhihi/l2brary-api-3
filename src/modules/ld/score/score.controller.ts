@@ -43,9 +43,13 @@ export class ScoreController {
   ) {}
 
   // Score Column endpoints
+  @ApiOperation({ 
+    summary: "Create score column", 
+    description: "Create a new score column for a course. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_CREATE)
   @Post("column/:courseId")
-  @ApiOperation({ summary: "Create a new score column for a course" })
   @ApiParam({ name: "courseId", type: String, description: "ID of the course" })
   @ApiResponse({ status: 201, description: "Score column created" })
   async createScoreColumn(
@@ -55,9 +59,13 @@ export class ScoreController {
     return this.scoreColumnService.create(courseId, createScoreColDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get score columns", 
+    description: "Retrieve all score columns for a course. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ALL)
   @Get("column/:courseId")
-  @ApiOperation({ summary: "Get all score columns for a course" })
   @ApiParam({ name: "courseId", type: String, description: "ID of the course" })
   @ApiQuery({
     name: "summarize",
@@ -73,18 +81,26 @@ export class ScoreController {
     return this.scoreColumnService.findAll(courseId, summarize);
   }
 
+  @ApiOperation({ 
+    summary: "Get score column details", 
+    description: "Retrieve detailed information about a score column. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ONE)
   @Get("column/detail/:id")
-  @ApiOperation({ summary: "Get details of a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
   @ApiResponse({ status: 200, description: "Score column details" })
   async getScoreColumn(@Param("id") id: number) {
     return this.scoreColumnService.findOne(id);
   }
 
+  @ApiOperation({ 
+    summary: "Update score column", 
+    description: "Update an existing score column. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_UPDATE)
   @Patch("column/:id")
-  @ApiOperation({ summary: "Update a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
   @ApiResponse({ status: 200, description: "Score column updated" })
   async updateScoreColumn(
@@ -94,9 +110,13 @@ export class ScoreController {
     return this.scoreColumnService.update(id, updateScoreColDto);
   }
 
+  @ApiOperation({ 
+    summary: "Delete score column", 
+    description: "Delete a score column. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_DELETE)
   @Delete("column/:id")
-  @ApiOperation({ summary: "Delete a score column" })
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
   @ApiResponse({ status: 200, description: "Score column deleted" })
   async deleteScoreColumn(@Param("id") id: number) {
@@ -104,9 +124,13 @@ export class ScoreController {
   }
 
   // Score endpoints
+  @ApiOperation({ 
+    summary: "Upsert scores", 
+    description: "Create or update scores for a score column. Requires JWT authentication.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_UPSERT)
   @Post()
-  @ApiOperation({ summary: "Upsert scores for a score column" })
   @ApiQuery({
     name: "scoreColumnId",
     type: Number,
@@ -125,9 +149,13 @@ export class ScoreController {
     return this.scoreService.upsertBulkByScoreColumn(scoreColumnId, scores);
   }
 
+  @ApiOperation({ 
+    summary: "Get score table", 
+    description: "Retrieve score table data for a course. Requires admin permissions.",
+    tags: ["Score Management"]
+  })
   @RequirePermission(PermissionEnum.SCORE_TABLE_READ)
   @Get("table")
-  @ApiOperation({ summary: "Get score table for given score column IDs" })
   @ApiQuery({
     name: "courseId",
     type: String,

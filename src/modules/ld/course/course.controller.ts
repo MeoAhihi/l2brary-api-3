@@ -32,6 +32,11 @@ import { ScheduleType } from "./types/schedule.types";
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
+  @ApiOperation({ 
+    summary: "Create course", 
+    description: "Create a new course. Requires admin permissions.",
+    tags: ["Course Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_CREATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -40,10 +45,14 @@ export class CourseController {
     return this.courseService.create(createCourseDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get all courses (admin)", 
+    description: "Retrieve all courses with filtering options. Requires admin permissions.",
+    tags: ["Course Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_READ_ALL)
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @ApiOperation({ summary: "Get and manage courses for admin" })
   @ApiQuery({
     name: "page",
     required: false,
@@ -105,8 +114,12 @@ export class CourseController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get public courses", 
+    description: "Retrieve public courses available to all users. No authentication required.",
+    tags: ["Course Management"]
+  })
   /* Intentional No Guard */
-  @ApiOperation({ summary: "Get public courses" })
   @ApiQuery({
     name: "page",
     required: false,
@@ -155,14 +168,23 @@ export class CourseController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get course groups", 
+    description: "Retrieve unique course groups. No authentication required.",
+    tags: ["Course Management"]
+  })
   /* Intentional No Guard */
   @Get("groups")
-  @ApiOperation({ summary: "Get unique course groups" })
   async getCourseGroups() {
     const groups = await this.courseService.findCourseGroup();
     return groups;
   }
 
+  @ApiOperation({ 
+    summary: "Get course by ID", 
+    description: "Retrieve a specific course by its ID. No authentication required.",
+    tags: ["Course Management"]
+  })
   /* Intentional No Guard */
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
@@ -170,6 +192,11 @@ export class CourseController {
     return this.courseService.findOne(id);
   }
 
+  @ApiOperation({ 
+    summary: "Update course", 
+    description: "Update an existing course. Requires admin permissions.",
+    tags: ["Course Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -178,6 +205,11 @@ export class CourseController {
     return this.courseService.update(id, updateCourseDto);
   }
 
+  @ApiOperation({ 
+    summary: "Delete course", 
+    description: "Delete a course. Requires admin permissions.",
+    tags: ["Course Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_DELETE)
   @UseGuards(JwtAuthGuard, PermissionGuard)

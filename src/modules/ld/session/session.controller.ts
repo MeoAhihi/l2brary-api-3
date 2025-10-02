@@ -17,7 +17,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { AttendanceService } from "./attendace.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
@@ -34,6 +34,11 @@ export class SessionController {
     private readonly attendanceService: AttendanceService,
   ) {}
 
+  @ApiOperation({ 
+    summary: "Create session", 
+    description: "Create a new session for a course. Requires admin permissions.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_CREATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -45,6 +50,11 @@ export class SessionController {
     return this.sessionService.create(courseId, createSessionDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get course sessions", 
+    description: "Retrieve all sessions for a specific course. No authentication required.",
+    tags: ["Session Management"]
+  })
   /* Intentional No Guard */
   @Get("course/:courseId/session")
   @ApiQuery({
@@ -78,6 +88,11 @@ export class SessionController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get session by ID", 
+    description: "Retrieve a specific session by its ID. No authentication required.",
+    tags: ["Session Management"]
+  })
   /* Intentional No Guard */
   @Get("session/:id")
   @UseInterceptors(ClassSerializerInterceptor)
@@ -85,6 +100,11 @@ export class SessionController {
     return await this.sessionService.findOne(id);
   }
 
+  @ApiOperation({ 
+    summary: "Update session", 
+    description: "Update an existing session. Requires admin permissions.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -96,6 +116,11 @@ export class SessionController {
     return this.sessionService.update(id, updateSessionDto);
   }
 
+  @ApiOperation({ 
+    summary: "Delete session", 
+    description: "Delete a session. Requires admin permissions.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_DELETE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -104,6 +129,11 @@ export class SessionController {
     return this.sessionService.remove(id);
   }
 
+  @ApiOperation({ 
+    summary: "Mark attendance", 
+    description: "Mark attendance for a session. Requires JWT authentication.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_ATTENDANCE_CREATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -116,6 +146,11 @@ export class SessionController {
     return this.attendanceService.markAttendance(id, markAttendanceDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get session attendance", 
+    description: "Retrieve attendance records for a session. Requires admin permissions.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_READ_ALL)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -124,6 +159,11 @@ export class SessionController {
     return this.attendanceService.getSessionAttendances(id);
   }
 
+  @ApiOperation({ 
+    summary: "Delete attendance", 
+    description: "Delete an attendance record. Requires admin permissions.",
+    tags: ["Session Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ATTENDANCE_DELETE)
   @UseGuards(JwtAuthGuard, PermissionGuard)

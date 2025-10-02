@@ -10,7 +10,7 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody , ApiOperation } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
 import { RequirePermission } from "./decorators/permission.decorator";
@@ -23,18 +23,33 @@ import { RoleService } from "./role.service";
 export class AuthorizationController {
   constructor(private readonly roleService: RoleService) {}
 
+  @ApiOperation({ 
+    summary: "Get all roles", 
+    description: "Retrieve a list of all roles. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_READ_ALL)
   @Get("roles")
   async getAllRoles() {
     return this.roleService.findAll();
   }
 
+  @ApiOperation({ 
+    summary: "Get role by ID", 
+    description: "Retrieve a specific role by its ID. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_READ_ONE)
   @Get("roles/:id")
   async getRoleById(@Param("id") id: string) {
     return this.roleService.findOne(id);
   }
 
+  @ApiOperation({ 
+    summary: "Create role", 
+    description: "Create a new role. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_CREATE)
   @ApiBody({
     schema: {
@@ -50,6 +65,11 @@ export class AuthorizationController {
     return this.roleService.create(createRoleDto.name);
   }
 
+  @ApiOperation({ 
+    summary: "Update role", 
+    description: "Update an existing role. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_UPDATE)
   @ApiBody({
     schema: {
@@ -68,12 +88,22 @@ export class AuthorizationController {
     return this.roleService.rename(id, updateRoleDto.name);
   }
 
+  @ApiOperation({ 
+    summary: "Delete role", 
+    description: "Delete a role. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_DELETE)
   @Delete("roles/:id")
   async deleteRole(@Param("id") id: string) {
     return this.roleService.delete(id);
   }
 
+  @ApiOperation({ 
+    summary: "Attach permissions to role", 
+    description: "Attach permissions to a role. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_ATTACH_PERMISSIONS)
   @ApiBody({
     schema: {
@@ -95,6 +125,11 @@ export class AuthorizationController {
     return this.roleService.attachPermissions(roleId, permissionIds);
   }
 
+  @ApiOperation({ 
+    summary: "Detach permissions from role", 
+    description: "Detach permissions from a role. Requires admin permissions.",
+    tags: ["Authorization"]
+  })
   @RequirePermission(PermissionEnum.ROLE_DETACH_PERMISSIONS)
   @ApiBody({
     schema: {

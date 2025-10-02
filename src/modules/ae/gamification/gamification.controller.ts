@@ -4,7 +4,7 @@ import { RequirePermission } from "@/modules/iam/authorization/decorators/permis
 import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
 
 import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { GamificationService } from "./gamification.service";
@@ -15,12 +15,22 @@ import { GamificationService } from "./gamification.service";
 export class GamificationController {
   constructor(private readonly gamificationService: GamificationService) {}
 
+  @ApiOperation({ 
+    summary: "Log gamification activity", 
+    description: "Log user activity for gamification tracking. Requires JWT authentication.",
+    tags: ["Gamification"]
+  })
   @RequirePermission(PermissionEnum.GAMIFICATION_LOG_ACTIVITY)
   @Post("log-activity")
   create(@Body() logActivityDto: LogActivityDto) {
     return this.gamificationService.create("user", logActivityDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get gamification data", 
+    description: "Retrieve gamification data with filtering options. Requires admin permissions.",
+    tags: ["Gamification"]
+  })
   @RequirePermission(PermissionEnum.GAMIFICATION_READ_ALL)
   @Get()
   @ApiQuery({
@@ -55,6 +65,11 @@ export class GamificationController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get user activity report", 
+    description: "Generate an activity report for a specific user. Requires admin permissions.",
+    tags: ["Gamification"]
+  })
   @Get("report/:userId")
   // @ApiQuery({s
   //   name: "startDate",

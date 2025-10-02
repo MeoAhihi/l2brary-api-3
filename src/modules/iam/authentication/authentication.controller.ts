@@ -9,7 +9,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
 import { PermissionGuard } from "../authorization/guards/permission.guard";
@@ -30,6 +30,11 @@ export class AuthenticationController {
     private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
+  @ApiOperation({ 
+    summary: "Generate invite code", 
+    description: "Generate an invite code for user registration. Requires admin permissions.",
+    tags: ["Authentication"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.AUTH_INVITE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -44,6 +49,11 @@ export class AuthenticationController {
     return this.inviteCodeService.invite(email);
   }
 
+  @ApiOperation({ 
+    summary: "Request password reset", 
+    description: "Request a password reset code to be sent to the user's email. No authentication required.",
+    tags: ["Authentication"]
+  })
   /* Intentional No Guard */
   @Post("forgot-password")
   @ApiQuery({
@@ -58,12 +68,22 @@ export class AuthenticationController {
     return this.resetPasswordCodeService.resetPassword(email);
   }
 
+  @ApiOperation({ 
+    summary: "User login", 
+    description: "Authenticate user with email and password. No authentication required.",
+    tags: ["Authentication"]
+  })
   /* Intentional No Guard */
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
     return this.authenticationService.login(loginDto);
   }
 
+  @ApiOperation({ 
+    summary: "User registration", 
+    description: "Register a new user with an invite code. No authentication required.",
+    tags: ["Authentication"]
+  })
   /* Intentional No Guard */
   @Post("register/:inviteCode")
   async register(
@@ -73,6 +93,11 @@ export class AuthenticationController {
     return this.authenticationService.register(inviteCode, registerDto);
   }
 
+  @ApiOperation({ 
+    summary: "Reset password", 
+    description: "Reset user password using a reset code. No authentication required.",
+    tags: ["Authentication"]
+  })
   /* Intentional No Guard */
   @Post("reset-password/:resetPasswordCode")
   @ApiBody({
@@ -98,6 +123,11 @@ export class AuthenticationController {
     );
   }
 
+  @ApiOperation({ 
+    summary: "Change password", 
+    description: "Change the current user's password. Requires JWT authentication.",
+    tags: ["Authentication"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post("change-password")
@@ -112,6 +142,11 @@ export class AuthenticationController {
     );
   }
 
+  @ApiOperation({ 
+    summary: "Refresh token", 
+    description: "Obtain new access and refresh tokens using a refresh token. No authentication required.",
+    tags: ["Authentication"]
+  })
   /* Intentional No Guard */
   @Post("refresh-token")
   @ApiBody({

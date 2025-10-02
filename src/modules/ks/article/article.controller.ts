@@ -14,7 +14,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
@@ -24,6 +24,11 @@ import { UpdateArticleDto } from "./dto/update-article.dto";
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @ApiOperation({ 
+    summary: "Create article", 
+    description: "Create a new article. Requires JWT authentication.",
+    tags: ["Article Management"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -41,6 +46,11 @@ export class ArticleController {
     return this.articleService.create(authorId, createArticleDto);
   }
 
+  @ApiOperation({ 
+    summary: "Get all articles", 
+    description: "Retrieve all published articles with filtering options. No authentication required.",
+    tags: ["Article Management"]
+  })
   /* Intentional No Guard */
   @Get()
   @ApiQuery({ name: "page", required: false, type: Number, example: 1 })
@@ -81,12 +91,22 @@ export class ArticleController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get article by ID", 
+    description: "Retrieve a specific article by its ID. No authentication required.",
+    tags: ["Article Management"]
+  })
   /* Intentional No Guard */
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.articleService.findOne(id);
   }
 
+  @ApiOperation({ 
+    summary: "Update article", 
+    description: "Update an existing article. Requires JWT authentication.",
+    tags: ["Article Management"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch(":id")
@@ -94,6 +114,11 @@ export class ArticleController {
     return this.articleService.update(id, updateArticleDto);
   }
 
+  @ApiOperation({ 
+    summary: "Delete article", 
+    description: "Delete an article. Requires JWT authentication.",
+    tags: ["Article Management"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(":id")
@@ -101,6 +126,11 @@ export class ArticleController {
     return this.articleService.remove(id);
   }
 
+  @ApiOperation({ 
+    summary: "Review article", 
+    description: "Publish or unpublish an article. Requires admin permissions.",
+    tags: ["Article Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ARTICLE_REVIEW_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)

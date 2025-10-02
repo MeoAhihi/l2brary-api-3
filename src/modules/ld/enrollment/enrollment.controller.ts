@@ -15,7 +15,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { ManageEnrollmentDto } from "./dto/manage-enrollment.dto";
 import { EnrollmentService } from "./enrollment.service";
@@ -24,6 +24,11 @@ import { EnrollmentService } from "./enrollment.service";
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
+  @ApiOperation({ 
+    summary: "Enroll in course", 
+    description: "Enroll the current user in a course. Requires JWT authentication.",
+    tags: ["Enrollment Management"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -32,6 +37,11 @@ export class EnrollmentController {
     return this.enrollmentService.enroll(req.user.sub, courseId);
   }
 
+  @ApiOperation({ 
+    summary: "Get all enrollments", 
+    description: "Retrieve all enrollments with filtering options. Requires admin permissions.",
+    tags: ["Enrollment Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_READ_ALL)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -66,6 +76,11 @@ export class EnrollmentController {
     });
   }
 
+  @ApiOperation({ 
+    summary: "Get my enrollment", 
+    description: "Get the current user's enrollment for a specific course. Requires JWT authentication.",
+    tags: ["Enrollment Management"]
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get("my")
@@ -76,6 +91,11 @@ export class EnrollmentController {
     return this.enrollmentService.findByUserAndCourse(req.user.sub, courseId);
   }
 
+  @ApiOperation({ 
+    summary: "Get enrollment by ID", 
+    description: "Retrieve a specific enrollment by its ID. Requires admin permissions.",
+    tags: ["Enrollment Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_READ_ONE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -84,6 +104,11 @@ export class EnrollmentController {
     return this.enrollmentService.findOne(+id);
   }
 
+  @ApiOperation({ 
+    summary: "Update enrollment", 
+    description: "Update an enrollment status. Requires admin permissions.",
+    tags: ["Enrollment Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)

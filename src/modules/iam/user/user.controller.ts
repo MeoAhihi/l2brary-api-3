@@ -20,9 +20,7 @@ import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
 import { PermissionGuard } from "../authorization/guards/permission.guard";
-import { AuthPayload } from "../types/auth-payload.interface";
 import { AuthRequest } from "../types/auth-request.type";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
@@ -32,6 +30,12 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({
+    summary: "Get all users",
+    description:
+      "Retrieve a list of all users with optional filtering. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_READ_MANY)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -70,6 +74,12 @@ export class UserController {
     return plainToInstance(User, users, { excludeExtraneousValues: true });
   }
 
+  @ApiOperation({
+    summary: "Get user profile",
+    description:
+      "Retrieve the current user's profile information. Requires JWT authentication.",
+    tags: ["User Profile"],
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
@@ -78,6 +88,12 @@ export class UserController {
     return await this.userService.findOne(req.user.sub, ["roles"]);
   }
 
+  @ApiOperation({
+    summary: "Get user by ID",
+    description:
+      "Retrieve a specific user by their ID. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_READ_ONE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -87,7 +103,12 @@ export class UserController {
     return await this.userService.findOne(id, ["roles"]);
   }
 
-  @ApiOperation({ summary: "Admin modify user profile" })
+  @ApiOperation({
+    summary: "Admin modify user profile",
+    description:
+      "Update a user's profile information. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -102,7 +123,12 @@ export class UserController {
     });
   }
 
-  @ApiOperation({ summary: "User modify self profile" })
+  @ApiOperation({
+    summary: "User modify self profile",
+    description:
+      "Update the current user's own profile information. Requires JWT authentication.",
+    tags: ["User Profile"],
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch()
@@ -119,6 +145,11 @@ export class UserController {
     });
   }
 
+  @ApiOperation({
+    summary: "Delete user",
+    description: "Remove a user from the system. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_OFFBOARD)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -128,6 +159,11 @@ export class UserController {
     return { message: `User with id ${id} has been deleted.` };
   }
 
+  @ApiOperation({
+    summary: "Assign role to user",
+    description: "Assign a role to a user. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_ASSIGN_ROLE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -142,6 +178,11 @@ export class UserController {
     };
   }
 
+  @ApiOperation({
+    summary: "Unassign role from user",
+    description: "Remove a role from a user. Requires admin permissions.",
+    tags: ["User Management"],
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_UNASSIGN_ROLE)
   @UseGuards(JwtAuthGuard, PermissionGuard)

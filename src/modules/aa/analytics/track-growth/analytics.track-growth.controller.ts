@@ -19,12 +19,22 @@ import { TrackGrowthService } from "./analytics.track-growth.service";
 export class TrackGrowthController {
   constructor(private readonly trackGrowthservice: TrackGrowthService) {}
 
+  @ApiOperation({ 
+    summary: "Get total user count", 
+    description: "Retrieve the total number of users in the system. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_COUNT)
   @Get("users/count")
   async countUsers() {
     return { count: await this.trackGrowthservice.countUsers() };
   }
 
+  @ApiOperation({ 
+    summary: "Get new users count", 
+    description: "Retrieve the count of new users within a date range. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_NEW)
   @Get("users/new")
   async countNewUsers(@Body("from") from: string, @Body("to") to: string) {
@@ -35,9 +45,13 @@ export class TrackGrowthController {
     };
   }
 
+  @ApiOperation({ 
+    summary: "Get active users", 
+    description: "Retrieve active users with minimum score threshold. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_ACTIVE)
   @Get("users/active")
-  @ApiOperation({ summary: "Get active users with minimum score" })
   @ApiQuery({
     name: "minscore",
     required: false,
@@ -53,9 +67,13 @@ export class TrackGrowthController {
     return await this.trackGrowthservice.getActiveUsers(minScore);
   }
 
+  @ApiOperation({ 
+    summary: "Count active users", 
+    description: "Get the count of active users with minimum score threshold. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_ACTIVE_COUNT)
   @Get("users/active/count")
-  @ApiOperation({ summary: "Count of active users with minimum score" })
   @ApiQuery({
     name: "minscore",
     required: false,
@@ -71,11 +89,13 @@ export class TrackGrowthController {
     return { count: await this.trackGrowthservice.countActiveUsers(minScore) };
   }
 
+  @ApiOperation({ 
+    summary: "Get inactive users", 
+    description: "Retrieve inactive users with maximum score and optional date filtering. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_INACTIVE)
   @Get("users/inactive")
-  @ApiOperation({
-    summary: "Get inactive users with maximum score and optional date interval",
-  })
   @ApiQuery({
     name: "maxscore",
     required: false,
@@ -115,12 +135,13 @@ export class TrackGrowthController {
     );
   }
 
+  @ApiOperation({ 
+    summary: "Count inactive users", 
+    description: "Get the count of inactive users with maximum score and optional date filtering. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_INACTIVE_COUNT)
   @Get("users/inactive/count")
-  @ApiOperation({
-    summary:
-      "Count of inactive users with maximum score and optional date interval",
-  })
   @ApiQuery({
     name: "maxscore",
     required: false,
@@ -160,6 +181,11 @@ export class TrackGrowthController {
     };
   }
 
+  @ApiOperation({ 
+    summary: "Get user retention rate", 
+    description: "Calculate user retention rate between two periods. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_RETENTION_RATE)
   @Get("users/retention-rate")
   async getRetentionRate(
@@ -186,6 +212,11 @@ export class TrackGrowthController {
     );
   }
 
+  @ApiOperation({ 
+    summary: "Get monthly user growth", 
+    description: "Retrieve monthly user growth data for the last 12 months. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"]
+  })
   @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_MONTHLY)
   @Get("users/monthly")
   async countUsersByMonthLast12() {

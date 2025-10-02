@@ -14,7 +14,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiQuery , ApiOperation } from "@nestjs/swagger";
 
 import { CreateGameLogDto } from "./dto/create-game-log.dto";
 import { GameLogService } from "./game-log.service";
@@ -27,6 +27,11 @@ export class GameController {
     private readonly gameLogService: GameLogService,
   ) {}
 
+  @ApiOperation({ 
+    summary: "Create game", 
+    description: "Create a new game for a session. Requires admin permissions.",
+    tags: ["Game Management"]
+  })
   // Create a new game for a given sessionId
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_CREATE)
@@ -45,6 +50,11 @@ export class GameController {
     return this.gameService.create(+sessionId);
   }
 
+  @ApiOperation({ 
+    summary: "Submit game", 
+    description: "Submit a game for scoring. Requires JWT authentication.",
+    tags: ["Game Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_SUBMIT)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -53,6 +63,11 @@ export class GameController {
     return this.gameService.submit(id);
   }
 
+  @ApiOperation({ 
+    summary: "Get all games", 
+    description: "Retrieve all games with optional session filtering. No authentication required.",
+    tags: ["Game Management"]
+  })
   /* Intentional No Guard */
   @Get()
   @ApiQuery({
@@ -65,12 +80,22 @@ export class GameController {
     return this.gameService.findAll(sessionId ? +sessionId : undefined);
   }
 
+  @ApiOperation({ 
+    summary: "Get game by ID", 
+    description: "Retrieve a specific game by its ID. No authentication required.",
+    tags: ["Game Management"]
+  })
   /* Intentional No Guard */
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.gameService.findOne(+id);
   }
 
+  @ApiOperation({ 
+    summary: "Delete game", 
+    description: "Delete a game. Requires admin permissions.",
+    tags: ["Game Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_DELETE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -79,6 +104,11 @@ export class GameController {
     return this.gameService.remove(+id);
   }
 
+  @ApiOperation({ 
+    summary: "Log game activity", 
+    description: "Log game activity and progress. Requires JWT authentication.",
+    tags: ["Game Management"]
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_LOG)
   @UseGuards(JwtAuthGuard, PermissionGuard)
