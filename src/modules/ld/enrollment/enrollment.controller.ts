@@ -3,10 +3,12 @@ import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
 import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
 import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
 import { AuthRequest } from "@/modules/iam/types/auth-request.type";
+import { plainToInstance } from "class-transformer";
 
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -15,32 +17,40 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery , ApiOperation } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 
 import { ManageEnrollmentDto } from "./dto/manage-enrollment.dto";
 import { EnrollmentService } from "./enrollment.service";
+import { Enrollment } from "./entities/enrollment.entity";
 
 @Controller("enrollment")
 export class EnrollmentController {
   constructor(private readonly enrollmentService: EnrollmentService) {}
 
-  @ApiOperation({ 
-    summary: "Enroll in course", 
-    description: "Enroll the current user in a course. Requires JWT authentication.",
-    tags: ["Enrollment Management"]
+  @ApiOperation({
+    summary: "Enroll in course",
+    description:
+      "Enroll the current user in a course. Requires JWT authentication.",
+    tags: ["Enrollment Management"],
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Query("courseId") courseId: string, @Req() req: AuthRequest) {
-    // You may want to use courseId in your service call or logic
-    return this.enrollmentService.enroll(req.user.sub, courseId);
+  async create(@Query("courseId") courseId: string, @Req() req: AuthRequest) {
+    const enrollment = await this.enrollmentService.enroll(
+      req.user.sub,
+      courseId,
+    );
+    return plainToInstance(Enrollment, enrollment, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  @ApiOperation({ 
-    summary: "Get all enrollments", 
-    description: "Retrieve all enrollments with filtering options. Requires admin permissions.",
-    tags: ["Enrollment Management"]
+  @ApiOperation({
+    summary: "Get all enrollments",
+    description:
+      "Retrieve all enrollments with filtering options. Requires admin permissions.",
+    tags: ["Enrollment Management"],
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_READ_ALL)
@@ -64,59 +74,95 @@ export class EnrollmentController {
     type: String,
     description: "Filter by course ID",
   })
-  findAll(
+  async findAll(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
     @Query("courseId") courseId?: string,
   ) {
-    return this.enrollmentService.findAll({
+    const result = await this.enrollmentService.findAll({
       page,
       limit,
       courseId,
     });
+    result.items = plainToInstance(Enrollment, result.items, {
+      excludeExtraneousValues: true,
+    });
+    return result;
   }
 
-  @ApiOperation({ 
-    summary: "Get my enrollment", 
-    description: "Get the current user's enrollment for a specific course. Requires JWT authentication.",
-    tags: ["Enrollment Management"]
+  @ApiOperation({
+    summary: "Get my enrollment",
+    description:
+      "Get the current user's enrollment for a specific course. Requires JWT authentication.",
+    tags: ["Enrollment Management"],
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get("my")
-  getMyEnrollment(
+  async getMyEnrollment(
     @Query("courseId") courseId: string,
     @Req() req: AuthRequest,
   ) {
-    return this.enrollmentService.findByUserAndCourse(req.user.sub, courseId);
+    const enrollment = await this.enrollmentService.findByUserAndCourse(
+      req.user.sub,
+      courseId,
+    );
+    enrollment.enrollment = plainToInstance(Enrollment, enrollment.enrollment, {
+      excludeExtraneousValues: true,
+    });
+    return enrollment;
   }
 
-  @ApiOperation({ 
-    summary: "Get enrollment by ID", 
-    description: "Retrieve a specific enrollment by its ID. Requires admin permissions.",
-    tags: ["Enrollment Management"]
+  @ApiOperation({
+    summary: "Get enrollment by ID",
+    description:
+      "Retrieve a specific enrollment by its ID. Requires admin permissions.",
+    tags: ["Enrollment Management"],
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_READ_ONE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.enrollmentService.findOne(+id);
+  async findOne(@Param("id") id: string) {
+    const enrollment = await this.enrollmentService.findOne(+id);
+    return plainToInstance(Enrollment, enrollment, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  @ApiOperation({ 
-    summary: "Update enrollment", 
+  @ApiOperation({
+    summary: "Update enrollment",
     description: "Update an enrollment status. Requires admin permissions.",
-    tags: ["Enrollment Management"]
+    tags: ["Enrollment Management"],
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.ENROLLMENT_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
-  manageEnrollment(
+  async manageEnrollment(
     @Param("id") id: string,
     @Body() manageEnrollmentDto: ManageEnrollmentDto,
   ) {
-    return this.enrollmentService.update(+id, manageEnrollmentDto.status);
+    const enrollment = await this.enrollmentService.update(
+      +id,
+      manageEnrollmentDto.status,
+    );
+    return plainToInstance(Enrollment, enrollment, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @ApiOperation({
+    summary: "Remove enrollment",
+    description: "Delete an enrollment by its ID. Requires admin permissions.",
+    tags: ["Enrollment Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ENROLLMENT_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Delete(":id")
+  async deleteEnrollment(@Param("id") id: string) {
+    const result = await this.enrollmentService.remove(+id);
+    return result;
   }
 }

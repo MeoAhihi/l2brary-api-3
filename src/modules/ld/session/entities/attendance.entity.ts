@@ -1,18 +1,16 @@
+import { ReferenceUserDto } from "@/modules/iam/user/dto/reference-user.dto";
 import { User } from "@/modules/iam/user/entities/user.entity";
 import { Expose, Type } from "class-transformer";
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
+  PrimaryGeneratedColumn
 } from "typeorm";
 
 import { ApiProperty } from "@nestjs/swagger";
 
-import { AttendanceUserDto } from "../dto/attendance-user.dto";
 import { Session } from "./session.entity";
 
 @Entity("attendance")
@@ -23,7 +21,7 @@ export class Attendance {
   @Expose()
   @ManyToOne(() => User)
   @JoinColumn()
-  @Type(() => AttendanceUserDto)
+  @Type(() => ReferenceUserDto)
   user: User;
 
   @Expose()

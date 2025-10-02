@@ -108,10 +108,6 @@ export class EnrollmentService {
     return enrollment;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} enrollment`;
-  }
-
   async enroll(userId: string, courseId: string) {
     // Get the user and course entity
     const user = await this.userService.findOne(userId);
@@ -132,6 +128,7 @@ export class EnrollmentService {
       user,
       course,
       status: EnrollmentStatusEnum.PENDING, // or EnrollmentStatusEnum.PENDING if imported
+      enrolledAt: new Date(),
     });
     await this.enrollmentRepository.save(enrollment);
     await this.gamificationService.systemLogActivity(
@@ -173,5 +170,12 @@ export class EnrollmentService {
     await this.enrollmentRepository.save(enrollment);
 
     return enrollment;
+  }
+
+  async remove(id: number) {
+    // Remove the enrollment by ID
+    const enrollment = await this.findOne(id);
+    await this.enrollmentRepository.remove(enrollment);
+    return { message: `Enrollment with id ${id} has been removed.` };
   }
 }
