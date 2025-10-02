@@ -32,12 +32,6 @@ import { UserService } from "./user.service";
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    const newUser = await this.userService.create(createUserDto);
-    return plainToInstance(User, newUser, { excludeExtraneousValues: true });
-  }
-
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_READ_MANY)
   @UseGuards(JwtAuthGuard, PermissionGuard)
