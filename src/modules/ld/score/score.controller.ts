@@ -6,6 +6,7 @@ import { plainToInstance } from "class-transformer";
 
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -14,6 +15,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -29,9 +31,11 @@ import { CreateScoreColDto } from "./dto/create-score-col.dto";
 import { ScoreTableDto } from "./dto/score-table.dto";
 import { ScoreDto } from "./dto/score.dto";
 import { UpdateScoreColDto } from "./dto/update-score-col.dto";
+import { ScoreColumn } from "./entities/score-column.entity";
 import { ScoreColumnService } from "./score-column.service";
 import { ScoreService } from "./score.service";
 
+@UseInterceptors(ClassSerializerInterceptor)
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("score")
@@ -43,10 +47,11 @@ export class ScoreController {
   ) {}
 
   // Score Column endpoints
-  @ApiOperation({ 
-    summary: "Create score column", 
-    description: "Create a new score column for a course. Requires admin permissions.",
-    tags: ["Score Management"]
+  @ApiOperation({
+    summary: "Create score column",
+    description:
+      "Create a new score column for a course. Requires admin permissions.",
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_CREATE)
   @Post("column/:courseId")
@@ -55,14 +60,21 @@ export class ScoreController {
   async createScoreColumn(
     @Param("courseId") courseId: string,
     @Body() createScoreColDto: CreateScoreColDto,
-  ) {
-    return this.scoreColumnService.create(courseId, createScoreColDto);
+  ): Promise<ScoreColumn> {
+    const scoreColumn = await this.scoreColumnService.create(
+      courseId,
+      createScoreColDto,
+    );
+    return plainToInstance(ScoreColumn, scoreColumn, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  @ApiOperation({ 
-    summary: "Get score columns", 
-    description: "Retrieve all score columns for a course. Requires admin permissions.",
-    tags: ["Score Management"]
+  @ApiOperation({
+    summary: "Get score columns",
+    description:
+      "Retrieve all score columns for a course. Requires admin permissions.",
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ALL)
   @Get("column/:courseId")
@@ -81,23 +93,27 @@ export class ScoreController {
     return this.scoreColumnService.findAll(courseId, summarize);
   }
 
-  @ApiOperation({ 
-    summary: "Get score column details", 
-    description: "Retrieve detailed information about a score column. Requires admin permissions.",
-    tags: ["Score Management"]
+  @ApiOperation({
+    summary: "Get score column details",
+    description:
+      "Retrieve detailed information about a score column. Requires admin permissions.",
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ONE)
   @Get("column/detail/:id")
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
   @ApiResponse({ status: 200, description: "Score column details" })
   async getScoreColumn(@Param("id") id: number) {
-    return this.scoreColumnService.findOne(id);
+    const scoreColumn = await this.scoreColumnService.findOne(id);
+    return plainToInstance(ScoreColumn, scoreColumn, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  @ApiOperation({ 
-    summary: "Update score column", 
+  @ApiOperation({
+    summary: "Update score column",
     description: "Update an existing score column. Requires admin permissions.",
-    tags: ["Score Management"]
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_UPDATE)
   @Patch("column/:id")
@@ -107,13 +123,19 @@ export class ScoreController {
     @Param("id") id: number,
     @Body() updateScoreColDto: UpdateScoreColDto,
   ) {
-    return this.scoreColumnService.update(id, updateScoreColDto);
+    const updatedScoreColumn = await this.scoreColumnService.update(
+      id,
+      updateScoreColDto,
+    );
+    return plainToInstance(ScoreColumn, updatedScoreColumn, {
+      excludeExtraneousValues: true,
+    });
   }
 
-  @ApiOperation({ 
-    summary: "Delete score column", 
+  @ApiOperation({
+    summary: "Delete score column",
     description: "Delete a score column. Requires admin permissions.",
-    tags: ["Score Management"]
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_DELETE)
   @Delete("column/:id")
@@ -124,10 +146,11 @@ export class ScoreController {
   }
 
   // Score endpoints
-  @ApiOperation({ 
-    summary: "Upsert scores", 
-    description: "Create or update scores for a score column. Requires JWT authentication.",
-    tags: ["Score Management"]
+  @ApiOperation({
+    summary: "Upsert scores",
+    description:
+      "Create or update scores for a score column. Requires JWT authentication.",
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_UPSERT)
   @Post()
@@ -144,15 +167,17 @@ export class ScoreController {
   @ApiResponse({ status: 201, description: "Scores upserted" })
   async upsertScores(
     @Query("scoreColumnId") scoreColumnId: number,
-    @Body("scores") scores: ScoreDto[],
+    @Body() scores: ScoreDto[],
   ) {
-    return this.scoreService.upsertBulkByScoreColumn(scoreColumnId, scores);
+    await this.scoreService.upsertBulkByScoreColumn(scoreColumnId, scores);
+    return { message: "Scores upserted successfully." };
   }
 
-  @ApiOperation({ 
-    summary: "Get score table", 
-    description: "Retrieve score table data for a course. Requires admin permissions.",
-    tags: ["Score Management"]
+  @ApiOperation({
+    summary: "Get score table",
+    description:
+      "Retrieve score table data for a course. Requires admin permissions.",
+    tags: ["Score Management"],
   })
   @RequirePermission(PermissionEnum.SCORE_TABLE_READ)
   @Get("table")

@@ -52,7 +52,7 @@ export class ScoreColumnService {
         "score_column.name AS name",
         "score_column.coefficient AS coefficient",
         "score_column.isLocked AS isLocked",
-        "AVG(score.score) AS average",
+        "COALESCE(AVG(score.score), 0) AS average",
       ])
       .where("score_column.courseId = :courseId", { courseId })
       .groupBy("score_column.id");
@@ -65,7 +65,7 @@ export class ScoreColumnService {
   async findOne(id: number): Promise<ScoreColumn> {
     const scoreColumn = await this.scoreColumnRepository.findOne({
       where: { id },
-      relations: ["scores"],
+      relations: ["scores", "course"],
     });
     if (!scoreColumn) {
       throw new NotFoundException(`ScoreColumn with id ${id} not found`);
