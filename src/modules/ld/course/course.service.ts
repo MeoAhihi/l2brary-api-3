@@ -2,6 +2,7 @@ import { UTC7EndOfDate, UTC7StartOfDate } from "src/common/datetime.utils";
 import { FindOptionsWhere, ILike, Repository } from "typeorm";
 
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -55,9 +56,25 @@ export class CourseService {
         return (
           Array.isArray((scheduleDetail as any).daysOfMonth) &&
           (scheduleDetail as any).daysOfMonth.length > 0 &&
-          (scheduleDetail as any).daysOfMonth.every(
-            (d: any) => typeof d === "number" && d >= 1 && d <= 31,
-          )
+          (scheduleDetail as any).daysOfMonth.every((d: any) => {
+            if (typeof d === "number") {
+              return d >= 1 && d <= 31;
+            }
+            if (typeof d === "string") {
+              // Check if string is numeric
+              if (/^\d+$/.test(d)) {
+                const num = Number(d);
+                return num >= 1 && num <= 31;
+              } else {
+                throw new BadRequestException(
+                  `Invalid daysOfMonth value: "${d}" is not a numeric string`,
+                );
+              }
+            }
+            throw new BadRequestException(
+              `Invalid daysOfMonth value: ${JSON.stringify(d)}`,
+            );
+          })
         );
       case ScheduleType.ONE_TIME:
         // Should have dates as a non-empty array of Date or date strings
@@ -98,6 +115,20 @@ export class CourseService {
     }
     if (createCourseDto.endDate) {
       (createCourseDto as any).endDate = UTC7EndOfDate(createCourseDto.endDate);
+    }
+    // If scheduleType is MONTHLY or LUNAR_MONTHLY, cast daysOfMonth array elements to numbers
+    if (
+      scheduleType === ScheduleType.MONTHLY ||
+      scheduleType === ScheduleType.LUNAR_MONTHLY
+    ) {
+      if (
+        createCourseDto.scheduleDetail &&
+        Array.isArray((createCourseDto.scheduleDetail as any).daysOfMonth)
+      ) {
+        (createCourseDto.scheduleDetail as any).daysOfMonth = (
+          createCourseDto.scheduleDetail as any
+        ).daysOfMonth.map((d: any) => Number(d));
+      }
     }
 
     const course = this.courseRepository.create(createCourseDto);
