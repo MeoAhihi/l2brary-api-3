@@ -49,6 +49,17 @@ export class ActivityController {
   }
 
   @ApiOperation({ 
+    summary: "Get activity categories", 
+    description: "Retrieve all activity categories. No authentication required.",
+    tags: ["Activity Management"]
+  })
+  /* Intentional No Guard */
+  @Get("categories")
+  getCategories() {
+    return this.activityService.getCategories();
+  }
+
+  @ApiOperation({ 
     summary: "Get activity by ID", 
     description: "Retrieve a specific activity by its ID. Requires admin permissions.",
     tags: ["Activity Management"]
@@ -90,14 +101,5 @@ export class ActivityController {
     return this.activityService.remove(+id);
   }
 
-  @ApiOperation({ 
-    summary: "Get activity categories", 
-    description: "Retrieve all activity categories. No authentication required.",
-    tags: ["Activity Management"]
-  })
-  /* Intentional No Guard */
-  @Get("categories")
-  getCategories() {
-    return this.activityService.getCategories();
-  }
+  
 }

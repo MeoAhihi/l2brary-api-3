@@ -70,7 +70,12 @@ export class AuthenticationService {
     // and permission entities are readonly
     const permissions = permissionEntities.map((p) => p.name as PermissionEnum);
 
-    return this.getTokens({ sub: user.id, permissions, roles });
+    return this.getTokens({
+      sub: user.id,
+      fullName: user.fullName,
+      permissions,
+      roles,
+    });
   }
 
   async refreshToken(
@@ -96,7 +101,12 @@ export class AuthenticationService {
       );
 
       // Generate new tokens
-      return this.getTokens({ sub: user.id, permissions, roles });
+      return this.getTokens({
+        sub: user.id,
+        fullName: user.fullName,
+        permissions,
+        roles,
+      });
     } catch (error) {
       throw new UnauthorizedException("Invalid refresh token");
     }
@@ -112,7 +122,12 @@ export class AuthenticationService {
     await this.inviteCodeService.delete(inviteCode);
 
     // new members have no permissions
-    return this.getTokens({ sub: user.id, permissions: [], roles: [] });
+    return this.getTokens({
+      sub: user.id,
+      fullName: user.fullName,
+      permissions: [],
+      roles: [],
+    });
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {

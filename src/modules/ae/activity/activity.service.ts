@@ -137,7 +137,7 @@ export class ActivityService {
     const categories = await this.activityRepository
       .createQueryBuilder("activity")
       .select("activity.category", "category")
-      // .distinct(true)
+      .distinct(true)
       .getRawMany();
     return categories.map<string>((c) => c.category);
   }
