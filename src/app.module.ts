@@ -16,6 +16,7 @@ import { EnrollmentModule } from "./modules/ld/enrollment/enrollment.module";
 import { GameModule } from "./modules/ld/game/game.module";
 import { SessionModule } from "./modules/ld/session/session.module";
 import { ScoreModule } from './modules/ld/score/score.module';
+import { MemoryCleanupService } from "./memory/memory-cleanup.service";
 
 @Module({
   imports: [
@@ -38,6 +39,6 @@ import { ScoreModule } from './modules/ld/score/score.module';
     ScoreModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MemoryCleanupService],
 })
 export class AppModule {}
