@@ -9,18 +9,19 @@ import {
 
 import { Course } from "../../course/entities/course.entity";
 import { Score } from "./score.entity";
+import { Exclude, Expose } from "class-transformer";
 
 @Entity()
 export class ScoreColumn {
   @PrimaryGeneratedColumn("increment")
   id: number;
-
+  
   @Column()
   name: string;
-
+  
   @Column("int", { default: 1 })
   coefficient: number;
-
+  
   @Column({ default: false })
   isLocked: boolean;
 

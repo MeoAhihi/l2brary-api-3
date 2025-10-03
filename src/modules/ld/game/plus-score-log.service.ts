@@ -64,12 +64,15 @@ export class PlusScoreLogService {
       return [];
     }
 
-    const entities = plusScoreDtos.map(({ scoreColumnId, score }) => ({
-      gameLogUserId,
-      gameLogGameId,
-      scoreColumnId,
-      score,
-    }));
+    const entities = plusScoreDtos.map(({ scoreColumnId, score }) => {
+      
+      return {
+        gameLogUserId,
+        gameLogGameId,
+        scoreColumnId,
+        score,
+      };
+    });
 
     await this.plusScoreLogRepository.upsert(entities, [
       "gameLogUserId",
