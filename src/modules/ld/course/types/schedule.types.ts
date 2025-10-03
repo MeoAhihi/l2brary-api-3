@@ -10,6 +10,7 @@ export enum Weekday {
 
 export enum ScheduleType {
   WEEKLY = "WEEKLY",
+  BIWEEKLY = "BIWEEKLY",
   MONTHLY = "MONTHLY",
   LUNAR_MONTHLY = "LUNAR_MONTHLY",
   ONE_TIME = "ONE_TIME",

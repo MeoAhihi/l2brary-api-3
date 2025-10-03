@@ -1,0 +1,62 @@
+[
+  "user:readMany",
+  "user:readOne",
+  "user:update",
+  "user:offboard",
+  "user:assignRole",
+  "user:unassignRole",
+
+  "authentication:invite",
+
+  "role:readAll",
+  "role:readOne",
+  "role:create",
+  "role:update",
+  "role:delete",
+  "role:attachPermissions",
+  "role:detachPermissions",
+
+  "course:create",
+  "course:readAll",
+  "course:update",
+  "course:delete",
+
+  "enrollment:readAll",
+  "enrollment:readOne",
+
+  "score:tableRead",
+
+  "session:readAll",
+  "session:readOne",
+
+  "attendance:delete",
+
+  "activity:create",
+  "activity:readAll",
+  "activity:readOne",
+  "activity:update",
+  "activity:delete",
+
+  "gamification:reportRead",
+
+  "article:delete",
+  "article:reviewUpdate",
+
+  "trackGrowth:usersCount",
+  "trackGrowth:usersNew",
+  "trackGrowth:usersActive",
+  "trackGrowth:usersActiveCount",
+  "trackGrowth:usersInactive",
+  "trackGrowth:usersInactiveCount",
+  "trackGrowth:usersRetentionRate",
+  "trackGrowth:usersMonthly",
+
+  "optimization:totalEnrollments",
+  "optimization:averageAttendance",
+  "optimization:attendanceRate",
+  "optimization:topUsers",
+
+  "demographic:rankRead",
+  "demographic:genderRead",
+  "demographic:ageRead"
+]

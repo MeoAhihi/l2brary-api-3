@@ -1,19 +1,57 @@
-import { Body, Controller, Get, Query } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiResponse } from "@nestjs/swagger";
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
+import { Body, Controller, Get, Query, UseGuards } from "@nestjs/common";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from "@nestjs/swagger";
 
 import { TrackGrowthService } from "./analytics.track-growth.service";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("analytics/track-growth")
 export class TrackGrowthController {
   constructor(private readonly trackGrowthservice: TrackGrowthService) {}
 
+  @ApiOperation({
+    summary: "Get total user count",
+    description:
+      "Retrieve the total number of users in the system. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_COUNT)
   @Get("users/count")
   async countUsers() {
     return { count: await this.trackGrowthservice.countUsers() };
   }
 
+  @ApiQuery({
+    name: "from",
+    required: true,
+    type: String,
+    description: "Start date (inclusive) in ISO format (e.g., 2023-01-01)",
+  })
+  @ApiQuery({
+    name: "to",
+    required: true,
+    type: String,
+    description: "End date (inclusive) in ISO format (e.g., 2023-01-31)",
+  })
+  @ApiOperation({
+    summary: "Get new users count",
+    description:
+      "Retrieve the count of new users within a date range. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_NEW)
   @Get("users/new")
-  async countNewUsers(@Body("from") from: string, @Body("to") to: string) {
+  async countNewUsers(@Query("from") from: string, @Query("to") to: string) {
     const fromDate = new Date(from);
     const toDate = new Date(to);
     return {
@@ -21,8 +59,14 @@ export class TrackGrowthController {
     };
   }
 
+  @ApiOperation({
+    summary: "Get active users",
+    description:
+      "Retrieve active users with minimum score threshold. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_ACTIVE)
   @Get("users/active")
-  @ApiOperation({ summary: "Get active users with minimum score" })
   @ApiQuery({
     name: "minscore",
     required: false,
@@ -38,8 +82,14 @@ export class TrackGrowthController {
     return await this.trackGrowthservice.getActiveUsers(minScore);
   }
 
+  @ApiOperation({
+    summary: "Count active users",
+    description:
+      "Get the count of active users with minimum score threshold. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_ACTIVE_COUNT)
   @Get("users/active/count")
-  @ApiOperation({ summary: "Count of active users with minimum score" })
   @ApiQuery({
     name: "minscore",
     required: false,
@@ -55,10 +105,14 @@ export class TrackGrowthController {
     return { count: await this.trackGrowthservice.countActiveUsers(minScore) };
   }
 
-  @Get("users/inactive")
   @ApiOperation({
-    summary: "Get inactive users with maximum score and optional date interval",
+    summary: "Get inactive users",
+    description:
+      "Retrieve inactive users with maximum score and optional date filtering. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
   })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_INACTIVE)
+  @Get("users/inactive")
   @ApiQuery({
     name: "maxscore",
     required: false,
@@ -98,11 +152,14 @@ export class TrackGrowthController {
     );
   }
 
-  @Get("users/inactive/count")
   @ApiOperation({
-    summary:
-      "Count of inactive users with maximum score and optional date interval",
+    summary: "Count inactive users",
+    description:
+      "Get the count of inactive users with maximum score and optional date filtering. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
   })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_INACTIVE_COUNT)
+  @Get("users/inactive/count")
   @ApiQuery({
     name: "maxscore",
     required: false,
@@ -142,6 +199,13 @@ export class TrackGrowthController {
     };
   }
 
+  @ApiOperation({
+    summary: "Get user retention rate",
+    description:
+      "Calculate user retention rate between two periods. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_RETENTION_RATE)
   @Get("users/retention-rate")
   async getRetentionRate(
     @Query("prevFrom") prevFrom: string,
@@ -167,6 +231,13 @@ export class TrackGrowthController {
     );
   }
 
+  @ApiOperation({
+    summary: "Get monthly user growth",
+    description:
+      "Retrieve monthly user growth data for the last 12 months. Requires admin permissions.",
+    tags: ["Analytics - Track Growth"],
+  })
+  @RequirePermission(PermissionEnum.TRACK_GROWTH_USERS_MONTHLY)
   @Get("users/monthly")
   async countUsersByMonthLast12() {
     return await this.trackGrowthservice.countNewUsersByMonthLast12();

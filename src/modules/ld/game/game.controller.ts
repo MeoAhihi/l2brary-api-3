@@ -1,4 +1,11 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+import { plainToInstance } from "class-transformer";
+
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -7,10 +14,17 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 
 import { CreateGameLogDto } from "./dto/create-game-log.dto";
+import { Game } from "./entities/game.entity";
 import { GameLogService } from "./game-log.service";
 import { GameService } from "./game.service";
 
@@ -21,28 +35,54 @@ export class GameController {
     private readonly gameLogService: GameLogService,
   ) {}
 
+  @ApiOperation({
+    summary: "Create game",
+    description: "Create a new game for a session. Requires admin permissions.",
+    tags: ["Game Management"],
+  })
   // Create a new game for a given sessionId
-  @Post()
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "sessionId",
     type: "string",
     required: true,
     description: "The ID of the session to create a game for",
   })
-  create(@Query("sessionId") sessionId: string) {
+  @Post()
+  async create(@Query("sessionId") sessionId: string) {
     if (!sessionId) {
-      throw new Error("sessionId query parameter is required");
+      throw new BadRequestException("sessionId query parameter is required");
     }
-    return this.gameService.create(+sessionId);
+    const game = await this.gameService.create(+sessionId);
+    return plainToInstance(Game, game, { excludeExtraneousValues: true });
   }
 
-  // Submit a game (mark as submitted and process plus score logs)
+  @ApiOperation({
+    summary: "Submit game",
+    description: "Submit a game for scoring. Requires JWT authentication.",
+    tags: ["Game Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_SUBMIT)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/submit")
   async submit(@Param("id", ParseIntPipe) id: number) {
-    return this.gameService.submit(id);
+    const game = await this.gameService.submit(id);
+    game.game = plainToInstance(Game, game.game, {
+      excludeExtraneousValues: true,
+    });
+    return game;
   }
 
-  // Get all games, optionally filter by sessionId
+  @ApiOperation({
+    summary: "Get all games",
+    description:
+      "Retrieve all games with optional session filtering. No authentication required.",
+    tags: ["Game Management"],
+  })
+  /* Intentional No Guard */
   @Get()
   @ApiQuery({
     name: "sessionId",
@@ -50,23 +90,47 @@ export class GameController {
     required: false,
     description: "Optional session id to filter games by session",
   })
-  findAll(@Query("sessionId") sessionId?: string) {
-    return this.gameService.findAll(sessionId ? +sessionId : undefined);
+  async findAll(@Query("sessionId") sessionId?: string) {
+    const games = await this.gameService.findAll(
+      sessionId ? +sessionId : undefined,
+    );
+    return plainToInstance(Game, games, { excludeExtraneousValues: true });
   }
 
-  // Get a single game by id
+  @ApiOperation({
+    summary: "Get game by ID",
+    description:
+      "Retrieve a specific game by its ID. No authentication required.",
+    tags: ["Game Management"],
+  })
+  /* Intentional No Guard */
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.gameService.findOne(+id);
+  async findOne(@Param("id") id: string) {
+    const game = await this.gameService.findOne(+id);
+    return plainToInstance(Game, game, { excludeExtraneousValues: true });
   }
 
-  // Soft-delete a game by id
+  @ApiOperation({
+    summary: "Delete game",
+    description: "Delete a game. Requires admin permissions.",
+    tags: ["Game Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_DELETE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.gameService.remove(+id);
   }
 
-  // Bulk upsert game logs for a game
+  @ApiOperation({
+    summary: "Log game activity",
+    description: "Log game activity and progress. Requires JWT authentication.",
+    tags: ["Game Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.GAME_LOG)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/logs")
   @ApiBody({
     type: CreateGameLogDto,

@@ -1,3 +1,8 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+
 import {
   Body,
   ClassSerializerInterceptor,
@@ -8,25 +13,48 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiOperation, ApiQuery, ApiQueryOptions } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiQueryOptions,
+} from "@nestjs/swagger";
 
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { ScheduleType } from "./types/schedule.types";
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller("course")
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
+  @ApiOperation({
+    summary: "Create course",
+    description: "Create a new course. Requires admin permissions.",
+    tags: ["Course Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_CREATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   create(@Body() createCourseDto: CreateCourseDto) {
     return this.courseService.create(createCourseDto);
   }
 
-  @Get()
+  @ApiOperation({
+    summary: "Get all courses (admin)",
+    description:
+      "Retrieve all courses with filtering options. Requires admin permissions.",
+    tags: ["Course Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_READ_ALL)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "page",
     required: false,
@@ -63,7 +91,7 @@ export class CourseController {
     type: Boolean,
     description: "Filter by public courses",
   })
-  // for authenticated user's course catalog
+  @Get()
   findAll(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
@@ -88,8 +116,13 @@ export class CourseController {
     });
   }
 
-  @Get("public")
-  @ApiOperation({ summary: "Get public courses" })
+  @ApiOperation({
+    summary: "Get public courses",
+    description:
+      "Retrieve public courses available to all users. No authentication required.",
+    tags: ["Course Management"],
+  })
+  /* Intentional No Guard */
   @ApiQuery({
     name: "page",
     required: false,
@@ -120,7 +153,7 @@ export class CourseController {
     enum: ScheduleType,
     description: "Filter by schedule type",
   })
-  // for guest to view catalog of courses
+  @Get("public")
   findPublicCourses(
     @Query("page") page?: number,
     @Query("limit") limit?: number,
@@ -138,26 +171,41 @@ export class CourseController {
     });
   }
 
+  @ApiOperation({
+    summary: "Get course groups",
+    description: "Retrieve unique course groups. No authentication required.",
+    tags: ["Course Management"],
+  })
+  /* Intentional No Guard */
   @Get("groups")
-  @ApiOperation({ summary: "Get unique course groups" })
   async getCourseGroups() {
     const groups = await this.courseService.findCourseGroup();
     return groups;
   }
 
+  @ApiOperation({
+    summary: "Get course by ID",
+    description:
+      "Retrieve a specific course by its ID. No authentication required.",
+    tags: ["Course Management"],
+  })
+  /* Intentional No Guard */
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.courseService.findOne(id);
   }
 
+  @ApiOperation({
+    summary: "Update course",
+    description: "Update an existing course. Requires admin permissions.",
+    tags: ["Course Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.COURSE_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateCourseDto: UpdateCourseDto) {
     return this.courseService.update(id, updateCourseDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.courseService.remove(id);
   }
 }

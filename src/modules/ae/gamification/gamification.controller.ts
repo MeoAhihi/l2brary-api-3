@@ -1,28 +1,59 @@
+import { PermissionEnum } from "@/common/permission.enum";
+import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
+import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
+import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+import { AuthRequest } from "@/modules/iam/types/auth-request.type";
+import { plainToInstance } from "class-transformer";
+
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
-  Patch,
   Post,
-  Query,
+  Req,
+  UseGuards,
 } from "@nestjs/common";
-import { ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 
 import { LogActivityDto } from "./dto/log-activity.dto";
-import { UpdateGamificationDto } from "./dto/update-gamification.dto";
+import { ActivityLog } from "./entities/activity-log.entity";
 import { GamificationService } from "./gamification.service";
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("gamification")
 export class GamificationController {
   constructor(private readonly gamificationService: GamificationService) {}
 
+  @ApiOperation({
+    summary: "Log gamification activity",
+    description:
+      "Log user activity for gamification tracking. Requires JWT authentication.",
+    tags: ["Gamification"],
+  })
+  @RequirePermission(PermissionEnum.GAMIFICATION_LOG_ACTIVITY)
   @Post("log-activity")
-  create(@Body() logActivityDto: LogActivityDto) {
-    return this.gamificationService.create("user", logActivityDto);
+  async create(
+    @Body() logActivityDto: LogActivityDto,
+    @Req() req: AuthRequest,
+  ) {
+    const activityLog = await this.gamificationService.create(
+      req.user.fullName + "/" + req.user.sub,
+      logActivityDto,
+    );
+    return plainToInstance(ActivityLog, activityLog, {
+      excludeExtraneousValues: true,
+    });
   }
 
+  @ApiOperation({
+    summary: "Get gamification data",
+    description:
+      "Retrieve gamification data with filtering options. Requires admin permissions.",
+    tags: ["Gamification"],
+  })
+  @RequirePermission(PermissionEnum.GAMIFICATION_READ_ALL)
   @Get()
   @ApiQuery({
     name: "userId",
@@ -42,40 +73,32 @@ export class GamificationController {
     type: Number,
     description: "Items per page",
   })
-  findAll(
+  async findAll(
     @Param("userId") userId: string,
     @Param("page") page: string = "1",
     @Param("limit") limit: string = "10",
   ) {
     const pageNumber = parseInt(page, 10) || 1;
     const limitNumber = parseInt(limit, 10) || 10;
-    return this.gamificationService.findAll({
+    const activityLogs = await this.gamificationService.findAll({
       userId,
       page: pageNumber,
       limit: limitNumber,
     });
+    activityLogs.items = plainToInstance(ActivityLog, activityLogs.items, {
+      excludeExtraneousValues: true,
+    });
+    return activityLogs;
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.gamificationService.findOne(+id);
-  }
-
-  @Patch(":id")
-  update(
-    @Param("id") id: string,
-    @Body() updateGamificationDto: UpdateGamificationDto,
-  ) {
-    return this.gamificationService.update(+id, updateGamificationDto);
-  }
-
-  @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.gamificationService.remove(+id);
-  }
-
+  @ApiOperation({
+    summary: "Get user activity report",
+    description:
+      "Generate an activity report for a specific user. Requires admin permissions.",
+    tags: ["Gamification"],
+  })
   @Get("report/:userId")
-  // @ApiQuery({
+  // @ApiQuery({s
   //   name: "startDate",
   //   required: false,
   //   type: String,

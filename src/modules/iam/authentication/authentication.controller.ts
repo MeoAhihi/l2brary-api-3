@@ -1,9 +1,24 @@
-import { Body, Controller, Param, Post, Query } from "@nestjs/common";
-import { ApiBody, ApiQuery } from "@nestjs/swagger";
+import { PermissionEnum } from "@/common/permission.enum";
 
+import {
+  Body,
+  Controller,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiQuery , ApiOperation } from "@nestjs/swagger";
+
+import { RequirePermission } from "../authorization/decorators/permission.decorator";
+import { PermissionGuard } from "../authorization/guards/permission.guard";
+import { AuthRequest } from "../types/auth-request.type";
 import { AuthenticationService } from "./authentication.service";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto";
+import { JwtAuthGuard } from "./guards/jwt.guard";
 import { InviteCodeService } from "./invite-code.service";
 import { ResetPasswordCodeService } from "./reset-password-code.service";
 
@@ -15,8 +30,14 @@ export class AuthenticationController {
     private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
-  // Endpoint to generate an invite code, optionally with an email
-  // POST /authentication/invite
+  @ApiOperation({ 
+    summary: "Generate invite code", 
+    description: "Generate an invite code for user registration. Requires admin permissions.",
+    tags: ["Authentication"]
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.AUTH_INVITE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "email",
     required: false,
@@ -28,8 +49,12 @@ export class AuthenticationController {
     return this.inviteCodeService.invite(email);
   }
 
-  // Endpoint to request a password reset (forgot password)
-  // POST /authentication/forgot-password
+  @ApiOperation({ 
+    summary: "Request password reset", 
+    description: "Request a password reset code to be sent to the user's email. No authentication required.",
+    tags: ["Authentication"]
+  })
+  /* Intentional No Guard */
   @Post("forgot-password")
   @ApiQuery({
     name: "email",
@@ -43,15 +68,23 @@ export class AuthenticationController {
     return this.resetPasswordCodeService.resetPassword(email);
   }
 
-  // Endpoint to login a user with phone number and password
-  // POST /authentication/login
+  @ApiOperation({ 
+    summary: "User login", 
+    description: "Authenticate user with email and password. No authentication required.",
+    tags: ["Authentication"]
+  })
+  /* Intentional No Guard */
   @Post("login")
   async login(@Body() loginDto: LoginDto) {
     return this.authenticationService.login(loginDto);
   }
 
-  // Endpoint to register a new user with invite code and registration data
-  // POST /authentication/register
+  @ApiOperation({ 
+    summary: "User registration", 
+    description: "Register a new user with an invite code. No authentication required.",
+    tags: ["Authentication"]
+  })
+  /* Intentional No Guard */
   @Post("register/:inviteCode")
   async register(
     @Param("inviteCode") inviteCode: string,
@@ -60,6 +93,12 @@ export class AuthenticationController {
     return this.authenticationService.register(inviteCode, registerDto);
   }
 
+  @ApiOperation({ 
+    summary: "Reset password", 
+    description: "Reset user password using a reset code. No authentication required.",
+    tags: ["Authentication"]
+  })
+  /* Intentional No Guard */
   @Post("reset-password/:resetPasswordCode")
   @ApiBody({
     schema: {
@@ -84,8 +123,31 @@ export class AuthenticationController {
     );
   }
 
-  // Endpoint to refresh tokens
-  // POST /authentication/refresh-token
+  @ApiOperation({ 
+    summary: "Change password", 
+    description: "Change the current user's password. Requires JWT authentication.",
+    tags: ["Authentication"]
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post("change-password")
+  async changePassword(
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Req() req: AuthRequest,
+  ) {
+    // Assumes req.user.sub contains the user ID (populated by authentication guard)
+    return this.authenticationService.changePassword(
+      req.user.sub,
+      changePasswordDto,
+    );
+  }
+
+  @ApiOperation({ 
+    summary: "Refresh token", 
+    description: "Obtain new access and refresh tokens using a refresh token. No authentication required.",
+    tags: ["Authentication"]
+  })
+  /* Intentional No Guard */
   @Post("refresh-token")
   @ApiBody({
     schema: {

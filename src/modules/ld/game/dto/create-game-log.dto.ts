@@ -15,7 +15,10 @@ export class PlusScoreDto {
 }
 
 export class CreateGameLogDto {
-  @ApiProperty({ description: "ID of the user", example: 1 })
+  @ApiProperty({
+    description: "ID of the user",
+    example: "b3e1c2d4-5678-4f9a-8b2c-123456789abc",
+  })
   @IsUUID()
   userId: string;
 

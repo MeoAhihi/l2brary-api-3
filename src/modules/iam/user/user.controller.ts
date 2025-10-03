@@ -1,3 +1,4 @@
+import { PermissionEnum } from "@/common/permission.enum";
 import { plainToInstance } from "class-transformer";
 
 import {
@@ -14,26 +15,31 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
+import { RequirePermission } from "../authorization/decorators/permission.decorator";
+import { PermissionGuard } from "../authorization/guards/permission.guard";
 import { AuthRequest } from "../types/auth-request.type";
-import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User } from "./entities/user.entity";
 import { UserService } from "./user.service";
 
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    const newUser = await this.userService.create(createUserDto);
-    return plainToInstance(User, newUser, { excludeExtraneousValues: true });
-  }
-
-  @Get()
+  @ApiOperation({
+    summary: "Get all users",
+    description:
+      "Retrieve a list of all users with optional filtering. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_READ_MANY)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @ApiQuery({
     name: "gender",
     required: false,
@@ -55,7 +61,8 @@ export class UserController {
     default: false,
     allowEmptyValue: true,
   })
-  async findAll(
+  @Get()
+  async findMany(
     @Query("gender") gender?: string,
     @Query("ranks") ranks?: string[],
     @Query("sortByRank") sortByRank?: boolean,
@@ -65,9 +72,16 @@ export class UserController {
       ranks,
       sortByRank,
     });
-    return plainToInstance(User, users, { excludeExtraneousValues: true });
+    return users;
+    // return plainToInstance(User, users, { excludeExtraneousValues: true });
   }
 
+  @ApiOperation({
+    summary: "Get user profile",
+    description:
+      "Retrieve the current user's profile information. Requires JWT authentication.",
+    tags: ["User Profile"],
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
@@ -76,12 +90,30 @@ export class UserController {
     return await this.userService.findOne(req.user.sub, ["roles"]);
   }
 
+  @ApiOperation({
+    summary: "Get user by ID",
+    description:
+      "Retrieve a specific user by their ID. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_READ_ONE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<User> {
     return await this.userService.findOne(id, ["roles"]);
   }
 
+  @ApiOperation({
+    summary: "Admin modify user profile",
+    description:
+      "Update a user's profile information. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_UPDATE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(":id")
   async update(
     @Param("id") id: string,
@@ -93,31 +125,71 @@ export class UserController {
     });
   }
 
+  @ApiOperation({
+    summary: "User modify self profile",
+    description:
+      "Update the current user's own profile information. Requires JWT authentication.",
+    tags: ["User Profile"],
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch()
+  async updateProfile(
+    @Req() req: AuthRequest,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Promise<User> {
+    const updatedUser = await this.userService.update(
+      req.user.sub,
+      updateProfileDto,
+    );
+    return plainToInstance(User, updatedUser, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  @ApiOperation({
+    summary: "Delete user",
+    description: "Remove a user from the system. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_OFFBOARD)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(":id")
-  async remove(@Param("id") id: string): Promise<{ message: string }> {
+  async offboard(@Param("id") id: string): Promise<{ message: string }> {
     await this.userService.remove(id);
     return { message: `User with id ${id} has been deleted.` };
   }
 
+  @ApiOperation({
+    summary: "Assign role to user",
+    description: "Assign a role to a user. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_ASSIGN_ROLE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/roles/:roleId/assign")
   async assignRole(
     @Param("id") userId: string,
     @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
-    await this.userService.assignRole(userId, roleId);
-    return {
-      message: `Role with id ${roleId} assigned to user with id ${userId}.`,
-    };
+    return this.userService.assignRole(userId, roleId);
   }
 
+  @ApiOperation({
+    summary: "Unassign role from user",
+    description: "Remove a role from a user. Requires admin permissions.",
+    tags: ["User Management"],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.USER_UNASSIGN_ROLE)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(":id/roles/:roleId/unassign")
   async unassignRole(
     @Param("id") userId: string,
     @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
-    await this.userService.unassignRole(userId, roleId);
-    return {
-      message: `Role with id ${roleId} unassigned from user with id ${userId}.`,
-    };
+    return this.userService.unassignRole(userId, roleId);
   }
 }

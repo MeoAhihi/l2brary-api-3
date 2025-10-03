@@ -10,6 +10,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 import { CreateGameLogDto } from "./dto/create-game-log.dto";
 import { GameLog } from "./entities/game-log.entity";
+import { Game } from "./entities/game.entity";
 import { GameService } from "./game.service";
 import { PlusScoreLogService } from "./plus-score-log.service";
 
@@ -22,6 +23,38 @@ export class GameLogService {
     private readonly userService: UserService,
     private readonly plusScoreLogService: PlusScoreLogService,
   ) {}
+
+  async upsert(game: Game, createGameLogDto: CreateGameLogDto) {
+    const {
+      score,
+      timePlayed,
+      triedTimes,
+      userId,
+      plusScores = [],
+    } = createGameLogDto;
+
+    const user = await this.userService.findOne(userId);
+
+    const data: GameLog = {
+      gameId: game.id,
+      game,
+      userId,
+      user,
+      score,
+      timePlayed,
+      triedTimes,
+      plusScoreLogs: [], // Will be updated after plusScoreLogs upsert
+    };
+
+    // Upsert the game log first
+    await this.gameLogRepository.upsert(data, ["user", "game"] as const);
+
+    // Upsert plus score logs for this user/game if any plusScoreDtos are provided
+    await this.plusScoreLogService.upsertBulk(userId, game.id, plusScores);
+
+    // Optionally, you could update the game log with the plusScoreLogs if needed
+    return { message: "Game log created or updated successfully." };
+  }
 
   async upsertBulk(gameId: number, createGameLogDtos: CreateGameLogDto[]) {
     const game = await this.gameService.findOne(gameId);
@@ -37,31 +70,9 @@ export class GameLogService {
       throw new ConflictException("Duplicate userId found.");
     }
 
-    const data: GameLog[] = await Promise.all(
-      createGameLogDtos.map(
-        async ({ score, timePlayed, triedTimes, userId, plusScores = [] }) => {
-          // Upsert plus score logs for this user/game if any plusScoreDtos are provided
-          const plusScoreLogs = await this.plusScoreLogService.upsertBulk(
-            userId,
-            gameId,
-            plusScores,
-          );
-          return {
-            gameId,
-            game,
-            userId,
-            user: await this.userService.findOne(userId),
-            score,
-            timePlayed,
-            triedTimes,
-            plusScoreLogs,
-          };
-        },
-      ),
-    );
-    await this.gameLogRepository.upsert(data, ["user", "game"] as const);
+    await Promise.all(createGameLogDtos.map((dto) => this.upsert(game, dto)));
 
-    return { message: "Game logs created successfully." };
+    return { message: "Game logs created or updated successfully." };
   }
 
   async findOne(gameId: number, userId: string) {

@@ -77,6 +77,24 @@ export class EnrollmentService {
     return enrollment;
   }
 
+  async findByUserAndCourse(
+    userId: string,
+    courseId: string,
+  ): Promise<{ message: string; enrollment: Enrollment | null }> {
+    const enrollment = await this.enrollmentRepository.findOne({
+      where: {
+        user: { id: userId },
+        course: { id: courseId },
+      },
+      relations: ["user", "course"],
+    });
+
+    return {
+      message: enrollment ? "Enrollment found" : "No Enrollment found",
+      enrollment,
+    };
+  }
+
   async update(id: number, status: EnrollmentStatusEnum): Promise<Enrollment> {
     const enrollment = await this.enrollmentRepository.findOne({
       where: { id },
@@ -88,10 +106,6 @@ export class EnrollmentService {
     enrollment.status = status;
     await this.enrollmentRepository.save(enrollment);
     return enrollment;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} enrollment`;
   }
 
   async enroll(userId: string, courseId: string) {
@@ -114,6 +128,7 @@ export class EnrollmentService {
       user,
       course,
       status: EnrollmentStatusEnum.PENDING, // or EnrollmentStatusEnum.PENDING if imported
+      enrolledAt: new Date(),
     });
     await this.enrollmentRepository.save(enrollment);
     await this.gamificationService.systemLogActivity(
@@ -155,5 +170,12 @@ export class EnrollmentService {
     await this.enrollmentRepository.save(enrollment);
 
     return enrollment;
+  }
+
+  async remove(id: number) {
+    // Remove the enrollment by ID
+    const enrollment = await this.findOne(id);
+    await this.enrollmentRepository.remove(enrollment);
+    return { message: `Enrollment with id ${id} has been removed.` };
   }
 }
