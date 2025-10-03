@@ -70,7 +70,6 @@ export class GameController {
   @Post(":id/submit")
   async submit(@Param("id", ParseIntPipe) id: number) {
     const game = await this.gameService.submit(id);
-    console.log("🚀 ~ GameController ~ submit ~ game:", game.game.gameLogs);
     game.game = plainToInstance(Game, game.game, {
       excludeExtraneousValues: true,
     });
