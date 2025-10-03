@@ -32,19 +32,29 @@ export class AnalyticsOptimizationService {
   /**
    * Returns a map of courseId to total number of enrollments.
    */
-  async getTotalEnrollmentsByCourse(): Promise<Map<string, number>> {
+  async getTotalEnrollmentsByCourse() {
     const enrollmentsRaw = await this.enrollmentRepository
       .createQueryBuilder("enrollment")
+      .leftJoin("enrollment.course", "course")
       .select("enrollment.courseId", "courseId")
+      .addSelect("course.title", "courseTitle")
+      .addSelect("course.code", "courseCode")
       .addSelect("COUNT(enrollment.id)", "enrollmentCount")
       .groupBy("enrollment.courseId")
-      .getRawMany<{ courseId: string; enrollmentCount: string }>();
+      .addGroupBy("course.title")
+      .addGroupBy("course.code")
+      .getRawMany<{
+        courseId: string;
+        courseTitle: string;
+        courseCode: string;
+        enrollmentCount: string;
+      }>();
 
-    const enrollmentsMap = new Map<string, number>();
-    enrollmentsRaw.forEach((e) => {
-      enrollmentsMap.set(e.courseId, Number(e.enrollmentCount));
-    });
-    return enrollmentsMap;
+    // const enrollmentsMap = new Map<string, number>();
+    // enrollmentsRaw.forEach((e) => {
+    //   enrollmentsMap.set(e.courseId, Number(e.enrollmentCount));
+    // });
+    return enrollmentsRaw;
   }
 
   /**

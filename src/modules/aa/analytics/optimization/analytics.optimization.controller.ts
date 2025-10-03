@@ -16,25 +16,25 @@ export class AnalyticsOptimizationController {
     private readonly analyticsOptimizationService: AnalyticsOptimizationService,
   ) {}
 
-  @ApiOperation({ 
-    summary: "Get total enrollments by course", 
-    description: "Retrieve total enrollment counts for each course. Requires admin permissions.",
-    tags: ["Analytics - Optimization"]
+  @ApiOperation({
+    summary: "Get total enrollments by course",
+    description:
+      "Retrieve total enrollment counts for each course. Requires admin permissions.",
+    tags: ["Analytics - Optimization"],
   })
   // Get total enrollments by course
   @RequirePermission(PermissionEnum.OPTIMIZATION_TOTAL_ENROLLMENTS)
   @Get("total-enrollments")
   async getTotalEnrollmentsByCourse() {
-    const result =
-      await this.analyticsOptimizationService.getTotalEnrollmentsByCourse();
+    return this.analyticsOptimizationService.getTotalEnrollmentsByCourse();
     // Convert Map to object for JSON response
-    return Object.fromEntries(result);
   }
 
-  @ApiOperation({ 
-    summary: "Get average attendance by course", 
-    description: "Retrieve average attendance per session for each course. Requires admin permissions.",
-    tags: ["Analytics - Optimization"]
+  @ApiOperation({
+    summary: "Get average attendance by course",
+    description:
+      "Retrieve average attendance per session for each course. Requires admin permissions.",
+    tags: ["Analytics - Optimization"],
   })
   // Get average attendance per session by course
   @RequirePermission(PermissionEnum.OPTIMIZATION_AVERAGE_ATTENDANCE)
@@ -45,10 +45,11 @@ export class AnalyticsOptimizationController {
     return Object.fromEntries(result);
   }
 
-  @ApiOperation({ 
-    summary: "Get attendance rate by course", 
-    description: "Retrieve overall attendance rate for each course. Requires admin permissions.",
-    tags: ["Analytics - Optimization"]
+  @ApiOperation({
+    summary: "Get attendance rate by course",
+    description:
+      "Retrieve overall attendance rate for each course. Requires admin permissions.",
+    tags: ["Analytics - Optimization"],
   })
   // Get overall attendance rate by course
   @RequirePermission(PermissionEnum.OPTIMIZATION_ATTENDANCE_RATE)
@@ -59,10 +60,11 @@ export class AnalyticsOptimizationController {
     return Object.fromEntries(result);
   }
 
-  @ApiOperation({ 
-    summary: "Get top users by activity", 
-    description: "Retrieve top users by activity points within a date range. Requires admin permissions.",
-    tags: ["Analytics - Optimization"]
+  @ApiOperation({
+    summary: "Get top users by activity",
+    description:
+      "Retrieve top users by activity points within a date range. Requires admin permissions.",
+    tags: ["Analytics - Optimization"],
   })
   // Get top N users by activity points in a given period
   @RequirePermission(PermissionEnum.OPTIMIZATION_TOP_USERS)
