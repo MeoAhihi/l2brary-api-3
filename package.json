@@ -26,6 +26,7 @@
     "migration:show": "npm run typeorm migration:show"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -40,6 +41,7 @@
     "class-validator": "^0.14.2",
     "dayjs": "^1.11.18",
     "mongoose": "^8.18.1",
+    "nodemailer": "^7.0.7",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
