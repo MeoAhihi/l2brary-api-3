@@ -60,6 +60,12 @@ export class Course {
   @Column({ type: "date", nullable: true })
   endDate: Date;
 
+  @Column({ type: "time", nullable: true })
+  startTime: string;
+
+  @Column({ type: "time", nullable: true })
+  endTime: string;
+
   @Column({ type: "json" })
   scheduleDetail: ScheduleDetail;
 

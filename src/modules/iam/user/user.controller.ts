@@ -62,18 +62,49 @@ export class UserController {
     allowEmptyValue: true,
   })
   @Get()
+  @ApiQuery({
+    name: "page",
+    required: false,
+    type: Number,
+    description: "Page number for pagination (default: 1)",
+    example: 1,
+    allowEmptyValue: true,
+  })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    description: "Number of users per page (default: 20)",
+    example: 20,
+    allowEmptyValue: true,
+  })
   async findMany(
     @Query("gender") gender?: string,
     @Query("ranks") ranks?: string[],
     @Query("sortByRank") sortByRank?: boolean,
-  ): Promise<User[]> {
-    const users = await this.userService.findAll({
+    @Query("page") page: number = 1,
+    @Query("limit") limit: number = 0,
+  ): Promise<{
+    items: User[];
+    total: number;
+    page: number;
+    limit: number;
+    pageCount: number;
+  }> {
+    const { items, total, pageCount } = await this.userService.findAll({
       gender,
       ranks,
       sortByRank,
+      page,
+      limit,
     });
-    return users;
-    // return plainToInstance(User, users, { excludeExtraneousValues: true });
+    return {
+      items,
+      total,
+      page,
+      limit,
+      pageCount,
+    };
   }
 
   @ApiOperation({

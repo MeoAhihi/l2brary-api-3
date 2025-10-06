@@ -51,7 +51,7 @@ export class AttendanceService {
     }
 
     // Fetch users by IDs, check for missing users
-    const usersNotAttended = await this.userService.findAll({
+    const { items: usersNotAttended } = await this.userService.findAll({
       ids: notAttendedUserIds,
     });
 

@@ -50,7 +50,9 @@ export class UserService {
     gender?: string;
     ranks?: string[];
     sortByRank?: boolean;
-  }): Promise<User[]> {
+    page?: number;
+    limit?: number;
+  }): Promise<{ items: User[]; total: number; page: number; limit: number; pageCount: number }> {
     const where: any = {};
 
     if (options?.ids && options.ids.length > 0) {
@@ -69,7 +71,17 @@ export class UserService {
       findOptions.order = { rank: "ASC" };
     }
 
-    return this.userRepository.find(findOptions);
+    // Pagination
+    let page = options?.page ?? 1;
+    let limit = options?.limit ?? 0;
+    if (limit > 0) {
+      findOptions.skip = (page - 1) * limit;
+      findOptions.take = limit;
+    }
+
+    const [items, total] = await this.userRepository.findAndCount(findOptions);
+    const pageCount = limit > 0 ? Math.ceil(total / limit) : 1;
+    return { items, page, total, limit, pageCount };
   }
 
   async findOne(

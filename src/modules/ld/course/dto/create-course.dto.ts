@@ -123,6 +123,26 @@ export class CreateCourseDto {
   @IsDateFormat()
   endDate?: string;
 
+  @ApiPropertyOptional({
+    description: "Course start time (HH:mm:ss, 24-hour format)",
+    type: String,
+    format: "time",
+    example: "09:00:00",
+  })
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @ApiPropertyOptional({
+    description: "Course end time (HH:mm:ss, 24-hour format)",
+    type: String,
+    format: "time",
+    example: "11:00:00",
+  })
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+
   @ApiProperty({
     description: "Schedule detail (structure depends on scheduleType)",
     type: Object,
