@@ -1,4 +1,8 @@
 // email/email.controller.ts
+import { readFileSync } from "fs";
+import { compile } from "handlebars";
+import path from "path";
+
 import { Body, Controller, Post } from "@nestjs/common";
 
 import { EmailService } from "./email.service";
@@ -9,14 +13,13 @@ export class EmailController {
 
   @Post("welcome")
   async sendWelcome() {
-    const name = "Wind Ly";
-
-    const content = "";
-    await this.emailService.sendPlainTextEmail(
+    await this.emailService.sendHTMLEmail(
       "viphongly2804@gmail.com",
       "This is the Subject of email",
-      content,
+      { name: "PhongAhihi" },
+      "welcome",
     );
+
     return { message: "Welcome email sent successfully!" };
   }
 }

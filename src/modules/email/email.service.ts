@@ -1,5 +1,7 @@
 // email/email.service.ts
 import { MailerService } from "@nestjs-modules/mailer";
+import { readFileSync } from "fs";
+import { compile } from "handlebars";
 
 import { Injectable } from "@nestjs/common";
 
@@ -7,22 +9,23 @@ import { Injectable } from "@nestjs/common";
 export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
-  async sendWelcomeEmail(to: string, name: string) {
-    await this.mailerService.sendMail({
-      to,
-      subject: "Welcome to Our App 🎉",
-      template: "./welcome", // refers to "templates/email/welcome.hbs"
-      context: {
-        name,
-      },
-    });
-  }
+  async sendHTMLEmail(
+    to: string,
+    subject: string,
+    input: Record<string, string>,
+    templateFile: string,
+  ) {
+    const templateSource = readFileSync(
+      `./src/templates/${templateFile}.hbs`,
+      "utf8",
+    );
+    const template = compile(templateSource);
+    const html = template(input);
 
-  async sendPlainTextEmail(to: string, subject: string, text: string) {
     await this.mailerService.sendMail({
       to,
       subject,
-      text,
+      html,
     });
   }
 }
