@@ -23,6 +23,7 @@ import { GameModule } from "./modules/ld/game/game.module";
 import { ScoreModule } from "./modules/ld/score/score.module";
 import { SessionModule } from "./modules/ld/session/session.module";
 import { EmailController } from './modules/email/email.controller';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { EmailController } from './modules/email/email.controller';
       //   },
       // },
     }),
+    UploadModule,
   ],
   controllers: [AppController, EmailController],
   providers: [AppService, MemoryCleanupService, EmailService],
