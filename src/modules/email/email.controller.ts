@@ -9,7 +9,14 @@ export class EmailController {
 
   @Post("welcome")
   async sendWelcome() {
-    await this.emailService.sendPlainTextEmail("viphongly2804@gmail.com" , "This is the Subject of email", "This is the content of the email that I added");
+    const name = "Wind Ly";
+
+    const content = "";
+    await this.emailService.sendPlainTextEmail(
+      "viphongly2804@gmail.com",
+      "This is the Subject of email",
+      content,
+    );
     return { message: "Welcome email sent successfully!" };
   }
 }
