@@ -62,7 +62,6 @@ export class AuthenticationService {
     );
 
     const user = await this.userService.findOne(userExisted.id, ["roles"]);
-    console.log("🚀 ~ AuthenticationService ~ login ~ user:", user);
     const roles = user.roles.map((role) => role.name);
     const roleIds = user.roles.map((role) => role.id);
     const permissionEntities = await this.permissionService.findAll(roleIds);

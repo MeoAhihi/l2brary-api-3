@@ -1,3 +1,4 @@
+import { EmailService } from "@/modules/email/email.service";
 import { LessThan, Repository } from "typeorm";
 
 import {
@@ -16,6 +17,7 @@ export class ResetPasswordCodeService {
   constructor(
     @InjectRepository(ResetPasswordCode)
     private readonly ResetPasswordCodeRepository: Repository<ResetPasswordCode>,
+    private readonly emailService: EmailService,
   ) {}
 
   // This cron job runs every day at 0:00 AM
@@ -71,14 +73,21 @@ export class ResetPasswordCodeService {
   async resetPassword(email: string) {
     // Generate a new invite code, optionally associated with an email
     const ResetPasswordCode = await this.create(email);
+    console.log("🚀 ~ ResetPasswordCodeService ~ resetPassword ~ ResetPasswordCode:", ResetPasswordCode)
 
     if (email) {
-      console.log(
-        `Email sent to ${email}:\nPlease use this code to reset password: "${ResetPasswordCode.code}"`,
+      await this.emailService.sendHTMLEmail(
+        email,
+        "Yêu cầu đặt lại mật khẩu L2brary",
+        {
+          resetPasswordCode: ResetPasswordCode.code,
+        },
+        "reset-password",
       );
     }
 
     return {
+      success: true,
       message: "Reset password code created successfully to " + email,
     };
   }
