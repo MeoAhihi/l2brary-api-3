@@ -21,13 +21,13 @@ export class Course {
   @Column({ type: "varchar", length: 255 })
   title: string;
 
-  @Column({ type: "varchar", length: 100, nullable: true })
+  @Column({ type: "varchar", length: 100, nullable: true, default: "" })
   code: string;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, default: "" })
   description: string;
 
-  @Column({ type: "varchar", length: 50, nullable: true })
+  @Column({ type: "varchar", length: 50, nullable: true, default: "" })
   difficulty: string;
 
   @Column({ type: "boolean", default: false })
@@ -39,7 +39,7 @@ export class Course {
   @Column({ type: "boolean", default: false })
   isAllowGuestAccess: boolean;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, default: "" })
   thumbnail: string;
 
   @Column({ type: "int", nullable: true })
@@ -60,16 +60,16 @@ export class Course {
   @Column({ type: "date", nullable: true })
   endDate: Date;
 
-  @Column({ type: "time", nullable: true })
+  @Column({ type: "time", nullable: true, default: "00:00:00" })
   startTime: string;
 
-  @Column({ type: "time", nullable: true })
+  @Column({ type: "time", nullable: true, default: "23:59:59" })
   endTime: string;
 
   @Column({ type: "json" })
   scheduleDetail: ScheduleDetail;
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, default: "" })
   chatGroupUrl: string;
 
   @OneToMany(() => Session, (session) => session.course, { cascade: true })
