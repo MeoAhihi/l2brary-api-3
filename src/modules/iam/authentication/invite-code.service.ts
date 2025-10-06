@@ -1,3 +1,4 @@
+import { EmailService } from "@/modules/email/email.service";
 import { LessThan, Repository } from "typeorm";
 
 import {
@@ -16,6 +17,7 @@ export class InviteCodeService {
   constructor(
     @InjectRepository(InviteCode)
     private readonly inviteCodeRepository: Repository<InviteCode>,
+    private readonly emailService: EmailService,
   ) {}
 
   // This cron job runs every day at 0:00 AM
@@ -73,8 +75,13 @@ export class InviteCodeService {
     const inviteCode = await this.create(email);
 
     if (email) {
-      console.log(
-        `Email sent to ${email}:\nPlease use this code to register: "${inviteCode.code}"`,
+      await this.emailService.sendHTMLEmail(
+        email,
+        "Bạn được mời tham gia L2brary!",
+        {
+          inviteCode: inviteCode.code,
+        },
+        "invite-member",
       );
     }
 

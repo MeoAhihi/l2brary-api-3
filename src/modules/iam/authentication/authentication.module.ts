@@ -1,3 +1,5 @@
+import { EmailService } from "@/modules/email/email.service";
+
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -27,6 +29,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     InviteCodeService,
     ResetPasswordCodeService,
     JwtStrategy,
+    EmailService,
   ],
   exports: [AuthenticationService],
 })
