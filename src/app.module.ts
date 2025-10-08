@@ -3,7 +3,7 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from "path";
 
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -12,6 +12,7 @@ import { AnalyticsModule } from "./modules/aa/analytics/analytics.module";
 import { ActivityModule } from "./modules/ae/activity/activity.module";
 import { GamificationModule } from "./modules/ae/gamification/gamification.module";
 import { DatabaseModule } from "./modules/database/database.module";
+import { EmailController } from "./modules/email/email.controller";
 import { EmailService } from "./modules/email/email.service";
 import { AuthenticationModule } from "./modules/iam/authentication/authentication.module";
 import { AuthorizationModule } from "./modules/iam/authorization/authorization.module";
@@ -22,8 +23,7 @@ import { EnrollmentModule } from "./modules/ld/enrollment/enrollment.module";
 import { GameModule } from "./modules/ld/game/game.module";
 import { ScoreModule } from "./modules/ld/score/score.module";
 import { SessionModule } from "./modules/ld/session/session.module";
-import { EmailController } from './modules/email/email.controller';
-import { UploadModule } from './modules/upload/upload.module';
+import { UploadModule } from "./modules/upload/upload.module";
 
 @Module({
   imports: [
@@ -44,26 +44,23 @@ import { UploadModule } from './modules/upload/upload.module';
     ArticleModule,
     AnalyticsModule,
     ScoreModule,
-    MailerModule.forRoot({
-      transport: {
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: "phonglv.124010121062@vtc.edu.vn",
-          pass: "gfti dkyv cdmk kvsi",
+    MailerModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>("MAIL_HOST"),
+          port: configService.get<number>("MAIL_PORT"),
+          secure: configService.get<boolean>("MAIL_SECURE"),
+          auth: {
+            user: configService.get<string>("MAIL_USER"),
+            pass: configService.get<string>("MAIL_PASS"),
+          },
         },
-      },
-      defaults: {
-        from: "L2brary <no-reply@l2brary-3.vercel.app>",
-      },
-      // template: {
-      //   dir: join(__dirname, "templates/email"), // folder for templates
-      //   adapter: new HandlebarsAdapter(), // or PugAdapter, EjsAdapter, etc.
-      //   options: {
-      //     strict: true,
-      //   },
-      // },
+        defaults: {
+          from: configService.get<string>("MAIL_FROM"),
+        },
+      }),
+      inject: [ConfigModule],
+      imports: [ConfigModule],
     }),
     UploadModule,
   ],
