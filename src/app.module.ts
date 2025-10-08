@@ -1,6 +1,3 @@
-import { MailerModule } from "@nestjs-modules/mailer";
-import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handlebars.adapter";
-import { join } from "path";
 
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
@@ -12,8 +9,7 @@ import { AnalyticsModule } from "./modules/aa/analytics/analytics.module";
 import { ActivityModule } from "./modules/ae/activity/activity.module";
 import { GamificationModule } from "./modules/ae/gamification/gamification.module";
 import { DatabaseModule } from "./modules/database/database.module";
-import { EmailController } from "./modules/email/email.controller";
-import { EmailService } from "./modules/email/email.service";
+import { EmailModule } from "./modules/email/email.module";
 import { AuthenticationModule } from "./modules/iam/authentication/authentication.module";
 import { AuthorizationModule } from "./modules/iam/authorization/authorization.module";
 import { UserModule } from "./modules/iam/user/user.module";
@@ -44,27 +40,10 @@ import { UploadModule } from "./modules/upload/upload.module";
     ArticleModule,
     AnalyticsModule,
     ScoreModule,
-    MailerModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        transport: {
-          host: configService.get<string>("MAIL_HOST"),
-          port: configService.get<number>("MAIL_PORT"),
-          secure: configService.get<boolean>("MAIL_SECURE"),
-          auth: {
-            user: configService.get<string>("MAIL_USER"),
-            pass: configService.get<string>("MAIL_PASS"),
-          },
-        },
-        defaults: {
-          from: configService.get<string>("MAIL_FROM"),
-        },
-      }),
-      inject: [ConfigModule],
-      imports: [ConfigModule],
-    }),
+    EmailModule,
     UploadModule,
   ],
-  controllers: [AppController, EmailController],
-  providers: [AppService, MemoryCleanupService, EmailService],
+  controllers: [AppController],
+  providers: [AppService, MemoryCleanupService],
 })
 export class AppModule {}
