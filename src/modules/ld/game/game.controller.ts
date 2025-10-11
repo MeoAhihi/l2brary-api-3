@@ -16,6 +16,7 @@ import {
   Query,
   UseGuards,
 } from "@nestjs/common";
+import { ApiCreatedResponse, ApiOkResponse } from "@nestjs/swagger";
 import {
   ApiBearerAuth,
   ApiBody,
@@ -39,6 +40,24 @@ export class GameController {
     summary: "Create game",
     description: "Create a new game for a session. Requires admin permissions.",
     tags: ["Game Management"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      id: 9,
+      session: {
+        id: 4,
+        thumbnail: "https://example.com/thumbnail.jpg",
+        title: "Introduction to Algebra",
+        course: {
+          id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+          title: "Introduction to Programming",
+          code: "CS101",
+        },
+      },
+      isSubmitted: false,
+      createdAt: "2025-10-11T06:20:46.735Z",
+      updatedAt: "2025-10-11T06:20:46.735Z",
+    },
   })
   // Create a new game for a given sessionId
   @ApiBearerAuth()
@@ -64,6 +83,52 @@ export class GameController {
     description: "Submit a game for scoring. Requires JWT authentication.",
     tags: ["Game Management"],
   })
+  @ApiCreatedResponse({
+    example: {
+      message: "Game has already been submitted",
+      game: {
+        id: 4,
+        session: {
+          id: 3,
+          thumbnail: "https://example.com/thumbnail.png",
+          title: "Lớp Đàn Chủ",
+        },
+        gameLogs: [
+          {
+            gameId: 4,
+            user: {
+              id: "367276c4-f513-4331-86fe-be31f488960c",
+              fullName: "Johny Doe",
+              internationalName: "J. Doe",
+            },
+            score: 100,
+            plusScoreLogs: [
+              {
+                scoreColumn: {
+                  id: 2,
+                  name: "Ahihi",
+                },
+                score: 5,
+              },
+              {
+                scoreColumn: {
+                  id: 4,
+                  name: "Ahaha",
+                },
+                score: 10,
+              },
+            ],
+            timePlayed: 300,
+            triedTimes: 2,
+          },
+        ],
+        isSubmitted: true,
+        createdAt: "2025-10-02T22:15:04.204Z",
+        updatedAt: "2025-10-11T06:24:21.053Z",
+      },
+      scores: [],
+    },
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_SUBMIT)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -81,6 +146,38 @@ export class GameController {
     description:
       "Retrieve all games with optional session filtering. No authentication required.",
     tags: ["Game Management"],
+  })
+  @ApiOkResponse({
+    example: [
+      {
+        id: 2,
+        gameLogs: [
+          {
+            gameId: 2,
+            score: 10,
+            timePlayed: 300,
+            triedTimes: 2,
+          },
+        ],
+        isSubmitted: true,
+        createdAt: "2025-09-28T09:11:50.901Z",
+        updatedAt: "2025-10-02T22:32:16.565Z",
+      },
+      {
+        id: 4,
+        gameLogs: [
+          {
+            gameId: 4,
+            score: 100,
+            timePlayed: 300,
+            triedTimes: 2,
+          },
+        ],
+        isSubmitted: false,
+        createdAt: "2025-10-02T22:15:04.204Z",
+        updatedAt: "2025-10-02T22:15:04.204Z",
+      },
+    ],
   })
   /* Intentional No Guard */
   @Get()
@@ -102,6 +199,48 @@ export class GameController {
     description:
       "Retrieve a specific game by its ID. No authentication required.",
     tags: ["Game Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: 4,
+      session: {
+        id: 3,
+        thumbnail: "https://example.com/thumbnail.png",
+        title: "Lớp Đàn Chủ",
+      },
+      gameLogs: [
+        {
+          gameId: 4,
+          user: {
+            id: "367276c4-f513-4331-86fe-be31f488960c",
+            fullName: "Johny Doe",
+            internationalName: "J. Doe",
+          },
+          score: 100,
+          plusScoreLogs: [
+            {
+              scoreColumn: {
+                id: 2,
+                name: "Ahihi",
+              },
+              score: 5,
+            },
+            {
+              scoreColumn: {
+                id: 4,
+                name: "Ahaha",
+              },
+              score: 10,
+            },
+          ],
+          timePlayed: 300,
+          triedTimes: 2,
+        },
+      ],
+      isSubmitted: true,
+      createdAt: "2025-10-02T22:15:04.204Z",
+      updatedAt: "2025-10-11T06:24:21.053Z",
+    },
   })
   /* Intentional No Guard */
   @Get(":id")
@@ -127,6 +266,11 @@ export class GameController {
     summary: "Log game activity",
     description: "Log game activity and progress. Requires JWT authentication.",
     tags: ["Game Management"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      message: "Game logs created or updated successfully.",
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.GAME_LOG)

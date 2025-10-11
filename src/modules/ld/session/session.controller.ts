@@ -18,7 +18,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 
 import { AttendanceService } from "./attendace.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
@@ -41,6 +47,41 @@ export class SessionController {
     description:
       "Create a new session for a course. Requires admin permissions.",
     tags: ["Session Management"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      id: 4,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      title: "Introduction to Algebra",
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+        description: "Learn the basics of programming using Python.",
+      },
+      description: "This session will cover the basics of algebra.",
+      startTime: "2024-06-01T10:00:00.000Z",
+      endTime: "2024-06-01T12:00:00.000Z",
+      presenterName: "Dr. Jane Doe",
+      locationType: "online",
+      roomInfo: "Room 101, Main Building",
+      address: "123 Main St, Springfield",
+      maxParticipant: 50,
+      lateThreshold: 10,
+      autoCheckIn: true,
+      allowLateJoin: true,
+      enableGame: true,
+      autoScoring: true,
+      maxGamePerSession: 3,
+      gameTimeout: 60,
+      emailNotification: true,
+      smsNotification: true,
+      reminderNotification: true,
+      updatedAt: "2025-10-11T05:51:42.595Z",
+      status: "completed",
+      checked: 0,
+      totalGame: 0,
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_CREATE)
@@ -65,6 +106,43 @@ export class SessionController {
       "Retrieve all sessions for a specific course. No authentication required.",
     tags: ["Session Management"],
   })
+  @ApiOkResponse({
+    example: {
+      items: [
+        {
+          id: 4,
+          thumbnail: "https://example.com/thumbnail.jpg",
+          title: "Introduction to Algebra",
+          description: "This session will cover the basics of algebra.",
+          startTime: "2024-06-01T10:00:00.000Z",
+          endTime: "2024-06-01T12:00:00.000Z",
+          presenterName: "Dr. Jane Doe",
+          locationType: "online",
+          roomInfo: "Room 101, Main Building",
+          address: "123 Main St, Springfield",
+          maxParticipant: 50,
+          lateThreshold: 10,
+          autoCheckIn: true,
+          allowLateJoin: true,
+          enableGame: true,
+          autoScoring: true,
+          maxGamePerSession: 3,
+          gameTimeout: 60,
+          emailNotification: true,
+          smsNotification: true,
+          reminderNotification: true,
+          updatedAt: "2025-10-11T05:51:42.595Z",
+          status: "completed",
+          checked: 0,
+          totalGame: 0,
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+      totalPages: 1,
+    },
+  })
   /* Intentional No Guard */
   @Get("course/:courseId/session")
   @ApiQuery({
@@ -85,24 +163,30 @@ export class SessionController {
     @Query("page") page: number,
     @Query("limit") limit: number,
   ): Promise<{
-    data: SessionDto[];
+    items: SessionDto[];
     total: number;
     page: number;
     limit: number;
     totalPages: number;
   }> {
-    const { data, total, totalPages } = await this.sessionService.findAll({
+    const {
+      data,
+      total,
+      totalPages,
+      page: resPage,
+      limit: resLimit,
+    } = await this.sessionService.findAll({
       courseId,
       page: page,
       limit: limit,
     });
     return {
-      data: plainToInstance(SessionDto, data, {
+      items: plainToInstance(SessionDto, data, {
         excludeExtraneousValues: true,
       }),
       total,
-      page,
-      limit,
+      page: resPage,
+      limit: resLimit,
       totalPages,
     };
   }
@@ -112,6 +196,43 @@ export class SessionController {
     description:
       "Retrieve a specific session by its ID. No authentication required.",
     tags: ["Session Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: 4,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      title: "Introduction to Algebra",
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+        description: "Learn the basics of programming using Python.",
+      },
+      description: "This session will cover the basics of algebra.",
+      startTime: "2024-06-01T10:00:00.000Z",
+      endTime: "2024-06-01T12:00:00.000Z",
+      presenterName: "Dr. Jane Doe",
+      locationType: "online",
+      roomInfo: "Room 101, Main Building",
+      address: "123 Main St, Springfield",
+      maxParticipant: 50,
+      lateThreshold: 10,
+      autoCheckIn: true,
+      allowLateJoin: true,
+      enableGame: true,
+      autoScoring: true,
+      maxGamePerSession: 3,
+      gameTimeout: 60,
+      emailNotification: true,
+      smsNotification: true,
+      reminderNotification: true,
+      attendances: [],
+      games: [],
+      updatedAt: "2025-10-11T05:51:42.595Z",
+      status: "completed",
+      checked: 0,
+      totalGame: 0,
+    },
   })
   /* Intentional No Guard */
   @Get("session/:id")
@@ -127,6 +248,43 @@ export class SessionController {
     description: "Update an existing session. Requires admin permissions.",
     tags: ["Session Management"],
   })
+  @ApiOkResponse({
+    example: {
+      id: 4,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      title: "Introduction to Algebra",
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+        description: "Learn the basics of programming using Python.",
+      },
+      description: "This session will cover the basics of algebra.",
+      startTime: "2024-06-01T10:00:00.000Z",
+      endTime: "2024-06-01T12:00:00.000Z",
+      presenterName: "Dr. Jane Doe",
+      locationType: "online",
+      roomInfo: "Room 101, Main Building",
+      address: "123 Main St, Springfield",
+      maxParticipant: 50,
+      lateThreshold: 10,
+      autoCheckIn: true,
+      allowLateJoin: true,
+      enableGame: true,
+      autoScoring: true,
+      maxGamePerSession: 3,
+      gameTimeout: 60,
+      emailNotification: true,
+      smsNotification: true,
+      reminderNotification: true,
+      attendances: [],
+      games: [],
+      updatedAt: "2025-10-11T06:14:25.512Z",
+      status: "completed",
+      checked: 0,
+      totalGame: 0,
+    },
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_UPDATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -135,7 +293,11 @@ export class SessionController {
     @Param("id", ParseIntPipe) id: number,
     @Body() updateSessionDto: UpdateSessionDto,
   ) {
-    return this.sessionService.update(id, updateSessionDto);
+    return this.sessionService
+      .update(id, updateSessionDto)
+      .then((session) =>
+        plainToInstance(SessionDto, session, { excludeExtraneousValues: true }),
+      );
   }
 
   @ApiOperation({
@@ -155,6 +317,18 @@ export class SessionController {
     summary: "Mark attendance",
     description: "Mark attendance for a session. Requires JWT authentication.",
     tags: ["Session Management"],
+  })
+  @ApiCreatedResponse({
+    example: [
+      {
+        user: {
+          id: "367276c4-f513-4331-86fe-be31f488960c",
+          fullName: "Johny Doe",
+          internationalName: "J. Doe",
+        },
+        attendTime: "2025-10-11T06:16:35.681Z",
+      },
+    ],
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.SESSION_ATTENDANCE_CREATE)
@@ -179,6 +353,18 @@ export class SessionController {
     description:
       "Retrieve attendance records for a session. Requires admin permissions.",
     tags: ["Session Management"],
+  })
+  @ApiCreatedResponse({
+    example: [
+      {
+        user: {
+          id: "367276c4-f513-4331-86fe-be31f488960c",
+          fullName: "Johny Doe",
+          internationalName: "J. Doe",
+        },
+        attendTime: "2025-10-11T06:16:35.681Z",
+      },
+    ],
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_READ_ALL)

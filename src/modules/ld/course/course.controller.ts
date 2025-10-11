@@ -18,6 +18,8 @@ import {
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
   ApiQueryOptions,
@@ -38,6 +40,34 @@ export class CourseController {
     description: "Create a new course. Requires admin permissions.",
     tags: ["Course Management"],
   })
+  @ApiCreatedResponse({
+    example: {
+      id: "344c3e29-9f20-4bd8-a016-8144aaf4b90f",
+      title: "Introduction to Programming",
+      code: "",
+      description: "Learn the basics of programming using Python.",
+      difficulty: "Beginner",
+      isPublic: true,
+      isRequireApproval: false,
+      isAllowGuestAccess: false,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      maxStudents: 30,
+      enrollmentDeadline: "2024-06-10T16:59:59.999Z",
+      group: "Computer Science",
+      scheduleType: "WEEKLY",
+      startDate: "2024-05-31T17:00:00.000Z",
+      endDate: "2024-08-01T16:59:59.999Z",
+      startTime: "09:00:00",
+      endTime: "11:00:00",
+      scheduleDetail: {
+        daysOfWeek: ["MONDAY", "WEDNESDAY"],
+      },
+      chatGroupUrl: "https://chat.example.com/group/123",
+      createdAt: "2025-10-11T05:39:57.276Z",
+      updatedAt: "2025-10-11T05:39:57.276Z",
+      isEnrollable: false,
+    },
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_CREATE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -51,6 +81,42 @@ export class CourseController {
     description:
       "Retrieve all courses with filtering options. Requires admin permissions.",
     tags: ["Course Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      items: [
+        {
+          id: "344c3e29-9f20-4bd8-a016-8144aaf4b90f",
+          title: "Introduction to Programming",
+          code: "",
+          description: "Learn the basics of programming using Python.",
+          difficulty: "Beginner",
+          isPublic: true,
+          isRequireApproval: false,
+          isAllowGuestAccess: false,
+          thumbnail: "https://example.com/thumbnail.jpg",
+          maxStudents: 30,
+          enrollmentDeadline: "2024-06-10",
+          group: "Computer Science",
+          scheduleType: "WEEKLY",
+          startDate: "2024-06-01",
+          endDate: "2024-08-01",
+          startTime: "09:00:00",
+          endTime: "11:00:00",
+          scheduleDetail: {
+            daysOfWeek: ["MONDAY", "WEDNESDAY"],
+          },
+          chatGroupUrl: "https://chat.example.com/group/123",
+          createdAt: "2025-10-11T05:39:57.276Z",
+          updatedAt: "2025-10-11T05:39:57.276Z",
+          isEnrollable: false,
+        },
+      ],
+      total: 23,
+      page: 1,
+      limit: 10,
+      pageCount: 3,
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_READ_ALL)
@@ -122,6 +188,42 @@ export class CourseController {
       "Retrieve public courses available to all users. No authentication required.",
     tags: ["Course Management"],
   })
+  @ApiOkResponse({
+    example: {
+      items: [
+        {
+          id: "344c3e29-9f20-4bd8-a016-8144aaf4b90f",
+          title: "Introduction to Programming",
+          code: "",
+          description: "Learn the basics of programming using Python.",
+          difficulty: "Beginner",
+          isPublic: true,
+          isRequireApproval: false,
+          isAllowGuestAccess: false,
+          thumbnail: "https://example.com/thumbnail.jpg",
+          maxStudents: 30,
+          enrollmentDeadline: "2024-06-10",
+          group: "Computer Science",
+          scheduleType: "WEEKLY",
+          startDate: "2024-06-01",
+          endDate: "2024-08-01",
+          startTime: "09:00:00",
+          endTime: "11:00:00",
+          scheduleDetail: {
+            daysOfWeek: ["MONDAY", "WEDNESDAY"],
+          },
+          chatGroupUrl: "https://chat.example.com/group/123",
+          createdAt: "2025-10-11T05:39:57.276Z",
+          updatedAt: "2025-10-11T05:39:57.276Z",
+          isEnrollable: false,
+        },
+      ],
+      total: 23,
+      page: 1,
+      limit: 10,
+      pageCount: 3,
+    },
+  })
   /* Intentional No Guard */
   @ApiQuery({
     name: "page",
@@ -176,6 +278,9 @@ export class CourseController {
     description: "Retrieve unique course groups. No authentication required.",
     tags: ["Course Management"],
   })
+  @ApiOkResponse({
+    example: ["Data Science", "History", "Communication"],
+  })
   /* Intentional No Guard */
   @Get("groups")
   async getCourseGroups() {
@@ -189,6 +294,34 @@ export class CourseController {
       "Retrieve a specific course by its ID. No authentication required.",
     tags: ["Course Management"],
   })
+  @ApiOkResponse({
+    example: {
+      id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+      title: "Introduction to Programming",
+      code: "CS101",
+      description: "Learn the basics of programming using Python.",
+      difficulty: "Beginner",
+      isPublic: true,
+      isRequireApproval: false,
+      isAllowGuestAccess: false,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      maxStudents: 30,
+      enrollmentDeadline: "2024-06-10",
+      group: "Computer Science",
+      scheduleType: "MONTHLY",
+      startDate: "2024-06-01",
+      endDate: "2025-12-01",
+      startTime: "17:00:00",
+      endTime: "19:00:00",
+      scheduleDetail: {
+        daysOfMonth: [1, 12],
+      },
+      chatGroupUrl: "https://chat.example.com/group/123",
+      createdAt: "2025-10-03T16:33:58.048Z",
+      updatedAt: "2025-10-03T16:33:58.048Z",
+      isEnrollable: false,
+    },
+  })
   /* Intentional No Guard */
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(":id")
@@ -200,6 +333,34 @@ export class CourseController {
     summary: "Update course",
     description: "Update an existing course. Requires admin permissions.",
     tags: ["Course Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+      title: "Introduction to Programming",
+      code: "CS101",
+      description: "Learn the basics of programming using Python.",
+      difficulty: "Beginner",
+      isPublic: true,
+      isRequireApproval: false,
+      isAllowGuestAccess: false,
+      thumbnail: "https://example.com/thumbnail.jpg",
+      maxStudents: 30,
+      enrollmentDeadline: "2024-06-10",
+      group: "Computer Science",
+      scheduleType: "MONTHLY",
+      startDate: "2024-06-01",
+      endDate: "2025-12-01",
+      startTime: "17:00:00",
+      endTime: "19:00:00",
+      scheduleDetail: {
+        daysOfMonth: [1, 12],
+      },
+      chatGroupUrl: "https://chat.example.com/group/123",
+      createdAt: "2025-10-03T16:33:58.048Z",
+      updatedAt: "2025-10-03T16:33:58.048Z",
+      isEnrollable: false,
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.COURSE_UPDATE)

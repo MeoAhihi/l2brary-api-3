@@ -1,4 +1,4 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import {
   Column,
   DeleteDateColumn,
@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
+import { ReferenceCourseDto } from "../../course/dto/reference-course.dto";
 import { Course } from "../../course/entities/course.entity";
 import { Game } from "../../game/entities/game.entity";
 import { LocationTypeEnum } from "../../types/location-type.enum";
@@ -30,6 +31,7 @@ export class Session {
   title: string;
 
   @Expose()
+  @Type(() => ReferenceCourseDto)
   @ManyToOne(() => Course, (course) => course.sessions)
   course: Course;
 

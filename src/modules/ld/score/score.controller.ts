@@ -20,6 +20,8 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
@@ -53,6 +55,19 @@ export class ScoreController {
       "Create a new score column for a course. Requires admin permissions.",
     tags: ["Score Management"],
   })
+  @ApiCreatedResponse({
+    example: {
+      id: 10,
+      name: "Quiz 1",
+      coefficient: 2,
+      isLocked: false,
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+      },
+    },
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_CREATE)
   @Post("column/:courseId")
   @ApiParam({ name: "courseId", type: String, description: "ID of the course" })
@@ -75,6 +90,16 @@ export class ScoreController {
     description:
       "Retrieve all score columns for a course. Requires admin permissions.",
     tags: ["Score Management"],
+  })
+  @ApiOkResponse({
+    example: [
+      {
+        id: 10,
+        name: "Quiz 1",
+        coefficient: 2,
+        isLocked: false,
+      },
+    ],
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ALL)
   @Get("column/:courseId")
@@ -99,6 +124,19 @@ export class ScoreController {
       "Retrieve detailed information about a score column. Requires admin permissions.",
     tags: ["Score Management"],
   })
+  @ApiOkResponse({
+    example: {
+      id: 10,
+      name: "Quiz 1",
+      coefficient: 2,
+      isLocked: false,
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+      },
+    },
+  })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_READ_ONE)
   @Get("column/detail/:id")
   @ApiParam({ name: "id", type: Number, description: "ID of the score column" })
@@ -114,6 +152,19 @@ export class ScoreController {
     summary: "Update score column",
     description: "Update an existing score column. Requires admin permissions.",
     tags: ["Score Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: 10,
+      name: "Quiz 1",
+      coefficient: 2,
+      isLocked: false,
+      course: {
+        id: "bbeb693c-2474-4610-b45e-5a2f45ff686a",
+        title: "Introduction to Programming",
+        code: "CS101",
+      },
+    },
   })
   @RequirePermission(PermissionEnum.SCORE_COLUMN_UPDATE)
   @Patch("column/:id")
@@ -152,6 +203,11 @@ export class ScoreController {
       "Create or update scores for a score column. Requires JWT authentication.",
     tags: ["Score Management"],
   })
+  @ApiCreatedResponse({
+    example: {
+      message: "Scores upserted successfully.",
+    },
+  })
   @RequirePermission(PermissionEnum.SCORE_UPSERT)
   @Post()
   @ApiQuery({
@@ -164,7 +220,6 @@ export class ScoreController {
     type: ScoreDto,
     isArray: true,
   })
-  @ApiResponse({ status: 201, description: "Scores upserted" })
   async upsertScores(
     @Query("scoreColumnId") scoreColumnId: number,
     @Body() scores: ScoreDto[],
@@ -178,6 +233,28 @@ export class ScoreController {
     description:
       "Retrieve score table data for a course. Requires admin permissions.",
     tags: ["Score Management"],
+  })
+  @ApiOkResponse({
+    example: [
+      {
+        user: {
+          id: "367276c4-f513-4331-86fe-be31f488960c",
+          fullName: "Johny Doe",
+          internationalName: "J. Doe",
+        },
+        scores: [
+          {
+            score: 10,
+            scoreColumn: {
+              id: 7,
+              name: "Quiz 1",
+              coefficient: 2,
+            },
+          },
+        ],
+        average: 10,
+      },
+    ],
   })
   @RequirePermission(PermissionEnum.SCORE_TABLE_READ)
   @Get("table")

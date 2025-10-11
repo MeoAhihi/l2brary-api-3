@@ -3,6 +3,7 @@ import { In, Repository } from "typeorm";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
+import { ScoreColumnService } from "../score/score-column.service";
 import { PlusScoreLog } from "./entities/plus-score-log.entity";
 
 @Injectable()
@@ -10,6 +11,7 @@ export class PlusScoreLogService {
   constructor(
     @InjectRepository(PlusScoreLog)
     private readonly plusScoreLogRepository: Repository<PlusScoreLog>,
+    private readonly scoreColumnService: ScoreColumnService,
   ) {}
 
   async findOne(
@@ -64,15 +66,19 @@ export class PlusScoreLogService {
       return [];
     }
 
-    const entities = plusScoreDtos.map(({ scoreColumnId, score }) => {
-      
-      return {
-        gameLogUserId,
-        gameLogGameId,
-        scoreColumnId,
-        score,
-      };
-    });
+    const entities = await Promise.all(
+      plusScoreDtos.map(async ({ scoreColumnId, score }) => {
+        // Use the scoreColumnService to check if the score column exists before proceeding
+        await this.scoreColumnService.findOne(scoreColumnId);
+
+        return {
+          gameLogUserId,
+          gameLogGameId,
+          scoreColumnId,
+          score,
+        };
+      }),
+    );
 
     await this.plusScoreLogRepository.upsert(entities, [
       "gameLogUserId",
