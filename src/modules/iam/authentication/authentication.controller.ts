@@ -9,7 +9,13 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiQuery , ApiOperation } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
 import { PermissionGuard } from "../authorization/guards/permission.guard";
@@ -30,10 +36,21 @@ export class AuthenticationController {
     private readonly resetPasswordCodeService: ResetPasswordCodeService,
   ) {}
 
-  @ApiOperation({ 
-    summary: "Generate invite code", 
-    description: "Generate an invite code for user registration. Requires admin permissions.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "Generate invite code",
+    description:
+      "Generate an invite code for user registration. Requires admin permissions.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      message: "Invite code created successfully.",
+      inviteCode: {
+        code: "885414",
+        email: "viphongly2804@gmail.com",
+        expireTime: "2025-10-12T05:27:04.277Z",
+      },
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.AUTH_INVITE)
@@ -49,10 +66,18 @@ export class AuthenticationController {
     return this.inviteCodeService.invite(email);
   }
 
-  @ApiOperation({ 
-    summary: "Request password reset", 
-    description: "Request a password reset code to be sent to the user's email. No authentication required.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "Request password reset",
+    description:
+      "Request a password reset code to be sent to the user's email. No authentication required.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      success: true,
+      message:
+        "Reset password code created successfully to viphongly2804@gmail.com",
+    },
   })
   /* Intentional No Guard */
   @Post("forgot-password")
@@ -68,10 +93,17 @@ export class AuthenticationController {
     return this.resetPasswordCodeService.resetPassword(email);
   }
 
-  @ApiOperation({ 
-    summary: "User login", 
-    description: "Authenticate user with email and password. No authentication required.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "User login",
+    description:
+      "Authenticate user with email and password. No authentication required.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      accessToken: "accesstoken",
+      refreshToken: "refreshtoken",
+    },
   })
   /* Intentional No Guard */
   @Post("login")
@@ -79,10 +111,17 @@ export class AuthenticationController {
     return this.authenticationService.login(loginDto);
   }
 
-  @ApiOperation({ 
-    summary: "User registration", 
-    description: "Register a new user with an invite code. No authentication required.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "User registration",
+    description:
+      "Register a new user with an invite code. No authentication required.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      accessToken: "accesstoken",
+      refreshToken: "refreshtoken",
+    },
   })
   /* Intentional No Guard */
   @Post("register/:inviteCode")
@@ -93,10 +132,16 @@ export class AuthenticationController {
     return this.authenticationService.register(inviteCode, registerDto);
   }
 
-  @ApiOperation({ 
-    summary: "Reset password", 
-    description: "Reset user password using a reset code. No authentication required.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "Reset password",
+    description:
+      "Reset user password using a reset code. No authentication required.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      message: "Password reset successfully",
+    },
   })
   /* Intentional No Guard */
   @Post("reset-password/:resetPasswordCode")
@@ -123,10 +168,16 @@ export class AuthenticationController {
     );
   }
 
-  @ApiOperation({ 
-    summary: "Change password", 
-    description: "Change the current user's password. Requires JWT authentication.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "Change password",
+    description:
+      "Change the current user's password. Requires JWT authentication.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      message: "Password changed successfully",
+    },
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -142,10 +193,17 @@ export class AuthenticationController {
     );
   }
 
-  @ApiOperation({ 
-    summary: "Refresh token", 
-    description: "Obtain new access and refresh tokens using a refresh token. No authentication required.",
-    tags: ["Authentication"]
+  @ApiOperation({
+    summary: "Refresh token",
+    description:
+      "Obtain new access and refresh tokens using a refresh token. No authentication required.",
+    tags: ["Authentication"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      accessToken: "accesstoken",
+      refreshToken: "refreshtoken",
+    },
   })
   /* Intentional No Guard */
   @Post("refresh-token")

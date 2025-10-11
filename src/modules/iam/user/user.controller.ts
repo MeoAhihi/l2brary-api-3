@@ -15,7 +15,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
 import { RequirePermission } from "../authorization/decorators/permission.decorator";
@@ -60,6 +66,35 @@ export class UserController {
     example: true,
     default: false,
     allowEmptyValue: true,
+  })
+  @ApiOkResponse({
+    description: "",
+    example: {
+      items: [
+        {
+          id: "e9f9a456-1930-43d9-aba9-b60a8cc1a7ec",
+          avatarUrl:
+            "https://img.freepik.com/free-vector/businesswoman-character-avatar-isolated_24877-60111.jpg",
+          fullName: "Jane Smith",
+          internationalName: "JANE SMITH",
+          gender: "female",
+          birthdate: "1992-05-11",
+          phoneNumber: "+1234567890",
+          email: "user@example.com",
+          rank: "member",
+          courseCertificates: ["CERT-C1", "CERT-C2"],
+          eventCertificates: ["CERT-E1"],
+          experiences: ["experience-1", "experience-2"],
+          createdAt: "2024-03-01T13:24:32.150Z",
+          updatedAt: "2024-04-22T15:14:12.670Z",
+          roles: [],
+        },
+      ],
+      total: 36,
+      page: 1,
+      limit: 20,
+      pageCount: 2,
+    },
   })
   @Get()
   @ApiQuery({
@@ -113,6 +148,67 @@ export class UserController {
       "Retrieve the current user's profile information. Requires JWT authentication.",
     tags: ["User Profile"],
   })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        id: "367276c4-f513-4331-86fe-be31f488960c",
+        avatarUrl: "",
+        fullName: "Johny Doe",
+        internationalName: "J. Doe",
+        gender: "male",
+        birthdate: "2000-01-01",
+        phoneNumber: "0123456789",
+        email: "johny.doe@example.com",
+        rank: "Junior",
+        courseCertificates: [
+          "Chuyên đề Vật lý hiện đại",
+          "Thực hành Quang học",
+          "Hội thảo Vật lý lượng tử",
+          "Workshop Điện từ học",
+          "Khóa học Cơ học cổ điển",
+          "Thí nghiệm Vật lý hạt nhân",
+          "Chuyên đề Vật lý thiên văn",
+        ],
+        eventCertificates: [
+          "Hội thảo Khoa học",
+          "Seminar Vật lý ứng dụng",
+          "Hội nghị Nghiên cứu trẻ",
+          "Workshop STEM",
+          "Hội thảo Công nghệ mới",
+          "Seminar Đổi mới sáng tạo",
+          "Hội thảo Giáo dục",
+        ],
+        experiences: [
+          "Olympic Vật lý",
+          "Thực tập lab",
+          "CLB Vật lý",
+          "Trợ giảng",
+          "Hội thảo",
+          "Nghiên cứu",
+          "Tình nguyện",
+        ],
+        createdAt: "2025-09-22T15:45:20.635Z",
+        updatedAt: "2025-10-02T07:42:39.562Z",
+        roles: [
+          {
+            id: "5361c117-b4d1-41f3-951f-6fbbc681f5de",
+            name: "member",
+            description: null,
+          },
+          {
+            id: "764a95e4-a113-4936-8e9e-b22c193a60ba",
+            name: "monitor",
+            description: null,
+          },
+          {
+            id: "ed8152ae-94cb-4b01-a398-5a048db5c914",
+            name: "admin",
+            description: null,
+          },
+        ],
+      },
+    },
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(ClassSerializerInterceptor)
@@ -126,6 +222,67 @@ export class UserController {
     description:
       "Retrieve a specific user by their ID. Requires admin permissions.",
     tags: ["User Management"],
+  })
+  @ApiOkResponse({
+    schema: {
+      example: {
+        id: "367276c4-f513-4331-86fe-be31f488960c",
+        avatarUrl: "",
+        fullName: "Johny Doe",
+        internationalName: "J. Doe",
+        gender: "male",
+        birthdate: "2000-01-01",
+        phoneNumber: "0123456789",
+        email: "johny.doe@example.com",
+        rank: "Junior",
+        courseCertificates: [
+          "Chuyên đề Vật lý hiện đại",
+          "Thực hành Quang học",
+          "Hội thảo Vật lý lượng tử",
+          "Workshop Điện từ học",
+          "Khóa học Cơ học cổ điển",
+          "Thí nghiệm Vật lý hạt nhân",
+          "Chuyên đề Vật lý thiên văn",
+        ],
+        eventCertificates: [
+          "Hội thảo Khoa học",
+          "Seminar Vật lý ứng dụng",
+          "Hội nghị Nghiên cứu trẻ",
+          "Workshop STEM",
+          "Hội thảo Công nghệ mới",
+          "Seminar Đổi mới sáng tạo",
+          "Hội thảo Giáo dục",
+        ],
+        experiences: [
+          "Olympic Vật lý",
+          "Thực tập lab",
+          "CLB Vật lý",
+          "Trợ giảng",
+          "Hội thảo",
+          "Nghiên cứu",
+          "Tình nguyện",
+        ],
+        createdAt: "2025-09-22T15:45:20.635Z",
+        updatedAt: "2025-10-02T07:42:39.562Z",
+        roles: [
+          {
+            id: "5361c117-b4d1-41f3-951f-6fbbc681f5de",
+            name: "member",
+            description: null,
+          },
+          {
+            id: "764a95e4-a113-4936-8e9e-b22c193a60ba",
+            name: "monitor",
+            description: null,
+          },
+          {
+            id: "ed8152ae-94cb-4b01-a398-5a048db5c914",
+            name: "admin",
+            description: null,
+          },
+        ],
+      },
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_READ_ONE)
@@ -141,6 +298,48 @@ export class UserController {
     description:
       "Update a user's profile information. Requires admin permissions.",
     tags: ["User Management"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: "367276c4-f513-4331-86fe-be31f488960c",
+      avatarUrl: "",
+      fullName: "Johny Doe",
+      internationalName: "J. Doe",
+      gender: "male",
+      birthdate: "2000-01-01",
+      phoneNumber: "0123456789",
+      email: "johny.doe@example.com",
+      rank: "Junior",
+      courseCertificates: [
+        "Chuyên đề Vật lý hiện đại",
+        "Thực hành Quang học",
+        "Hội thảo Vật lý lượng tử",
+        "Workshop Điện từ học",
+        "Khóa học Cơ học cổ điển",
+        "Thí nghiệm Vật lý hạt nhân",
+        "Chuyên đề Vật lý thiên văn",
+      ],
+      eventCertificates: [
+        "Hội thảo Khoa học",
+        "Seminar Vật lý ứng dụng",
+        "Hội nghị Nghiên cứu trẻ",
+        "Workshop STEM",
+        "Hội thảo Công nghệ mới",
+        "Seminar Đổi mới sáng tạo",
+        "Hội thảo Giáo dục",
+      ],
+      experiences: [
+        "Olympic Vật lý",
+        "Thực tập lab",
+        "CLB Vật lý",
+        "Trợ giảng",
+        "Hội thảo",
+        "Nghiên cứu",
+        "Tình nguyện",
+      ],
+      createdAt: "2025-09-22T15:45:20.635Z",
+      updatedAt: "2025-10-11T05:07:23.226Z",
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_UPDATE)
@@ -161,6 +360,48 @@ export class UserController {
     description:
       "Update the current user's own profile information. Requires JWT authentication.",
     tags: ["User Profile"],
+  })
+  @ApiOkResponse({
+    example: {
+      id: "367276c4-f513-4331-86fe-be31f488960c",
+      avatarUrl: "",
+      fullName: "Johny Doe",
+      internationalName: "J. Doe",
+      gender: "male",
+      birthdate: "2000-01-01",
+      phoneNumber: "0123456789",
+      email: "johny.doe@example.com",
+      rank: "Junior",
+      courseCertificates: [
+        "Chuyên đề Vật lý hiện đại",
+        "Thực hành Quang học",
+        "Hội thảo Vật lý lượng tử",
+        "Workshop Điện từ học",
+        "Khóa học Cơ học cổ điển",
+        "Thí nghiệm Vật lý hạt nhân",
+        "Chuyên đề Vật lý thiên văn",
+      ],
+      eventCertificates: [
+        "Hội thảo Khoa học",
+        "Seminar Vật lý ứng dụng",
+        "Hội nghị Nghiên cứu trẻ",
+        "Workshop STEM",
+        "Hội thảo Công nghệ mới",
+        "Seminar Đổi mới sáng tạo",
+        "Hội thảo Giáo dục",
+      ],
+      experiences: [
+        "Olympic Vật lý",
+        "Thực tập lab",
+        "CLB Vật lý",
+        "Trợ giảng",
+        "Hội thảo",
+        "Nghiên cứu",
+        "Tình nguyện",
+      ],
+      createdAt: "2025-09-22T15:45:20.635Z",
+      updatedAt: "2025-10-11T05:07:23.226Z",
+    },
   })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
@@ -197,6 +438,11 @@ export class UserController {
     description: "Assign a role to a user. Requires admin permissions.",
     tags: ["User Management"],
   })
+  @ApiCreatedResponse({
+    example: {
+      message: 'Role "member" assigned from user "Johny Doe" successfully',
+    },
+  })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_ASSIGN_ROLE)
   @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -212,6 +458,11 @@ export class UserController {
     summary: "Unassign role from user",
     description: "Remove a role from a user. Requires admin permissions.",
     tags: ["User Management"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      message: 'Role "member" unassigned from user "Johny Doe" successfully',
+    },
   })
   @ApiBearerAuth()
   @RequirePermission(PermissionEnum.USER_UNASSIGN_ROLE)

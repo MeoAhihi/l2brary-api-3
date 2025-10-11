@@ -52,7 +52,13 @@ export class UserService {
     sortByRank?: boolean;
     page?: number;
     limit?: number;
-  }): Promise<{ items: User[]; total: number; page: number; limit: number; pageCount: number }> {
+  }): Promise<{
+    items: User[];
+    total: number;
+    page: number;
+    limit: number;
+    pageCount: number;
+  }> {
     const where: any = {};
 
     if (options?.ids && options.ids.length > 0) {
@@ -65,7 +71,7 @@ export class UserService {
       where.rank = In(options.ranks);
     }
 
-    const findOptions: any = { where };
+    const findOptions: any = { where, relations: ["roles"] };
 
     if (options?.sortByRank) {
       findOptions.order = { rank: "ASC" };
