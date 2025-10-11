@@ -14,6 +14,7 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
 } from "@nestjs/swagger";
@@ -26,13 +27,43 @@ import { DetachPermissionDto } from "./dto/detach-permission.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 import { Role } from "./entities/role.entity";
 import { PermissionGuard } from "./guards/permission.guard";
+import { PermissionService } from "./permission.service";
 import { RoleService } from "./role.service";
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, PermissionGuard)
 @Controller("authorization")
 export class AuthorizationController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(
+    private readonly roleService: RoleService,
+    private readonly permissionService: PermissionService,
+  ) {}
+
+  @ApiOperation({
+    summary: "Get all permissions",
+    description: "Retrieve a list of all available permissions.",
+    tags: ["Authorization"],
+  })
+  @ApiOkResponse({
+    schema: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: {
+            type: "string",
+            example: "e49e9872-9a06-4bde-a789-71a0a3933433",
+          },
+          name: { type: "string", example: "enrollment:update" },
+        },
+      },
+    },
+  })
+  @RequirePermission(PermissionEnum.ROLE_READ_ALL)
+  @Get("permissions")
+  async getAllPermissions() {
+    return this.permissionService.findAll();
+  }
 
   @ApiOperation({
     summary: "Get all roles",
@@ -87,7 +118,7 @@ export class AuthorizationController {
     description: "Create a new role. Requires admin permissions.",
     tags: ["Authorization"],
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     type: Role,
   })
   @RequirePermission(PermissionEnum.ROLE_CREATE)
@@ -147,7 +178,7 @@ export class AuthorizationController {
     description: "Attach permissions to a role. Requires admin permissions.",
     tags: ["Authorization"],
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     example: {
       id: "764a95e4-a113-4936-8e9e-b22c193a60ba",
       name: "monitor",
@@ -194,7 +225,7 @@ export class AuthorizationController {
     description: "Detach permissions from a role. Requires admin permissions.",
     tags: ["Authorization"],
   })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     example: {
       id: "764a95e4-a113-4936-8e9e-b22c193a60ba",
       name: "monitor",

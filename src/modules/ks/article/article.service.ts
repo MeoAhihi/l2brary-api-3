@@ -23,10 +23,8 @@ export class ArticleService {
     const author = await this.userService.findOne(authorId);
 
     const article = this.articleRepository.create({
-      title: createArticleDto.title,
-      content: createArticleDto.content,
+      ...createArticleDto,
       author,
-      tags: createArticleDto.tags,
       isPublished: false,
       createdAt: new Date(),
       updatedAt: new Date(),
