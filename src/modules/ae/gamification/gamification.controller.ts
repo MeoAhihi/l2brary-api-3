@@ -14,7 +14,13 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiQuery } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiQuery,
+} from "@nestjs/swagger";
 
 import { LogActivityDto } from "./dto/log-activity.dto";
 import { ActivityLog } from "./entities/activity-log.entity";
@@ -31,6 +37,25 @@ export class GamificationController {
     description:
       "Log user activity for gamification tracking. Requires JWT authentication.",
     tags: ["Gamification"],
+  })
+  @ApiCreatedResponse({
+    example: {
+      id: 24,
+      user: {
+        id: "367276c4-f513-4331-86fe-be31f488960c",
+        fullName: "Johny Doe",
+        internationalName: "J. Doe",
+      },
+      activity: {
+        id: 1,
+        name: "Quiz",
+        point: 5,
+        category: "Assessment",
+      },
+      loggedBy: "Johny Doe/367276c4-f513-4331-86fe-be31f488960c",
+      note: "Completed extra tasks",
+      createdAt: "2025-10-11T07:08:21.274Z",
+    },
   })
   @RequirePermission(PermissionEnum.GAMIFICATION_LOG_ACTIVITY)
   @Post("log-activity")
@@ -52,6 +77,33 @@ export class GamificationController {
     description:
       "Retrieve gamification data with filtering options. Requires admin permissions.",
     tags: ["Gamification"],
+  })
+  @ApiOkResponse({
+    example: {
+      items: [
+        {
+          id: 24,
+          user: {
+            id: "367276c4-f513-4331-86fe-be31f488960c",
+            fullName: "Johny Doe",
+            internationalName: "J. Doe",
+          },
+          activity: {
+            id: 1,
+            name: "Quiz",
+            point: 5,
+            category: "Assessment",
+          },
+          loggedBy: "Johny Doe/367276c4-f513-4331-86fe-be31f488960c",
+          note: "Completed extra tasks",
+          createdAt: "2025-10-11T07:08:21.274Z",
+        },
+      ],
+      total: 18,
+      page: 1,
+      limit: 10,
+      pageCount: 2,
+    },
   })
   @RequirePermission(PermissionEnum.GAMIFICATION_READ_ALL)
   @Get()
@@ -96,6 +148,53 @@ export class GamificationController {
     description:
       "Generate an activity report for a specific user. Requires admin permissions.",
     tags: ["Gamification"],
+  })
+  @ApiOkResponse({
+    example: {
+      userId: "367276c4-f513-4331-86fe-be31f488960c",
+      engagementScore: 69,
+      activityLogs: [
+        {
+          id: 24,
+          activity: {
+            id: 1,
+            name: "Quiz",
+            point: 5,
+            category: "Assessment",
+            isManual: true,
+          },
+          loggedBy: "Johny Doe/367276c4-f513-4331-86fe-be31f488960c",
+          note: "Completed extra tasks",
+          createdAt: "2025-10-11T07:08:21.274Z",
+        },
+        {
+          id: 23,
+          activity: {
+            id: 73,
+            name: "Enrollment Approved",
+            point: 3,
+            category: "system",
+            isManual: false,
+          },
+          loggedBy: "system",
+          note: "Action completed from L&D Domain",
+          createdAt: "2025-10-11T05:47:18.736Z",
+        },
+        {
+          id: 22,
+          activity: {
+            id: 70,
+            name: "Course Updated",
+            point: 5,
+            category: "system",
+            isManual: false,
+          },
+          loggedBy: "Johny Doe/367276c4-f513-4331-86fe-be31f488960c",
+          note: "Completed extra tasks",
+          createdAt: "2025-10-03T06:39:52.652Z",
+        },
+      ],
+    },
   })
   @Get("report/:userId")
   // @ApiQuery({s

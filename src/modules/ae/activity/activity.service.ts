@@ -81,12 +81,11 @@ export class ActivityService {
     const existing = await this.activityRepository.findOne({
       where: {
         name: createActivityDto.name,
-        category: createActivityDto.category,
       },
     });
     if (existing) {
       throw new ConflictException(
-        `Activity with name "${createActivityDto.name}" and category "${createActivityDto.category}" already exists`,
+        `Activity with name "${createActivityDto.name}" already exists`,
       );
     }
     const activity = this.activityRepository.create(createActivityDto);
