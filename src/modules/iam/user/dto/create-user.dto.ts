@@ -17,6 +17,15 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Gender } from "../../types/gender.enum";
 
 export class CreateUserDto {
+  @ApiPropertyOptional({
+    example:
+      "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3383.jpg?semt=ais_hybrid&w=740&q=80",
+    description: "Avatar URL of the user",
+  })
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+
   @ApiProperty({ example: "John Doe", description: "Full name of the user" })
   @IsString()
   @IsNotEmpty()

@@ -21,6 +21,10 @@ export class User {
   @Expose()
   id: string;
 
+  @Column({ nullable: true, default: "" })
+  @Expose()
+  avatarUrl: string;
+
   @Column()
   @Expose()
   fullName: string;

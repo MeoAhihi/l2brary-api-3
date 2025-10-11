@@ -18,6 +18,15 @@ export class Article {
   id: string;
 
   @Expose()
+  @Column({
+    type: "text",
+    nullable: true,
+    default:
+      "https://img.freepik.com/free-vector/female-coach-explaining-statistics-businessmen-graph-company-analysis-flat-vector-illustration-business-marketing_74855-13069.jpg?semt=ais_hybrid&w=740&q=80",
+  })
+  thumbnail: string;
+
+  @Expose()
   @Column()
   title: string;
 
