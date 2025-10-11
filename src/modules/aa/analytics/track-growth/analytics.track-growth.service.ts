@@ -53,28 +53,20 @@ export class TrackGrowthService {
     const raw = await this.userRepository
       .createQueryBuilder("user")
       .select([
-        "YEAR(user.createdAt) AS year",
-        "MONTH(user.createdAt) AS monthNum",
-        "CONCAT(YEAR(user.createdAt), '-', LPAD(MONTH(user.createdAt), 2, '0')) AS month",
+        `TO_CHAR(user.createdAt, 'YYYY-MM') AS month`,
       ])
       .addSelect("COUNT(*)", "count")
       .where("user.createdAt >= :start AND user.createdAt < :end", {
         start,
         end,
       })
-      .groupBy("year")
-      .addGroupBy("monthNum")
-      .addGroupBy("month")
-      .orderBy("year", "ASC")
-      .addOrderBy("monthNum", "ASC")
+      .groupBy("month")
+      .orderBy("month", "ASC")
       .getRawMany<{
-        year: number;
-        monthNum: number;
         month: string;
-        count: number;
+        count: string | number;
       }>();
     const months = getLast12Months(start);
-    // return months;
 
     return months.map((month) => {
       const found = raw.find((r) => r.month === month);

@@ -42,17 +42,16 @@ export class DemographicService {
   }
 
   async countUsersByAge(): Promise<{ age: number; count: number }[]> {
-    // Calculate age based on birthdate (assuming user.birthdate is a Date column)
-    // The calculation uses the difference in years between now and the birthdate
+    // Postgres-specific: Calculate integer age based on birthdate
+    // Use age(CURRENT_DATE, user.birthdate) to get interval, then extract years and cast to integer
+    // Group users by integer age using Postgres age() and extract(years)
     const result = await this.userRepository
       .createQueryBuilder("user")
-      .select(
-        `FLOOR(DATEDIFF(CURDATE(), user.birthdate) / 365.25)`,
-        "age"
-      )
+      .select("EXTRACT(YEAR FROM AGE(CURRENT_DATE, user.birthdate))", "age")
       .addSelect("COUNT(*)", "count")
       .where("user.birthdate IS NOT NULL")
       .groupBy("age")
+      .orderBy("age", "ASC")
       .getRawMany();
 
     // Ensure count and age are numbers
@@ -61,4 +60,5 @@ export class DemographicService {
       count: Number(row.count),
     }));
   }
-F}
+  F;
+}

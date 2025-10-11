@@ -168,19 +168,27 @@ export class AnalyticsOptimizationService {
    * @param limit number - number of top users to return
    */
   async getTopUsersByActivityPoints(from: Date, to: Date, limit = 10) {
-    return this.activityLogRepository
+    // Postgres: Use explicit type casting to integer for SUM, handle NULL as 0, and respect case in identifiers
+    const raw = await this.activityLogRepository
       .createQueryBuilder("log")
       .leftJoin("log.user", "user")
       .leftJoin("log.activity", "activity")
       .select("user.id", "userId")
       .addSelect("user.fullName", "name")
-      .addSelect("SUM(activity.point)", "totalPoints")
+      .addSelect("COALESCE(SUM(activity.point)::integer, 0)", "points")
       .where("log.createdAt >= :from AND log.createdAt <= :to", { from, to })
       .groupBy("user.id")
       .addGroupBy("user.fullName")
-      .orderBy("totalPoints", "DESC")
+      .orderBy("points", "DESC")
       .limit(limit)
       .getRawMany();
+
+    // Optionally map to expected return format
+    return raw.map((row) => ({
+      userId: row.userId,
+      name: row.name,
+      points: Number(row.points),
+    }));
   }
 
   /**
