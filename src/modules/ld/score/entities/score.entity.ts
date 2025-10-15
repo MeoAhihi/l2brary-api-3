@@ -3,6 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PrimaryColumn } from "typeorm";
 
 import { ScoreColumn } from "./score-column.entity";
+import { ReferenceUserDto } from "@/modules/iam/user/dto/reference-user.dto";
 
 @Entity()
 export class Score {
@@ -12,7 +13,7 @@ export class Score {
   @PrimaryColumn()
   scoreColumnId: number;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => ReferenceUserDto, { eager: true })
   user: User;
 
   @ManyToOne(() => ScoreColumn, (scoreColumn) => scoreColumn.scores)
