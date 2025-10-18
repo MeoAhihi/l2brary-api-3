@@ -181,9 +181,7 @@ export class SessionController {
       limit: limit,
     });
     return {
-      items: plainToInstance(SessionDto, data, {
-        excludeExtraneousValues: true,
-      }),
+      items: data,
       total,
       page: resPage,
       limit: resLimit,

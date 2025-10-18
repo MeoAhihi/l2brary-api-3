@@ -1,9 +1,10 @@
+import { ReferenceUserDto } from "@/modules/iam/user/dto/reference-user.dto";
 import { User } from "@/modules/iam/user/entities/user.entity";
+import { Type } from "class-transformer";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PrimaryColumn } from "typeorm";
 
 import { ScoreColumn } from "./score-column.entity";
-import { ReferenceUserDto } from "@/modules/iam/user/dto/reference-user.dto";
 
 @Entity()
 export class Score {
@@ -13,7 +14,8 @@ export class Score {
   @PrimaryColumn()
   scoreColumnId: number;
 
-  @ManyToOne(() => ReferenceUserDto, { eager: true })
+  @ManyToOne(() => User, { eager: true })
+  @Type(() => ReferenceUserDto)
   user: User;
 
   @ManyToOne(() => ScoreColumn, (scoreColumn) => scoreColumn.scores)

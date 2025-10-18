@@ -49,8 +49,8 @@ export class SessionService {
       skip,
       take: limit,
       order: { startTime: "DESC" },
+      relations: ["attendances", "games"],
     });
-
     return {
       data: sessions,
       total,
