@@ -1,7 +1,11 @@
 import { compare, compareSync } from "bcrypt";
 import { PermissionEnum } from "src/common/permission.enum";
 
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 
@@ -138,7 +142,7 @@ export class AuthenticationService {
       user.password,
     );
     if (!isMatch) {
-      throw new UnauthorizedException("Current password is incorrect");
+      throw new BadRequestException("Current password is incorrect");
     }
 
     // Update password
