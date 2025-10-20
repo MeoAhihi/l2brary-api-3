@@ -152,6 +152,12 @@ export class EnrollmentController {
       "Get the current user's enrollment for a specific course. Requires JWT authentication.",
     tags: ["Enrollment Management"],
   })
+  @ApiQuery({
+    name: "courseId",
+    required: false,
+    type: String,
+    description: "Course ID to find my enrollment for",
+  })
   @ApiOkResponse({
     example: {
       message: "Enrollment found",
@@ -176,17 +182,18 @@ export class EnrollmentController {
   @UseGuards(JwtAuthGuard)
   @Get("my")
   async getMyEnrollment(
-    @Query("courseId") courseId: string,
     @Req() req: AuthRequest,
+    @Query("courseId") courseId?: string,
   ) {
-    const enrollment = await this.enrollmentService.findByUserAndCourse(
+    const data = await this.enrollmentService.findByUserAndCourse(
       req.user.sub,
       courseId,
     );
-    enrollment.enrollment = plainToInstance(Enrollment, enrollment.enrollment, {
-      excludeExtraneousValues: true,
-    });
-    return enrollment;
+    if (data.enrollment)
+      data.enrollment = plainToInstance(Enrollment, data.enrollment, {
+        excludeExtraneousValues: true,
+      });
+    return data;
   }
 
   @ApiOperation({

@@ -79,9 +79,9 @@ export class EnrollmentService {
 
   async findByUserAndCourse(
     userId: string,
-    courseId: string,
-  ): Promise<{ message: string; enrollment: Enrollment | null }> {
-    const enrollment = await this.enrollmentRepository.findOne({
+    courseId?: string,
+  ): Promise<{ message: string; enrollment: Enrollment[] | null }> {
+    const enrollment = await this.enrollmentRepository.find({
       where: {
         user: { id: userId },
         course: { id: courseId },
