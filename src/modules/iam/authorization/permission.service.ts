@@ -36,10 +36,20 @@ export class PermissionService implements OnModuleInit {
     return Object.values(PermissionEnum);
   }
 
-  async findAll(roleIds?: string[]): Promise<Permission[]> {
-    if (!roleIds || roleIds.length === 0) {
+  async findAll(options?: {
+    attachRoles?: boolean;
+    roleIds?: string[];
+  }): Promise<Permission[]> {
+    const { attachRoles = false, roleIds } = options || {};
+
+    if (!attachRoles) {
       return this.permissionRepository.find();
     }
+
+    if (!roleIds || roleIds.length === 0) {
+      return this.permissionRepository.find({ relations: ["roles"] });
+    }
+
     return this.permissionRepository
       .createQueryBuilder("permission")
       .leftJoinAndSelect("permission.roles", "role")

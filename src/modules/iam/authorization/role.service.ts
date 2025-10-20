@@ -22,7 +22,10 @@ export class RoleService {
     return this.roleRepository.save(role);
   }
 
-  async findAll(): Promise<Role[]> {
+  async findAll(options?: { includePermissions?: boolean }): Promise<Role[]> {
+    if (options?.includePermissions) {
+      return this.roleRepository.find({ relations: ["permissions"] });
+    }
     return this.roleRepository.find();
   }
 

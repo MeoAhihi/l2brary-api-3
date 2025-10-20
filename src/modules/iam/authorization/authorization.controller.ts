@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -17,6 +18,7 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
 } from "@nestjs/swagger";
 
 import { JwtAuthGuard } from "../authentication/guards/jwt.guard";
@@ -44,6 +46,14 @@ export class AuthorizationController {
     description: "Retrieve a list of all available permissions.",
     tags: ["Authorization"],
   })
+  @ApiQuery({
+    name: "attachRoles",
+    required: false,
+    type: "boolean",
+    description:
+      "If true, include roles associated with each permission in the response. Defaults to false.",
+    example: true,
+  })
   @ApiOkResponse({
     schema: {
       type: "array",
@@ -61,8 +71,11 @@ export class AuthorizationController {
   })
   @RequirePermission(PermissionEnum.ROLE_READ_ALL)
   @Get("permissions")
-  async getAllPermissions() {
-    return this.permissionService.findAll();
+  async getAllPermissions(
+    @Query("attachRoles") attachRoles?: boolean | string,
+  ) {
+    const attach = attachRoles === true || attachRoles === "true";
+    return this.permissionService.findAll({ attachRoles: attach });
   }
 
   @ApiOperation({
@@ -70,14 +83,27 @@ export class AuthorizationController {
     description: "Retrieve a list of all roles. Requires admin permissions.",
     tags: ["Authorization"],
   })
+  @ApiQuery({
+    name: "permissions",
+    required: false,
+    type: "boolean",
+    description:
+      "If true, include the permissions for each role in the response. Defaults to false.",
+    example: true,
+  })
   @ApiOkResponse({
     type: Role,
     isArray: true,
   })
   @RequirePermission(PermissionEnum.ROLE_READ_ALL)
   @Get("roles")
-  async getAllRoles() {
-    return this.roleService.findAll();
+  async getAllRoles(
+    @Query("permissions") includePermissions?: boolean | string,
+  ) {
+    return this.roleService.findAll({
+      includePermissions:
+        includePermissions === true || includePermissions === "true",
+    });
   }
 
   @ApiOperation({

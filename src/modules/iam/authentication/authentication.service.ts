@@ -68,7 +68,9 @@ export class AuthenticationService {
     const user = await this.userService.findOne(userExisted.id, ["roles"]);
     const roles = user.roles.map((role) => role.name);
     const roleIds = user.roles.map((role) => role.id);
-    const permissionEntities = await this.permissionService.findAll(roleIds);
+    const permissionEntities = await this.permissionService.findAll({
+      roleIds,
+    });
     // This is safe as permissions enum are synchronized on startup,
     // and permission entities are readonly
     const permissions = permissionEntities.map((p) => p.name as PermissionEnum);
@@ -96,7 +98,9 @@ export class AuthenticationService {
       const user = await this.userService.findOne(payload.sub, ["roles"]);
       const roles = user.roles.map((role) => role.name);
       const roleIds = user.roles.map((role) => role.id);
-      const permissionEntities = await this.permissionService.findAll(roleIds);
+      const permissionEntities = await this.permissionService.findAll({
+        roleIds,
+      });
       // This is safe as permissions enum are synchronized on startup,
       // and permission entities are readonly
       const permissions = permissionEntities.map(
