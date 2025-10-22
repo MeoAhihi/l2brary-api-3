@@ -11,6 +11,7 @@ import {
 
 import { ScoreColumn } from "../../score/entities/score-column.entity";
 import { Session } from "../../session/entities/session.entity";
+import { CourseStatus } from "../types/course-status.enum";
 import { ScheduleDetail, ScheduleType } from "../types/schedule.types";
 
 @Entity({ name: "courses" })
@@ -132,5 +133,31 @@ export class Course {
     const end = new Date(this.endDate);
     end.setHours(23, 59, 59, 999);
     return now > end;
+  }
+
+  @Expose()
+  get status(): CourseStatus {
+    const now = new Date();
+
+    if (!this.startDate) {
+      return CourseStatus.NotStartedYet;
+    }
+
+    const start = new Date(this.startDate);
+    start.setHours(0, 0, 0, 0);
+
+    if (now < start) {
+      return CourseStatus.NotStartedYet;
+    }
+
+    if (this.endDate) {
+      const end = new Date(this.endDate);
+      end.setHours(23, 59, 59, 999);
+      if (now > end) {
+        return CourseStatus.Ended;
+      }
+    }
+
+    return CourseStatus.OnGoing;
   }
 }

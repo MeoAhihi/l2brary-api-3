@@ -2,6 +2,7 @@ import { PermissionEnum } from "@/common/permission.enum";
 import { JwtAuthGuard } from "@/modules/iam/authentication/guards/jwt.guard";
 import { RequirePermission } from "@/modules/iam/authorization/decorators/permission.decorator";
 import { PermissionGuard } from "@/modules/iam/authorization/guards/permission.guard";
+import { AuthRequest } from "@/modules/iam/types/auth-request.type";
 import { plainToInstance } from "class-transformer";
 
 import {
@@ -15,6 +16,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
@@ -98,6 +100,42 @@ export class SessionController {
     return plainToInstance(SessionDto, session, {
       excludeExtraneousValues: true,
     });
+  }
+
+  @ApiOperation({
+    summary: "Get sessions for the current week",
+    description:
+      "Retrieve all sessions for a given course that occur within the current week. Requires JWT.",
+    tags: ["Session Management"],
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get("/session/week")
+  async getSessionsForThisWeek(@Req() req: AuthRequest) {
+    // Determine current week's start (Monday 00:00:00) and end (Sunday 23:59:59)
+    const now = new Date();
+
+    // Get the day of the week (0 for Sunday, 1 for Monday, ...)
+    const dayOfWeek = now.getDay();
+    // Calculate how many days to subtract to get to Monday
+    const diffToMonday = (dayOfWeek + 6) % 7;
+
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - diffToMonday);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Query all sessions for this course within this week
+    const sessions = await this.sessionService.getSessionsByUser(
+      req.user.sub,
+      startOfWeek,
+      endOfWeek,
+    );
+
+    return sessions;
   }
 
   @ApiOperation({

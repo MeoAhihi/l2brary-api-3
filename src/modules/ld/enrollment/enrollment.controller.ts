@@ -288,4 +288,49 @@ export class EnrollmentController {
     const result = await this.enrollmentService.remove(+id);
     return result;
   }
+
+  @ApiOperation({
+    summary: "Get student roster for a course",
+    description:
+      "Retrieve a roster of students enrolled (approved) in a course. Requires admin permissions.",
+    tags: ["Enrollment Management"],
+  })
+  @ApiOkResponse({
+    description: "List of enrolled students for the course.",
+    example: [
+      {
+        id: 20,
+        user: {
+          id: "367276c4-f513-4331-86fe-be31f488960c",
+          fullName: "Johny Doe",
+          internationalName: "J. Doe",
+        },
+        status: "approved",
+        enrolledAt: "2025-10-11T05:47:18.717Z",
+      },
+      {
+        id: 21,
+        user: {
+          id: "4281e3c2-8ae6-47bb-b192-ff4d3a935169",
+          fullName: "Jane Smith",
+          internationalName: "J. Smith",
+        },
+        status: "approved",
+        enrolledAt: "2025-10-11T08:11:18.717Z",
+      },
+    ],
+  })
+  @ApiBearerAuth()
+  @RequirePermission(PermissionEnum.ENROLLMENT_READ_ALL)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Get("course/:courseId/roster")
+  async getStudentRoster(@Param("courseId") courseId: string) {
+    const roster = await this.enrollmentService.getStudentRoster(courseId);
+    // Optionally transform output for serialization
+    return roster.map((enrollment) =>
+      plainToInstance(Enrollment, enrollment, {
+        excludeExtraneousValues: true,
+      }),
+    );
+  }
 }
