@@ -178,4 +178,17 @@ export class EnrollmentService {
     await this.enrollmentRepository.remove(enrollment);
     return { message: `Enrollment with id ${id} has been removed.` };
   }
+
+  async getStudentRoster(courseId: string) {
+    // Fetch all enrollments for the given courseId with user relation eagerly loaded
+    const enrollments = await this.enrollmentRepository.find({
+      where: {
+        course: { id: courseId },
+        status: EnrollmentStatusEnum.APPROVED,
+      },
+      relations: ["user"],
+    });
+
+    return enrollments;
+  }
 }

@@ -1,9 +1,11 @@
-import { Repository } from "typeorm";
+import { Between, In, Repository } from "typeorm";
 
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 
 import { CourseService } from "../course/course.service";
+import { EnrollmentService } from "../enrollment/enrollment.service";
+import { EnrollmentStatusEnum } from "../types/enrollment-status.enum";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { Session } from "./entities/session.entity";
@@ -15,6 +17,7 @@ export class SessionService {
     @InjectRepository(Session)
     private readonly sessionRepository: Repository<Session>,
     private readonly courseService: CourseService,
+    private readonly enrollmentService: EnrollmentService,
   ) {}
 
   async create(
@@ -85,5 +88,30 @@ export class SessionService {
     const session = await this.findOne(id);
     session.deletedAt = new Date();
     await this.sessionRepository.save(session);
+  }
+
+  async getSessionsByUser(userId: string, from: Date, to: Date) {
+    const { enrollment: enrollments } =
+      await this.enrollmentService.findByUserAndCourse(userId);
+    console.log("🚀 ~ SessionService ~ getSessionsByUser ~ enrollments:", enrollments)
+    if (!enrollments || enrollments.length) return [];
+    const joinedCoursesOfUser = enrollments
+      .filter((e) => e.status === EnrollmentStatusEnum.APPROVED)
+      .map((e) => e.course);
+    // console.log("🚀 ~ SessionService ~ getSessionsByUser ~ joinedCoursesOfUser:", joinedCoursesOfUser)
+
+    // Get sessions of the user's joined courses that start between 'from' and 'to'
+    if (!joinedCoursesOfUser.length) return [];
+
+    const sessions = await this.sessionRepository.find({
+      where: {
+        course: { id: In(joinedCoursesOfUser.map((c) => c.id)) },
+        startTime: Between(from, to),
+      },
+      order: { startTime: "ASC" },
+      relations: ["course", "games", "attendances"],
+    });
+
+    return sessions;
   }
 }
