@@ -47,9 +47,12 @@ export class UserService {
 
   async findAll(options?: {
     ids?: string[];
+    fullName?: string;
     gender?: string;
     ranks?: string[];
-    sortByRank?: boolean;
+    courseCertificates?: string;
+    eventCertificates?: string;
+    experiences?: string;
     page?: number;
     limit?: number;
   }): Promise<{
@@ -61,31 +64,72 @@ export class UserService {
   }> {
     const where: any = {};
 
+    // Use QueryBuilder for flexible filtering and relation loading
+    const qb = this.userRepository
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.roles", "role");
+
     if (options?.ids && options.ids.length > 0) {
-      where.id = In(options.ids);
+      qb.andWhere("user.id IN (:...ids)", { ids: options.ids });
     }
+
+    if (options?.fullName)
+      qb.andWhere(
+        'unaccent(lower("user"."fullName")) LIKE unaccent(lower(:fullName))',
+        {
+          fullName: `%${options?.fullName}%`,
+        },
+      );
+
     if (options?.gender) {
-      where.gender = options.gender;
-    }
-    if (options?.ranks && options.ranks.length > 0) {
-      where.rank = In(options.ranks);
+      qb.andWhere("user.gender = :gender", { gender: options.gender });
     }
 
-    const findOptions: any = { where, relations: ["roles"] };
-
-    if (options?.sortByRank) {
-      findOptions.order = { rank: "ASC" };
+    if (options?.ranks && !Array.isArray(options.ranks)) {
+      options.ranks = [options.ranks];
+    } else if (options?.ranks && typeof options.ranks === "string") {
+      options.ranks = [options.ranks];
     }
+    if (
+      options?.ranks &&
+      Array.isArray(options.ranks) &&
+      options.ranks.length > 0
+    ) {
+      qb.andWhere("user.rank IN (:...ranks)", { ranks: options.ranks });
+    }
+
+    if (options?.experiences)
+      qb.andWhere(
+        'unaccent(lower("user"."experiences")) LIKE unaccent(lower(:exp))',
+        {
+          exp: `%${options?.experiences}%`,
+        },
+      );
+
+    if (options?.courseCertificates)
+      qb.andWhere(
+        'unaccent(lower("user"."courseCertificates")) LIKE unaccent(lower(:course))',
+        {
+          course: `%${options?.courseCertificates}%`,
+        },
+      );
+
+    if (options?.eventCertificates)
+      qb.andWhere(
+        'unaccent(lower("user"."eventCertificates")) LIKE unaccent(lower(:event))',
+        {
+          event: `%${options?.eventCertificates}%`,
+        },
+      );
 
     // Pagination
     let page = options?.page ?? 1;
     let limit = options?.limit ?? 0;
     if (limit > 0) {
-      findOptions.skip = (page - 1) * limit;
-      findOptions.take = limit;
+      qb.skip((page - 1) * limit).take(limit);
     }
 
-    const [items, total] = await this.userRepository.findAndCount(findOptions);
+    const [items, total] = await qb.getManyAndCount();
     const pageCount = limit > 0 ? Math.ceil(total / limit) : 1;
     return { items, page, total, limit, pageCount };
   }
@@ -185,5 +229,53 @@ export class UserService {
     const hashedPassword = hashSync(newPassword, saltRounds);
     user.password = hashedPassword;
     await this.userRepository.save(user);
+  }
+
+  async getAllDistinctCourseCertificates(): Promise<string[]> {
+    // Assumes the User entity has 'courseCertificates' as a comma-separated string
+    const result = await this.userRepository
+      .createQueryBuilder("u")
+      .select(
+        "DISTINCT UNNEST(string_to_array(u.\"courseCertificates\", ','))",
+        "course",
+      )
+      .getRawMany();
+
+    // result will be an array of objects with the shape { course: string }
+    return result
+      .map((row) => row.course)
+      .filter((course) => !!course && course.trim().length > 0);
+  }
+
+  async getAllDistinctEventCertificates(): Promise<string[]> {
+    // Assumes the User entity has 'eventCertificates' as a comma-separated string
+    const result = await this.userRepository
+      .createQueryBuilder("u")
+      .select(
+        "DISTINCT UNNEST(string_to_array(u.\"eventCertificates\", ','))",
+        "event",
+      )
+      .getRawMany();
+
+    // result will be an array of objects with the shape { event: string }
+    return result
+      .map((row) => row.event)
+      .filter((event) => !!event && event.trim().length > 0);
+  }
+
+  async getAllDistinctExperiences(): Promise<string[]> {
+    // Assumes the User entity has 'experiences' as a comma-separated string
+    const result = await this.userRepository
+      .createQueryBuilder("u")
+      .select(
+        "DISTINCT UNNEST(string_to_array(u.\"experiences\", ','))",
+        "experience",
+      )
+      .getRawMany();
+
+    // result: array of objects with the shape { experience: string }
+    return result
+      .map((row) => row.experience)
+      .filter((exp) => !!exp && exp.trim().length > 0);
   }
 }

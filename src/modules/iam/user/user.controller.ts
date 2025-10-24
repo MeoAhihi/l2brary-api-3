@@ -58,15 +58,6 @@ export class UserController {
     type: [String],
     description: "Filter users by an array of ranks",
   })
-  @ApiQuery({
-    name: "sortByRank",
-    required: false,
-    type: Boolean,
-    description: "Sort users by rank in ascending order",
-    example: true,
-    default: false,
-    allowEmptyValue: true,
-  })
   @ApiOkResponse({
     description: "",
     example: {
@@ -98,6 +89,36 @@ export class UserController {
   })
   @Get()
   @ApiQuery({
+    name: "fullName",
+    required: false,
+    type: String,
+    description: "Page number for pagination (default: 1)",
+    allowEmptyValue: true,
+  })
+  @ApiQuery({
+    name: "experiences",
+    required: false,
+    type: String,
+    description: "Filter users by experience keyword(s)",
+    allowEmptyValue: true,
+  })
+  @ApiQuery({
+    name: "courseCertificates",
+    required: false,
+    type: String,
+    description:
+      "Filter users by course certificates (array of certificate IDs or names)",
+    allowEmptyValue: true,
+  })
+  @ApiQuery({
+    name: "eventCertificates",
+    required: false,
+    type: String,
+    description:
+      "Filter users by event certificates (array of certificate IDs or names)",
+    allowEmptyValue: true,
+  })
+  @ApiQuery({
     name: "page",
     required: false,
     type: Number,
@@ -115,8 +136,11 @@ export class UserController {
   })
   async findMany(
     @Query("gender") gender?: string,
+    @Query("fullName") fullName?: string,
     @Query("ranks") ranks?: string[],
-    @Query("sortByRank") sortByRank?: boolean,
+    @Query("experiences") experiences?: string,
+    @Query("courseCertificates") courseCertificates?: string,
+    @Query("eventCertificates") eventCertificates?: string,
     @Query("page") page: number = 1,
     @Query("limit") limit: number = 0,
   ): Promise<{
@@ -127,9 +151,12 @@ export class UserController {
     pageCount: number;
   }> {
     const { items, total, pageCount } = await this.userService.findAll({
+      fullName,
       gender,
       ranks,
-      sortByRank,
+      experiences,
+      courseCertificates,
+      eventCertificates,
       page,
       limit,
     });
@@ -473,5 +500,61 @@ export class UserController {
     @Param("roleId") roleId: string,
   ): Promise<{ message: string }> {
     return this.userService.unassignRole(userId, roleId);
+  }
+
+  @ApiOperation({
+    summary: "Get all distinct experiences from users",
+    description: "Returns all unique experiences found in user records.",
+    tags: ["User Management"],
+  })
+  @ApiOkResponse({
+    schema: {
+      example: ["experience-1", "experience-2", "researcher", "mentor"],
+    },
+  })
+  @Get("distinct/experiences")
+  async getAllDistinctExperiences(): Promise<string[]> {
+    return this.userService.getAllDistinctExperiences();
+  }
+
+  @ApiOperation({
+    summary: "Get all distinct event certificates from users",
+    description: "Returns all unique event certificates found in user records.",
+    tags: ["User Management"],
+  })
+  @ApiOkResponse({
+    schema: {
+      example: [
+        "Hội thảo Khoa học",
+        "Seminar Vật lý ứng dụng",
+        "Hội nghị Nghiên cứu trẻ",
+        "Workshop STEM",
+      ],
+    },
+  })
+  @Get("distinct/event-certificates")
+  async getAllDistinctEventCertificates(): Promise<string[]> {
+    return this.userService.getAllDistinctEventCertificates();
+  }
+
+  @ApiOperation({
+    summary: "Get all distinct course certificates from users",
+    description:
+      "Returns all unique course certificates found in user records.",
+    tags: ["User Management"],
+  })
+  @ApiOkResponse({
+    schema: {
+      example: [
+        "Chuyên đề Vật lý hiện đại",
+        "Thực hành Quang học",
+        "Hội thảo Vật lý lượng tử",
+        "Workshop Điện từ học",
+      ],
+    },
+  })
+  @Get("distinct/course-certificates")
+  async getAllDistinctCourseCertificates(): Promise<string[]> {
+    return this.userService.getAllDistinctCourseCertificates();
   }
 }
