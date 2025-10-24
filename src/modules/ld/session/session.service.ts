@@ -91,27 +91,15 @@ export class SessionService {
   }
 
   async getSessionsByUser(userId: string, from: Date, to: Date) {
-    const { enrollment: enrollments } =
-      await this.enrollmentService.findByUserAndCourse(userId);
-    console.log("🚀 ~ SessionService ~ getSessionsByUser ~ enrollments:", enrollments)
-    if (!enrollments || enrollments.length) return [];
-    const joinedCoursesOfUser = enrollments
-      .filter((e) => e.status === EnrollmentStatusEnum.APPROVED)
-      .map((e) => e.course);
-    // console.log("🚀 ~ SessionService ~ getSessionsByUser ~ joinedCoursesOfUser:", joinedCoursesOfUser)
-
-    // Get sessions of the user's joined courses that start between 'from' and 'to'
-    if (!joinedCoursesOfUser.length) return [];
-
-    const sessions = await this.sessionRepository.find({
-      where: {
-        course: { id: In(joinedCoursesOfUser.map((c) => c.id)) },
-        startTime: Between(from, to),
-      },
-      order: { startTime: "ASC" },
-      relations: ["course", "games", "attendances"],
-    });
-
+    const sessions = await this.sessionRepository
+      .createQueryBuilder("s")
+      .innerJoin("enrollment", "e", 'e."courseId" = s."courseId"')
+      .where('e."userId" = :userId', { userId })
+      .andWhere("e.status = :status", { status: "approved" })
+      .andWhere('s."startTime" > :start', { start: from })
+      .andWhere('s."startTime" < :end', { end: to })
+      .select("s")
+      .getMany();
     return sessions;
   }
 }
